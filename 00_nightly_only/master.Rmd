@@ -3,13 +3,9 @@ title: "Tidycells Package"
 author: "Indranil Gayen"
 date: "`r Sys.Date()`"
 output:
-  rmarkdown::html_vignette:
+  rmarkdown::html_notebook:
     fig_width: 4.5
     fig_height: 3
-vignette: >
-  %\VignetteIndexEntry{Tidycells Package}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -25,6 +21,20 @@ library(tidycells)
 
 # **tidycells**
 #### _Read Natural Tabular Data from Diverse Sources and Transform them into a Format Compatible to 'Tidyverse'_
+
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/tidycells?color=red)](https://cran.r-project.org/package=tidycells)
+[![Travis build status](https://travis-ci.org/r-rudra/tidycells.svg?branch=master)](https://travis-ci.org/r-rudra/tidycells)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/r-rudra/tidycells?branch=master&svg=true)](https://ci.appveyor.com/project/bedantaguru/tidycells)
+[![Codecov test coverage](https://codecov.io/gh/r-rudra/tidycells/branch/master/graph/badge.svg)](https://codecov.io/gh/r-rudra/tidycells?branch=master)
+[![Coveralls test coverage](https://coveralls.io/repos/github/r-rudra/tidycells/badge.svg)](https://coveralls.io/r/r-rudra/tidycells?branch=master)
+[![Lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://choosealicense.com/licenses/mit/)
+<!-- badges: end -->
+
+## Author
+
+Indranil Gayen
 
 ## TL;DR 
 Given a `file_name` which is a path of a file that contains table(s). Run this `read_cells()` in the R-console to see whether support is present for the file type. If support is present, just run
@@ -77,7 +87,7 @@ read_cells()
 ```
 
 ```{r, out.width = "550px", echo=FALSE}
-knitr::include_graphics("ext/read_cells_out.png")
+knitr::include_graphics("vignettes/ext/read_cells_out.png")
 ```
 
 Well, this is like "I'm feeling lucky" kind of thing. If the final result is not what you are looking for, you may have to do some bit of extra work.
@@ -110,7 +120,7 @@ You can even see how the data looks by issuing plot command.
 plot(cd, adaptive_txt_size = FALSE, txt_size = 2.5)
 ```
 ```{r, out.width = "356px", echo=FALSE}
-knitr::include_graphics("ext/pr/p1.png")
+knitr::include_graphics("vignettes/ext/pr/p1.png")
 ```
 
 
@@ -138,7 +148,7 @@ Let's plot it
 plot(va_cells, adaptive_txt_size = FALSE, txt_size = 3)
 ```
 ```{r, out.width = "256px", echo=FALSE}
-knitr::include_graphics("ext/pr/p2.png")
+knitr::include_graphics("vignettes/ext/pr/p2.png")
 ```
 
 
@@ -149,7 +159,7 @@ cd <- numeric_values_classifier(cd)
 plot(cd, adaptive_txt_size = FALSE, txt_size = 2.5)
 ```
 ```{r, out.width = "356px", echo=FALSE}
-knitr::include_graphics("ext/pr/p3.png")
+knitr::include_graphics("vignettes/ext/pr/p3.png")
 ```
 ```{r, echo=FALSE}
 cd <- numeric_values_classifier(cd)
@@ -166,7 +176,7 @@ This takes a while (the time taken is largely dependent on the complexity of the
 plot(ca)
 ```
 ```{r, out.width = "356px", echo=FALSE}
-knitr::include_graphics("ext/pr/p4.png")
+knitr::include_graphics("vignettes/ext/pr/p4.png")
 ```
 
 Having a cell analysis at hand, the next process to perform is to compose this cell analysis to form a composed columnar format data.frame. This is easily done as
@@ -181,7 +191,7 @@ cell_composition_traceback(ca, trace_row = 1)
 cell_composition_traceback(ca, trace_row = 10)
 ```
 ```{r, out.width = "356px", echo=FALSE}
-knitr::include_graphics("ext/pr/p5.png")
+knitr::include_graphics("vignettes/ext/pr/p5.png")
 ```
 
 There is an optional interactive version of it, which is explained in the subsequent section _Interactive Modules_.
@@ -208,39 +218,11 @@ rc_part %>% read_cells(from_level = 3)
 When coming to support for multiple formats (assuming you have all the required packages as specified by `read_cells`) you can run following set of command to test the multi-format support in `read_cells`.
 ```{r}
 dm <- tibble::tibble(fn = list.files(fold, full.names = T))
-dm$fn %>% basename()
-```
-
-```{r, echo=FALSE, include=FALSE}
-# filter based on file-type
-dm <- dm %>%
-    dplyr::mutate(original = dm$fn %>%
-      purrr::map_chr(~ basename(.x) %>%
-        stringr::str_split("\\.") %>%
-        purrr::map_chr(1)))
-if(!(rlang::is_installed("readxl") | rlang::is_installed("xlsx"))){
-  dm <- dm %>% dplyr::filter(original!="xls")
-}
-if(!(rlang::is_installed("tidyxl"))){
-  dm <- dm %>% dplyr::filter(original!="xlsx")
-}
-if(!(rlang::is_installed("docxtractr"))){
-  dm <- dm %>% dplyr::filter(original!="docx" & original!="doc")
-}
-if(!(rlang::is_installed("tabulizer"))){
-  dm <- dm %>% dplyr::filter(original!="pdf")
-}
-if(!(rlang::is_installed("XML"))){
-  dm <- dm %>% dplyr::filter(original!="html")
-}
-```
-
-```{r}
 dcomps <- dm$fn %>% purrr::map(read_cells)
 dcomps_sel <- dcomps %>%
     purrr::map(~ .x %>%
       dplyr::select(value, major_1, major_2))
-# all of them are same [intentionaly made. but the file types are totally different]
+# all of them are same [intentionaly made. but the file types are totally diffwrent]
 dcomps_sel %>% purrr::map_lgl(~identical(.x, dcomps_sel[[1]]))
 # check one sample
 dcomps_sel[[1]]
@@ -260,22 +242,56 @@ Here are screenshots of each interactive widgets.
 2. `visual_crop()` for data crop and deletion of sections
 
 ```{r, out.width = "516px", echo=FALSE}
-knitr::include_graphics("ext/v12.png")
+knitr::include_graphics("vignettes/ext/v12.png")
 ```
 
 3. `visual_va_classify()` for interactive VA classification
 4. `visual_data_block_inspection()` this shows how the heuristic has performed the analysis after `analyze_cells`
 
 ```{r, out.width = "516px", echo=FALSE}
-knitr::include_graphics("ext/v34.png")
+knitr::include_graphics("vignettes/ext/v34.png")
 ```
 
 5. `visual_orientation_modification()` for modification to heuristic based results
 6. `visual_traceback()` this is for observing how the original data is composed to form the final output. (`compose_cells` is called internally)
 
 ```{r, out.width = "516px", echo=FALSE}
-knitr::include_graphics("ext/v56.png")
+knitr::include_graphics("vignettes/ext/v56.png")
 ```
 
 For each of these modules, there is a dynamic plot option available from [plotly](https://github.com/ropensci/plotly). If you have that package the corresponding tab will be activated. 
 Since all of these modules are entirely optional the dependency is kept at **tidycells** 'suggests' level only. 
+
+## Current State of Development and Way Forward
+- [x] Test it in [r-hub](https://builder.r-hub.io/)
+- [ ] Write more tests (increase coverage)
+- [ ] Write more vignettes on other topics
+- [ ] Releasing this package to CRAN
+- [ ] Making a pkgdown site
+- [ ] Making cell analysis little faster
+- [ ] Test for optional shiny modules (series of visual functions)
+
+
+
+## Reference and Related Projects
+* [tidyxl](https://github.com/nacnudus/tidyxl) :  **Read Untidy Excel Files:**
+    Imports non-tabular from Excel files into R. Exposes cell content, position and formatting in a tidy structure for further manipulation. Tokenizes Excel formulas. Supports '.xlsx' and '.xlsm' via the embedded 'RapidXML' C++ library <http://rapidxml.sourceforge.net>. Does not support '.xlsb' or '.xls'.
+* [unpivotr](https://github.com/nacnudus/unpivotr): **Unpivot Complex and Irregular Data Layouts**
+    Tools for converting data from complex or irregular layouts to a columnar structure. For example, tables with multilevel column or row headers, or spreadsheets. Header and data cells are selected by their contents and position, as well as formatting and comments where available, and are associated with one other by their proximity in given directions. Functions for data frames and HTML tables are provided.
+    Major parts of the package right now fully depend on **unpivotr**. The **tidycells** package would have never existed without this wonderful package from [Duncan Garmonsway](https://github.com/nacnudus).
+* The [rsheets](https://github.com/rsheets) project: 
+    It hosts several R packages (few of them are in CRAN already) which are in the early stages of importing spreadsheets from Excel and Google Sheets into R.  Specifically, have a look at these projects which seems closely related to these projects : [jailbreaker](https://github.com/rsheets/jailbreakr), [rexcel](https://github.com/rsheets/rexcel) (README of this project has a wonderful reference for excel integration with R).
+
+
+## Acknowledgements
+This package incomplete without following packages (apart from the **unpivotr** which is the core package on which **tidycells** dependes largely, as mentioned above ). Each of these packages are in suggests fields of `tidycells`.
+(The read_cells basically, performs unification on several functions from various packages to give you support for different file types. These are listed below.)
+
+* [**readr**](https://cran.r-project.org/package=readr): for csv (in melted format)
+* [**readxl**](https://cran.r-project.org/package=readxl): for reading xls (if xlsx is present by default xlsx will be used for xls)
+* [**xlsx**](https://cran.r-project.org/package=xlsx): for reading xls (also it has capabilities to read xlsx)
+* [**tidyxl**](https://cran.r-project.org/package=tidyxl): really fast library for reading xlsx
+* [**docxtractr**](https://cran.r-project.org/package=docxtractr) : for docx and doc (it has a system level dependency now)
+* [**tabulizer**](https://cran.r-project.org/package=tabulizer) : for pdf
+* [**XML**](https://cran.r-project.org/package=XML) : for html/xml type files
+

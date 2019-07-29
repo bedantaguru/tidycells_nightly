@@ -1,0 +1,93 @@
+{
+  "input": {
+    "cancel": 0,
+    "done": 0,
+    "now_tab_main": "Data Block",
+    "ui_data_block-block_boundary": true,
+    "ui_data_block-dat_att_boundary": false,
+    "ui_data_block-direction_text": false,
+    "ui_data_block-direction_text_on_all": false,
+    "ui_data_block-gids": "All",
+    "ui_data_block-gids-selectized": "",
+    "ui_data_block-plot_issues": false,
+    "ui_data_block-zoom_selected_gids": false,
+    "ui_plot_tune-adaptive_txt_size": false,
+    "ui_plot_tune-fill": "type",
+    "ui_plot_tune-no_txt": false,
+    "ui_plot_tune-txt_alpha": 0.1,
+    "ui_plot_tune-txt_size": 6
+  },
+  "output": {
+    "ui_data_block-plot_data_block": {
+      "src": "[image data sha1: 39b9a85accaab9130e43cdf0256057e163d138c0]",
+      "width": 962,
+      "height": 498,
+      "coordmap": {
+        "panels": [
+          {
+            "domain": {
+              "left": -0.04,
+              "right": 1.04,
+              "bottom": -0.04,
+              "top": 1.04
+            },
+            "range": {
+              "left": 0,
+              "right": 962,
+              "bottom": 497,
+              "top": -1
+            },
+            "log": {
+              "x": null,
+              "y": null
+            },
+            "mapping": {
+
+            }
+          }
+        ],
+        "dims": {
+          "width": 962,
+          "height": 498
+        }
+      }
+    },
+    "ui_plot_tune-plot_tune": {
+      "src": "[image data sha1: f20420c609d8635aa9113f8df15708cea1e984b0]",
+      "width": 962,
+      "height": 372,
+      "coordmap": {
+        "panels": [
+          {
+            "domain": {
+              "left": -0.04,
+              "right": 1.04,
+              "bottom": -0.04,
+              "top": 1.04
+            },
+            "range": {
+              "left": 0,
+              "right": 962,
+              "bottom": 371,
+              "top": -1
+            },
+            "log": {
+              "x": null,
+              "y": null
+            },
+            "mapping": {
+
+            }
+          }
+        ],
+        "dims": {
+          "width": 962,
+          "height": 372
+        }
+      }
+    }
+  },
+  "export": {
+
+  }
+}

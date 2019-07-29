@@ -1,0 +1,88 @@
+
+# attach required functions
+source("testlib/shiny_test.R")
+
+test_that("shiny widgets works", {
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("miniUI")
+  skip_if_not_installed("shinytest")
+
+  skip_on_cran()
+
+  # it is failing in covr:3.2.1
+  # skip_on_covr()
+
+  inst_deps()
+
+  nowats <- getOption("AutoUnloadShiny")
+  options(AutoUnloadShiny = FALSE)
+
+  cd <- iris %>%
+    head() %>%
+    as_cell_df(take_col_names = TRUE) %>%
+    basic_classifier()
+  ca <- analyze_cells(cd)
+
+  # need a interactive session always
+  if (!interactive()){
+    expect_error(shiny_check())
+  }
+
+  # load shiny and miniUI
+  shiny_check(force_load = TRUE)
+
+  app_crop <- temp_app_create(
+    shiny_app_crop(cd, test_this = TRUE),
+    name = "crop")
+
+  app_va_classify <- temp_app_create(
+    shiny_app_va_classify(cd, test_this = TRUE),
+    name = "va_classify")
+
+  app_data_block <- temp_app_create(
+    shiny_app_data_block(ca, test_this = TRUE),
+    name = "data_block")
+
+  app_omod <- temp_app_create(
+    shiny_app_orientation_modification(ca, test_this = TRUE),
+    name = "omod")
+
+  # optional module based on DT
+  if(rlang::is_installed("DT")){
+    app_traceback <- temp_app_create(
+      shiny_app_traceback(ca, test_this = TRUE),
+      name = "traceback")
+  }
+
+
+  # if testing for images enable this
+  # also set when plotly present
+  # like test_image <- TRUE
+  # else set test_image <- FALSE
+  test_image <- FALSE
+
+  if(test_image){
+    image_test(enable_now = TRUE)
+    expect_true(image_test())
+  }else{
+    expect_false(image_test())
+  }
+
+  test_temp_app(app_crop)
+  test_temp_app(app_va_classify)
+  test_temp_app(app_data_block)
+  test_temp_app(app_omod)
+  # optional module based on DT
+  if(rlang::is_installed("DT")){
+    # don't check image for DT
+    # as DT actions are not recorded properly
+    test_temp_app(app_traceback, test_img = FALSE)
+  }else{
+    expect_error(visual_traceback(ca),"DT")
+  }
+
+  # reset option
+  options(AutoUnloadShiny = nowats)
+
+})
+
