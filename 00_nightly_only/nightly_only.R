@@ -1,36 +1,40 @@
 
-d <- "inst/extdata/marks.xlsx" %>% 
+covr::package_coverage(line_exclusions = 
+                         c("R/shiny_etc.R","R/shiny_main.R","R/shiny_parts_server.R","R/shiny_parts_server_components.R","R/shiny_parts_ui.R","R/visual_functions.R"))
+
+
+# covr::coveralls(line_exclusions = c("R/shiny_etc.R","R/shiny_main.R","R/shiny_parts_server.R","R/shiny_parts_server_components.R","R/shiny_parts_ui.R","R/visual_functions.R"))
+
+# if you have tidyxl installed
+d <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
   read_cells(at_level = "make_cells") %>% 
   .[[1]]
 
-# saveRDS(d, "inst/extdata/marks_cells.rds", version = 2)
-#or
-d <- readRDS("inst/extdata/marks_cells.rds")
+# or you may do 
+d <- system.file("extdata", "marks_cells.rds", package = "tidycells", mustWork = TRUE) %>% 
+  readRDS()
 d <- numeric_values_classifier(d)
 da <- analyze_cells(d)
-dc <- compose_cells(da)
+dc <- compose_cells(da, print_attribute_overview = TRUE)
 
-require(stringr)
-require(dplyr)
-
-# bit tricky and tedious
-dc %>% 
-  mutate(name = case_when(
+# bit tricky and tedious unless you do print_attribute_overview = TRUE in above line
+dcfine <- dc %>% 
+  dplyr::mutate(name = dplyr::case_when(
     data_block == 1 ~ major_row_left_2_1,
     data_block == 2 ~ major_col_bottom_1_1,
     data_block == 3 ~ major_row_left_1_1
-  )) %>% 
-  mutate(sex = case_when(
+  ),
+  sex = dplyr::case_when(
     data_block == 1 ~ major_row_left_1_1,
     data_block == 2 ~ major_col_bottom_2_1,
     data_block == 3 ~ minor_row_right_1_1
-  )) %>%
-  mutate(school = case_when(
+  ),
+  school = dplyr::case_when(
     data_block == 1 ~ minor_col_top_1_1,
     data_block == 2 ~ minor_corner_topLeft_1_1,
     data_block == 3 ~ minor_col_top_1_1
   )) %>% 
-  select(school,sex, name, value)
+  dplyr::select(school,sex, name, value)
 
 
 
