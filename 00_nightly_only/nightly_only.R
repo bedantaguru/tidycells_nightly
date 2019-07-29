@@ -1,4 +1,48 @@
 
+d <- "inst/extdata/marks.xlsx" %>% 
+  read_cells(at_level = "make_cells") %>% 
+  .[[1]]
+
+# saveRDS(d, "inst/extdata/marks_cells.rds", version = 2)
+#or
+d <- readRDS("inst/extdata/marks_cells.rds")
+d <- numeric_values_classifier(d)
+da <- analyze_cells(d)
+dc <- compose_cells(da)
+
+require(stringr)
+require(dplyr)
+
+# bit tricky and tedious
+dc %>% 
+  mutate(name = case_when(
+    data_block == 1 ~ major_row_left_2_1,
+    data_block == 2 ~ major_col_bottom_1_1,
+    data_block == 3 ~ major_row_left_1_1
+  )) %>% 
+  mutate(sex = case_when(
+    data_block == 1 ~ major_row_left_1_1,
+    data_block == 2 ~ major_col_bottom_2_1,
+    data_block == 3 ~ minor_row_right_1_1
+  )) %>%
+  mutate(school = case_when(
+    data_block == 1 ~ minor_col_top_1_1,
+    data_block == 2 ~ minor_corner_topLeft_1_1,
+    data_block == 3 ~ minor_col_top_1_1
+  )) %>% 
+  select(school,sex, name, value)
+
+
+
+
+
+
+#read_cells(list(d), from_level = 2)
+
+# marks <- d
+# 
+# usethis::use_data(marks)
+
 # failing on OSX
 # https://stackoverflow.com/questions/38231896/r-unable-to-install-rcpp-package-for-r-3-3-1-on-osx-el-capitan
 
@@ -191,7 +235,7 @@ check_man <- function(){
   unlink(man_files)
   n_man_file <- list.files("man_backup", full.names = T)
   tp <- tempdir()
-
+  
   for_a_man <- function(mn){
     cat("Checking: ", basename(mn))
     file.copy(mn, "man")
@@ -203,9 +247,9 @@ check_man <- function(){
     cat(" ... Done!", ifelse(chk, "ok","issues"),"\n")
     d0
   }
-
+  
   all_checks <- n_man_file %>% map_df(for_a_man)
-
+  
   file.copy(n_man_file, "man")
   unlink(tp, recursive = T)
   unlink("man_backup", recursive = T)
@@ -279,20 +323,20 @@ rf %>% map(readLines) %>% map(~.x[str_detect(.x,"call\\.")]) %>% unlist()
 rf %>% map(readLines) %>% imap_dfr(~tibble(fn = .y, nc = max(max(nchar(.x))), ln = which.max(nchar(.x)))) %>% arrange(desc(nc))
 
 tf_replacement <- function(code_path, write_back = T){
-
+  
   code_str <- readLines(code_path)
-
+  
   F_str <- "^F$|[- \\=,]F$|^F[,) ]|[- \\=,]F[,) ]"
   T_str <- str_replace_all(F_str, "F","T")
-
+  
   dc <- tibble(code = code_str)
-
+  
   dc <- dc %>%
     mutate(fp = str_detect(code, F_str),
            tp = str_detect(code, T_str),
            fps = code %>% str_extract_all(F_str) %>% map(~.x %>% unique()),
            tps = code %>% str_extract_all(T_str) %>% map(~.x %>% unique()))
-
+  
   dc <- dc %>%
     rowwise() %>%
     group_split() %>%
@@ -304,7 +348,7 @@ tf_replacement <- function(code_path, write_back = T){
         }
         .x$code <-.code
       }
-
+      
       if(.x$tp){
         .code <- .x$code
         for(.tp in .x$tps[[1]]){
@@ -312,17 +356,17 @@ tf_replacement <- function(code_path, write_back = T){
         }
         .x$code <-.code
       }
-
+      
       .x
     }) %>%
     ungroup()
-
+  
   if(write_back){
     writeLines(dc$code, code_path)
   }
-
+  
   dc %>% summarise(sum(fp|tp)) %>% pull(1)
-
+  
 }
 
 
