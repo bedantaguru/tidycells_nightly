@@ -16,7 +16,6 @@
     "ui_plot_tune-no_txt": false,
     "ui_plot_tune-txt_alpha": 0.9,
     "ui_plot_tune-txt_size": 4,
-    "ui_traceback-click_traceback": null,
     "ui_traceback-dt_trace_cell_clicked": {
 
     },
@@ -241,7 +240,7 @@
       ]
     },
     "ui_traceback-plot_traceback": {
-      "src": "[image data sha1: 3695452187820c8f867ca7a4155831192fbffa5c]",
+      "src": "[image data sha1: b3c5a125a1e3b6fc231c83e40f8a95d124aae753]",
       "width": 962,
       "height": 618,
       "coordmap": {

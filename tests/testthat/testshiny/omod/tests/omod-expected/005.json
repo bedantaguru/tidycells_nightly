@@ -26,7 +26,7 @@
   },
   "output": {
     "ui_data_block-plot_data_block": {
-      "src": "[image data sha1: 2ac374c460553b8234534f80a527ec679c7d679f]",
+      "src": "[image data sha1: c7c8ee2d6e08715f771dcb167c21c28deba1545f]",
       "width": 962,
       "height": 498,
       "coordmap": {
@@ -60,7 +60,7 @@
       }
     },
     "ui_orientation_modification-plot_omod": {
-      "src": "[image data sha1: bfe061327bef3e38ec894f7d44d3644c0fe55d7e]",
+      "src": "[image data sha1: c7e0272fcad4962d018c2460ebdb164c5f9799c8]",
       "width": 962,
       "height": 508,
       "coordmap": {
@@ -103,7 +103,7 @@
       }
     },
     "ui_plot_tune-plot_tune": {
-      "src": "[image data sha1: 4257005c5fcebd90c55a8b10527febb191532dae]",
+      "src": "[image data sha1: 20f919397cc9b8eeb770d9ded3cfc85108020fdf]",
       "width": 962,
       "height": 372,
       "coordmap": {

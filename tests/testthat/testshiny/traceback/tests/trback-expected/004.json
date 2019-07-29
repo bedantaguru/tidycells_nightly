@@ -79,7 +79,7 @@
   },
   "output": {
     "ui_data_block-plot_data_block": {
-      "src": "[image data sha1: 233ba2113dc55f5320b7833afd389110fa03ea06]",
+      "src": "[image data sha1: d82ab1215e8dfaaab377127bebe3e3bd72fd48f0]",
       "width": 962,
       "height": 498,
       "coordmap": {
@@ -309,7 +309,7 @@
       ]
     },
     "ui_traceback-plot_traceback": {
-      "src": "[image data sha1: bf9109f13673cf66dcf14d1fa9a9481f98a1812f]",
+      "src": "[image data sha1: 8568c48aad070a59b291adc42b231ce8afd4afb7]",
       "width": 962,
       "height": 618,
       "coordmap": {
