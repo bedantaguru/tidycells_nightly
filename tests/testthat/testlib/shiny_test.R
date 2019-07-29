@@ -1,11 +1,18 @@
 
 # this file is required by shiny module tests
 
+# # may need to run
+# # devtools::load_all()
+# # after record test you may do
+# # this function is kept for test development and not for test to run.
+# # after pulling all tests run these lines
+# unlink("tests/testthat/testshiny/testshiny.tar")
+# tar("tests/testthat/testshiny/testshiny.tar", "tests/testthat/testshiny")
+# d <- data.frame(fn = list.files("tests/testthat/testshiny/", full.names = TRUE), stringsAsFactors = FALSE)
+# d$fn0 <- basename(d$fn)
+# # delete rest files
+# unlink(d$fn[d$fn0!="testshiny.tar"], recursive = TRUE)
 
-# may need to run
-# devtools::load_all()
-# after record test you may do
-# this function is kept for test development and not for test to run.
 pull_shiny_test <-function(x){
   testf <- list.files(x$app_dir, pattern = "test", include.dirs = TRUE, full.names = TRUE)
   here_testf <- file.path("tests/testthat/testshiny", x$name)
@@ -32,16 +39,35 @@ temp_app_create <- function(es, name){
   list(app_dir = td_this, app = tf_for_app, es = tf_for_es, name = name)
 }
 
+
 # if set options(LOCAL_TEST_IN_SHINYTEST = TRUE)
 # it will be tested from project root instead of "tests/testthat/"
-copy_test_to_temp_app <- function(x){
+
+untar_tests <- function(){
+  td_this <- tempdir(check = TRUE)
+  td_for_test_store <- tempfile("testshiny_",tmpdir = td_this)
+  dir.create(td_for_test_store, showWarnings = FALSE)
+  
   if(identical(getOption("LOCAL_TEST_IN_SHINYTEST"), TRUE)){
     # for internal checks only
     message("Testing in local environment. Reading SHINYTEST from project root.")
-    here_testf <- file.path("tests/testthat/testshiny", x$name, "tests")
+    file.copy("tests/testthat/testshiny/testshiny.tar", to = td_for_test_store)
   }else{
-    here_testf <- file.path("testshiny", x$name, "tests")
+    file.copy("testshiny/testshiny.tar", to = td_for_test_store)
   }
+  utils::untar(file.path(td_for_test_store, "testshiny.tar"), exdir = td_for_test_store)
+  fl <- list.files(td_for_test_store, pattern = ".R$", recursive = TRUE, full.names = TRUE)
+  if(length(fl)==0) stop("no test files", call. = FALSE)
+  test_root <- dirname(dirname(dirname(fl[1])))
+  list(dir = td_for_test_store, test_root = test_root)
+}
+
+clean_untars <- function(x){
+  unlink(x$dir, recursive = TRUE)
+}
+
+copy_test_to_temp_app <- function(x, untar_adds){
+  here_testf <- file.path(untar_adds$test_root, x$name, "tests")
   if(file.exists(here_testf)){
     file.copy(here_testf, x$app_dir, overwrite = TRUE, recursive = TRUE)
   }
@@ -81,8 +107,8 @@ image_test <- function(enable_now){
   return(FALSE)
 }
 
-test_temp_app <- function(x, test_img){
-  copy_test_to_temp_app(x)
+test_temp_app <- function(x, test_img, untar_adds){
+  copy_test_to_temp_app(x, untar_adds)
 
   img_chk <- image_test()
   if(!missing(test_img)){
