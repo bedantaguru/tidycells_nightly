@@ -1,0 +1,26 @@
+#  issue with GitHub Pull Push
+
+>>> C:/Program Files/Git/bin/git.exe commit -F C:/Users/igayen/AppData/Local/Temp/RtmpQnTWmu/git-commit-message-3e4412555d0d.txt
+warning: LF will be replaced by CRLF in 00_nightly_only/shiny_test/exapp/tests/crop-expected/001.json.
+The file will have its original line endings in your working directory.
+warning: LF will be replaced by CRLF in 00_nightly_only/shiny_test/exapp/tests/crop-expected/002.json.
+The file will have its original line endings in your working directory.
+warning: LF will be replaced by CRLF in 00_nightly_only/shiny_test/exapp/tests/crop-expected/003.json.
+The file will have its original line endings in your working directory.
+[master 0eb42c0] for "rstudio/rstudio/issues/4054"
+13 files changed, 433 insertions(+)
+create mode 100644 00_nightly_only/shiny_test/exapp/app.R
+create mode 100644 00_nightly_only/shiny_test/exapp/data
+create mode 100644 00_nightly_only/shiny_test/exapp/fail_as_clicked_on_done.png
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/crop-expected/001.json
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/crop-expected/001.png
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/crop-expected/002.json
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/crop-expected/002.png
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/crop-expected/003.json
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/crop-expected/003.png
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/crop.R
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/fails_after_close-current/001.json
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/fails_after_close-current/001.png
+create mode 100644 00_nightly_only/shiny_test/exapp/tests/fails_after_close.R
+warning: LF will be replaced by CRLF in 00_nightly_only/shiny_test/exapp/tests/fails_after_close-current/001.json.
+The file will have its original line endings in your working directory.
