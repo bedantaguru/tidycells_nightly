@@ -59,12 +59,11 @@ See other builds in [Dev-Notes](https://github.com/r-rudra/tidycells/blob/master
 
 _Assuming following **Note** is considered ok_
 
-> \* checking CRAN incoming feasibility ... NOTE
-
-> Maintainer: ‘Indranil Gayen <nil.gayen@gmail.com>’
-
-> New submission`
-
+```
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: ‘Indranil Gayen <nil.gayen@gmail.com>’
+New submission`
+```
 
 
 ## Downstream dependencies
