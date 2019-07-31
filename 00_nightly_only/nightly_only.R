@@ -60,6 +60,13 @@ usethis:::use_readme_rmd()
 
 # r hub thing
 # follow https://r-hub.github.io/rhub/articles/rhub.html
+x <- platforms()
+require(purrr)
+# validate_email(email = "nil.gayen@gmail.com", token = "ed728b8460a7460081331fa6ca2e10b7")
+rh <- x$name %>% map(~check(platform = .x, check_args = "--as-cran", show_status = F))
+
+
+
 
 
 ####### start stable run ######
@@ -109,6 +116,8 @@ tic()
 covr::package_coverage(type = "all")
 toc()
 # 70.57 sec elapsed
+
+covr::report()
 
 # we use unit tests ok
 tic()
@@ -220,6 +229,7 @@ saveRDS(WSS,
 
 devtools::install(build_vignettes = TRUE)
 devtools::document()
+devtools::build_manual()
 styler::style_pkg()
 lintr::lint_package()
 devtools::spell_check()
@@ -285,7 +295,7 @@ library(strict)
 
 # https://cran.r-project.org/web/packages/submission_checklist.html
 
-r_files <- list.files("R/", full.names = T)
+r_files <- list.files(full.names = T, pattern = ".R$", recursive = T)
 
 require(tidyverse)
 
