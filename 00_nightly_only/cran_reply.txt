@@ -1,0 +1,43 @@
+
+my internal notes
+
+
+Please reduce the title to less than 65 chars.
+
+--> Read Tabular Data from Diverse Sources and Easily Make Them Tidy
+
+Please omit the "It" at the beginning of the description and just start 
+with "Provides".
+
+If there are references describing the methods in your package
+---> No public references as of now. methods used in the package is developed soley based on experiences and 
+knowledge of the author. 
+
+
+
+The methods in the package are purely based on experiences and knowledge of the author and not based on any published article. Hence there are no references to attach currently. 
+
+Also, note that the methods used in the package are novel in this field (as per the knowledge of the author). Any potential similarity with other related work is completely unintentional.
+
+
+
+---------------------------------------------------
+Thanks,
+
+Please reduce the title to less than 65 chars.
+
+Please omit the "It" at the beginning of the description and just start 
+with "Provides".
+
+If there are references describing the methods in your package, please 
+add these in the description field of your DESCRIPTION file in the form
+authors (year) <doi:...>
+authors (year) <arXiv:...>
+authors (year, ISBN:...)
+with no space after 'doi:', 'arXiv:' and angle brackets for auto-linking.
+
+Please fix and resubmit.
+
+Best,
+Martina Schmirl
+

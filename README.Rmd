@@ -19,7 +19,7 @@ library(tidycells)
 ```
 
 # **tidycells**
-#### _Read Natural Tabular Data from Diverse Sources and Transform them into a Format Compatible to 'Tidyverse'_
+#### _Read Tabular Data from Diverse Sources and Easily Make Them Tidy_
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/tidycells?color=red)](https://cran.r-project.org/package=tidycells)

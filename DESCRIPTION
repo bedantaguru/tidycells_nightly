@@ -1,6 +1,6 @@
 Package: tidycells
 Type: Package
-Title: Read Natural Tabular Data from Diverse Sources and Transform Them into a Format Compatible to 'Tidyverse'
+Title: Read Tabular Data from Diverse Sources and Easily Make Them Tidy
 Version: 0.1.9
 Authors@R: c(
     person("Indranil", "Gayen", 
@@ -8,7 +8,7 @@ Authors@R: c(
     role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-0197-1944"))
     )
-Description: It provides utilities to read, cells from complex 
+Description: Provides utilities to read, cells from complex 
     tabular data and heuristic detection based structural assignment of those 
     cells to a columnar or tidy format.
     Read functionality has the ability to read (in a unified manner) 

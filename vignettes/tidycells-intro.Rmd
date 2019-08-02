@@ -24,7 +24,7 @@ library(tidycells)
 ```
 
 # **tidycells**
-#### _Read Natural Tabular Data from Diverse Sources and Transform Them into a Format Compatible to 'Tidyverse'_
+#### _Read Tabular Data from Diverse Sources and Easily Make Them Tidy_
 
 ## TL;DR 
 Given a `file_name` which is a path of a file that contains table(s). Run this `read_cells()` in the R-console to see whether support is present for the file type. If support is present, just run

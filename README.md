@@ -1,6 +1,6 @@
 # **tidycells**
 
-#### *Read Natural Tabular Data from Diverse Sources and Transform them into a Format Compatible to ‘Tidyverse’*
+#### *Read Tabular Data from Diverse Sources and Easily Make Them Tidy*
 
 <!-- badges: start -->
 

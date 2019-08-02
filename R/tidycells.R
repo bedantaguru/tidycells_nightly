@@ -1,7 +1,7 @@
 
 #' `tidycells` package
 #'
-#' **Read Natural Tabular Data from Diverse Sources and Transform them into a Format Compatible to 'Tidyverse'**
+#' **Read Tabular Data from Diverse Sources and Easily Make Them Tidy**
 #'
 #' The package provides utilities to read, cells from complex tabular data and heuristic detection based structural assignment of those cells to a columnar or tidy format.
 #' Read functionality has the ability to read (in a unified manner) structured, partially structured or unstructured tabular data (usually spreadsheets for public data dissemination and aimed for common human understanding) from various types of documents. The tabular information is read as cells.
