@@ -1,4 +1,8 @@
 
+tools::toTitleCase(tolower("Read Tabular Data from Diverse Sources and Easily Make Them Tidy"))
+
+"Read Tabular Data from Diverse Sources and Easily Make Them Tidy"
+
 covr::package_coverage(line_exclusions = 
                          c("R/shiny_etc.R","R/shiny_main.R","R/shiny_parts_server.R","R/shiny_parts_server_components.R","R/shiny_parts_ui.R","R/visual_functions.R"))
 

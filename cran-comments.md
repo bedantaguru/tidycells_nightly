@@ -44,6 +44,8 @@
   * (R-release) R version 3.6.1 (2019-07-05)
 * Windows Server 2012 [x86_64-w64-mingw32 (64-bit)],
   * (R-devel, Rtools4.0, 32/64 bit) R version 3.6.0 Under development (Testing Rtools) (2019-02-27 r76167)
+* Fedora Linux, R-devel, GCC [x86_64-pc-linux-gnu (64-bit)]
+  * (R-devel, GCC) R Under development (unstable) (2019-07-26 r76894)
 * CentOS 6 with Redhat Developer Toolset [x86_64-redhat-linux-gnu (64-bit)]
   * (R from EPEL) R version 3.5.2 (2018-12-20)
 

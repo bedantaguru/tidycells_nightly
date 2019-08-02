@@ -29,7 +29,7 @@ The shiny tests are only carried out in selected testing environments because of
 * The input [`plot brush`](https://shiny.rstudio.com/articles/plot-interaction.html) is changing in fractional values under different OS. Most of the functionalities are recorded with brush input which slightly differs. Since the `JSON` to `JSON` comparison is strict now, these are resulting in test failures. 
 * Sometimes GitHub push and pull is changing JSON slightly [getting `LF will be replaced by CRLF` warning.] (Full message: _The file will have its original line endings in your working directory. warning: LF will be replaced by CRLF_). It is solved using tar files (which untar on the fly). This is the reason the all recorded tests (includes JSON) are compress to tar in [tidycells/tests/testthat/testshiny/](https://github.com/r-rudra/tidycells/tree/master/tests/testthat/testshiny). 
 
-Given these difficulties, the shinytest are tested in the following environments only.
+Given these difficulties, the shiny tests are tested in the following environments only.
 
 | Test Environment | OS                                      | R Version                                   | Screenshot Tested |
 |------------------|-----------------------------------------|---------------------------------------------|-------------------|
@@ -67,7 +67,6 @@ See other successful builds in [CRAN Comments](https://github.com/r-rudra/tidyce
 
 * Fedora Linux, 
   * R-devel, clang, gfortran
-  * R-devel, GCC
 
 **Result** : NOTE
 
@@ -104,7 +103,6 @@ See other successful builds in [CRAN Comments](https://github.com/r-rudra/tidyce
 
 **All R-hub build summary**
 
-
 | OS                                     | R Version                                                                                                | Result    |
 |----------------------------------------|----------------------------------------------------------------------------------------------------------|-----------|
 | macOS 10.11 El Capitan                 | (R-release) R version 3.6.0 (2019-04-26)                                                                 | SUCCESS   |
@@ -113,12 +111,12 @@ See other successful builds in [CRAN Comments](https://github.com/r-rudra/tidyce
 | Windows Server 2008 R2 SP3             | (R-patched) R version 3.6.0 Patched (2019-06-21 r76731)                                                  | SUCCESS   |
 | Windows Server 2008 R2 SP4             | (R-release) R version 3.6.1 (2019-07-05)                                                                 | SUCCESS   |
 | Windows Server 2012                    | (R-devel, Rtools4.0, 32/64 bit) R version 3.6.0 Under development   (Testing Rtools) (2019-02-27 r76167) | SUCCESS   |
+| Fedora Linux                           | R-devel, GCC                                                                                             | SUCCESS   |
 | CentOS 6 with Redhat Developer Toolset | (R from EPEL) R version 3.5.2 (2018-12-20)                                                               | SUCCESS   |
 | **WARNING**                            | **Reason : _induced system dependency_**                                                                 |           |
 | Oracle Solaris 10, x86, 32 bit         | R-patched                                                                                                | WARNING   |
 | **NOTE**                               | **Reason : _optional package dependency_**                                                               |           |
 | Fedora Linux                           | R-devel, clang, gfortran                                                                                 | NOTE      |
-| Fedora Linux                           | R-devel, GCC                                                                                             | NOTE      |
 | CentOS 6                               | stock R from EPEL                                                                                        | NOTE      |
 | **PREPERROR**                          | **Reason : _induced system dependency_**                                                                 |           |
 | Debian Linux                           | R-devel, clang, ISO-8859-15 locale                                                                       | PREPERROR |
