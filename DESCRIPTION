@@ -63,5 +63,6 @@ Suggests:
     xlsx,
     covr,
     cli,
-    shinytest
+    shinytest,
+    stringdist
 VignetteBuilder: knitr

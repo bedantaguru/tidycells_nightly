@@ -179,6 +179,8 @@ use_package("graphics")
 
 # sugests
 
+use_package("stringdist", type = "Suggests")
+
 use_package("rstudioapi", type = "Suggests")
 use_package("readr", type = "Suggests")
 use_package("tidyxl", type = "Suggests")

@@ -1,5 +1,5 @@
 
-read_cell_task_orders <- c("detect_and_read", "make_cells", "va_classify", "analyze", "compose")
+read_cell_task_orders <- c("detect_and_read", "make_cells", "va_classify", "analyze", "compose", "collate")
 
 
 
