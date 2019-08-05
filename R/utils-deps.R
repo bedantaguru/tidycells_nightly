@@ -99,6 +99,9 @@ NULL
 #' @importFrom purrr map_chr
 NULL
 
+#' @importFrom purrr imap_dfr
+NULL
+
 #' @importFrom purrr reduce
 NULL
 

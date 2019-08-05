@@ -67,7 +67,7 @@ usethis:::use_readme_rmd()
 x <- platforms()
 require(purrr)
 # validate_email(email = "nil.gayen@gmail.com", token = "ed728b8460a7460081331fa6ca2e10b7")
-rh <- x$name %>% map(~check(platform = .x, check_args = "--as-cran", show_status = F))
+rh <- x$name %>% map(~check(platform = .x, check_args = "--as-cran", show_status = FALSE))
 
 
 
@@ -175,6 +175,7 @@ use_package("cli", type = "Suggests")
 
 use_package("methods")
 use_package("utils")
+use_package("stats")
 use_package("graphics")
 
 # sugests
@@ -218,6 +219,7 @@ use_test(name = "read_cells")
 use_test(name = "read_cells_real")
 use_test(name = "print_cell_df")
 use_test(name = "print_cell_analysis")
+use_test(name = "collate_columns")
 
 # check https://github.com/r-lib/devtools/issues/1912
 # use saveRDS(version = 2)
@@ -242,6 +244,7 @@ devtools::spell_check()
 goodpractice::gp()
 
 
+
 # pdf manual
 
 # debug whic man causes it
@@ -249,11 +252,11 @@ goodpractice::gp()
 library(tidyverse)
 
 check_man <- function(){
-  man_files <- list.files("man", full.names = T)
-  dir.create("man_backup", showWarnings = F)
+  man_files <- list.files("man", full.names = TRUE)
+  dir.create("man_backup", showWarnings = FALSE)
   file.copy(man_files, "man_backup")
   unlink(man_files)
-  n_man_file <- list.files("man_backup", full.names = T)
+  n_man_file <- list.files("man_backup", full.names = TRUE)
   tp <- tempdir()
   
   for_a_man <- function(mn){
@@ -262,8 +265,8 @@ check_man <- function(){
     devtools::build_manual(path = tp)
     chk <- length(list.files(tp, ".pdf$")) > 0
     d0 <- tibble(man_file = basename(mn), test = chk)
-    unlink(list.files(tp, ".pdf$", full.names = T))
-    unlink(list.files("man", full.names = T))
+    unlink(list.files(tp, ".pdf$", full.names = TRUE))
+    unlink(list.files("man", full.names = TRUE))
     cat(" ... Done!", ifelse(chk, "ok","issues"),"\n")
     d0
   }
@@ -271,8 +274,8 @@ check_man <- function(){
   all_checks <- n_man_file %>% map_df(for_a_man)
   
   file.copy(n_man_file, "man")
-  unlink(tp, recursive = T)
-  unlink("man_backup", recursive = T)
+  unlink(tp, recursive = TRUE)
+  unlink("man_backup", recursive = TRUE)
   all_checks
 }
 
@@ -301,7 +304,7 @@ library(strict)
 
 # https://cran.r-project.org/web/packages/submission_checklist.html
 
-r_files <- list.files(full.names = T, pattern = ".R$", recursive = T)
+r_files <- list.files(full.names = TRUE, pattern = ".R$", recursive = TRUE)
 
 require(tidyverse)
 
@@ -309,8 +312,8 @@ r_files %>% map(requirements::req_file) %>% unlist() %>% unique()
 
 rf <- r_files %>% as.list()
 names(rf) <- r_files
-# fix T --> TRUE
-# fix F --> FALSE
+# fix TRUE --> TRUE
+# fix FALSE --> FALSE
 #rf %>% map(readLines) %>% map(~.x[str_detect(.x,"[- \\=]F")]) %>% unlist()
 #rf %>% map(readLines) %>% map(~.x[str_detect(.x,"not\\(")]) %>% unlist()
 
@@ -342,7 +345,7 @@ rf %>% map(readLines) %>% map(~.x[str_detect(.x,"call\\.")]) %>% unlist()
 
 rf %>% map(readLines) %>% imap_dfr(~tibble(fn = .y, nc = max(max(nchar(.x))), ln = which.max(nchar(.x)))) %>% arrange(desc(nc))
 
-tf_replacement <- function(code_path, write_back = T){
+tf_replacement <- function(code_path, write_back = TRUE){
   
   code_str <- readLines(code_path)
   
@@ -390,7 +393,7 @@ tf_replacement <- function(code_path, write_back = T){
 }
 
 
-rf %>% map_int(~tf_replacement(.x, write_back = T)) %>% unique()
+rf %>% map_int(~tf_replacement(.x, write_back = TRUE)) %>% unique()
 
 
 

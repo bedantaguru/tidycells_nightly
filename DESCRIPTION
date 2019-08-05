@@ -44,7 +44,8 @@ Imports:
     unpivotr (>= 0.5.1),
     methods,
     utils,
-    graphics
+    graphics,
+    stats
 Suggests: 
     testthat (>= 2.1.0),
     readr,

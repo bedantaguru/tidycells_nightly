@@ -20,7 +20,7 @@ if (getRversion() >= "2.15.1") {
   gvars <- c(
 
     ########
-    # for dplyr oprations non-standard evaluation (nse)
+    # for dplyr oprations : non-standard evaluation (nse)
 
     ".", "ad", "ag",
     "aid", "attr_gid", "attr_gid_split", "attr_group",
@@ -50,7 +50,9 @@ if (getRversion() >= "2.15.1") {
     "RN", "row_a", "row_d", "row_orig",
     "sheet", "support_possible", "this_attr_max_rel", "txt",
     "txt_orig", "txt_size_", "type", "val_type",
-    "value", "value_chk", "id",
+    "value", "value_chk", "id", "block",
+    "cn_id_raw", "cr", "n1", "n2",
+    "new_name", "old_name", "tinf",
 
     ########
     # for shiny

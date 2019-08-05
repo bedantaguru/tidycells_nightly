@@ -49,7 +49,24 @@ read_cells <- function(x,
 }
 
 
-#' @rdname read_cells
+#' Read Cells from file
+#' 
+#' @param x either a valid file path or a [`read_cell_part`][read_cell_part-class]
+#' @param at_level till which level to process.
+#' Should be one of `detect_and_read`, `make_cells`, `va_classify`, `analyze`, `compose`. Or simply a number.
+#' @param omit (Optional) the file-types to omit. A character vector.
+#' @param simplify whether to simplify the output. (Default `TRUE`). If set to `FALSE` a [`read_cell_part`][read_cell_part-class]
+#' will be returned.
+#' @param compose_main_cols_only whether to compose main columns only. (Default `TRUE`).
+#' @param from_level (Optional) override start level. (`read_cells` will process after `from_level`)
+#' @param silent if `TRUE` no message will be displayed.(Default `TRUE`)
+#' @param ... further arguments
+#' 
+#' @seealso 
+#' [`read_cells`][read_cells()]
+#' 
+#' @rdname read_cells_internal
+#' @keywords internal
 #' @export
 read_cells.read_cell_part <- function(x,
                                       at_level = c("compose", "detect_and_read", "make_cells", "va_classify", "analyze"),
@@ -231,7 +248,7 @@ read_cells.read_cell_part <- function(x,
   }
 }
 
-#' @rdname read_cells
+#' @rdname read_cells_internal
 #' @export
 read_cells.character <- function(x,
                                  at_level = c("compose", "detect_and_read", "make_cells", "va_classify", "analyze"),
@@ -251,7 +268,7 @@ read_cells.character <- function(x,
     compose_main_cols_only = compose_main_cols_only
   )
 }
-#' @rdname read_cells
+#' @rdname read_cells_internal
 #' @export
 read_cells.default <- function(x,
                                at_level = c("compose", "detect_and_read", "make_cells", "va_classify", "analyze"),
@@ -278,7 +295,7 @@ read_cells.default <- function(x,
   )
 }
 
-#' @rdname read_cells
+#' @rdname read_cells_internal
 #' @export
 read_cells.NULL <- function(x, ...) {
   cat(cli_b("Please provide a valid file path to process.\n"))

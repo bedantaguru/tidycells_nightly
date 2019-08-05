@@ -1,15 +1,15 @@
 
-norm_this <- function(x){
+norm_this <- function(x) {
   m <- min(x, na.rm = TRUE)
   M <- max(x, na.rm = TRUE)
-  if(m==M){
-    if(m>0.5){
+  if (m == M) {
+    if (m > 0.5) {
       x <- rep(1, length(x))
-    }else{
+    } else {
       x <- rep(0, length(x))
     }
-  }else{
-    x <- (x-m)/(M-m)
+  } else {
+    x <- (x - m) / (M - m)
   }
   x
 }

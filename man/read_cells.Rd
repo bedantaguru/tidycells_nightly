@@ -2,31 +2,11 @@
 % Please edit documentation in R/read_cells.R
 \name{read_cells}
 \alias{read_cells}
-\alias{read_cells.read_cell_part}
-\alias{read_cells.character}
-\alias{read_cells.default}
-\alias{read_cells.NULL}
 \title{Read Cells from file}
 \usage{
 read_cells(x, at_level = c("compose", "detect_and_read", "make_cells",
   "va_classify", "analyze"), omit = NULL, simplify = TRUE,
   compose_main_cols_only = TRUE, from_level, silent = TRUE, ...)
-
-\method{read_cells}{read_cell_part}(x, at_level = c("compose",
-  "detect_and_read", "make_cells", "va_classify", "analyze"),
-  omit = NULL, simplify = TRUE, compose_main_cols_only = TRUE,
-  from_level, silent = TRUE, ...)
-
-\method{read_cells}{character}(x, at_level = c("compose",
-  "detect_and_read", "make_cells", "va_classify", "analyze"),
-  omit = NULL, simplify = TRUE, compose_main_cols_only = TRUE, ...)
-
-\method{read_cells}{default}(x, at_level = c("compose",
-  "detect_and_read", "make_cells", "va_classify", "analyze"),
-  omit = NULL, simplify = TRUE, compose_main_cols_only = TRUE,
-  from_level, ...)
-
-\method{read_cells}{NULL}(x, ...)
 }
 \arguments{
 \item{x}{either a valid file path or a \code{\link[=read_cell_part-class]{read_cell_part}}}
