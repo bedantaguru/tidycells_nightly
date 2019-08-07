@@ -277,19 +277,7 @@ read_cells.read_cell_part <- function(x,
     if (!out_l$is_empty) {
       raw_present <- FALSE
       if (!is.null(out_l$raw_composition)) {
-        if (is.list(out_l$raw_composition)) {
-          if (length(out_l$raw_composition) > 0) {
-            if (is.list(out_l$raw_composition[[1]])) {
-              if (length(out_l$raw_composition[[1]]) > 0) {
-                if (is.data.frame(out_l$raw_composition[[1]][[1]])) {
-                  if (nrow(out_l$raw_composition[[1]][[1]]) > 0) {
-                    raw_present <- TRUE
-                  }
-                }
-              }
-            }
-          }
-        }
+        raw_present <- TRUE
       }
 
       if (raw_present) {

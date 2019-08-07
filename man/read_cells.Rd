@@ -70,10 +70,9 @@ Here is the flowchart of the same:
 read_cells()
 
 fold <- system.file("extdata", "messy", package = "tidycells", mustWork = TRUE)
-# File extension is intentionally given wrong  
+# File extension is intentionally given wrong
 # while filename is actual identifier of the file type
 fcsv <- list.files(fold, pattern = "^csv.", full.names = TRUE)[1]
 # read the data
 read_cells(fcsv)
-
 }

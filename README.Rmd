@@ -356,6 +356,8 @@ Since all of these modules are entirely optional the dependency is kept at **tid
     Major parts of the package right now fully depend on **unpivotr**. The **tidycells** package would have never existed without this wonderful package from [Duncan Garmonsway](https://github.com/nacnudus).
 * The [rsheets](https://github.com/rsheets) project: 
     It hosts several R packages (few of them are in CRAN already) which are in the early stages of importing spreadsheets from Excel and Google Sheets into R.  Specifically, have a look at these projects which seems closely related to these projects : [jailbreaker](https://github.com/rsheets/jailbreakr), [rexcel](https://github.com/rsheets/rexcel) (README of this project has a wonderful reference for excel integration with R).
+* The [tidyABS](https://github.com/ianmoran11/tidyABS) package: 
+    The `tidyABS` package converts ABS excel tables to tidy data frames. It uses rules-of-thumb to determine the structure of excel tables, however it sometimes requires pointers from the user. This package is in early development.
 
 
 ## Acknowledgement
