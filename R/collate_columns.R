@@ -30,16 +30,33 @@ collate_columns <- function(composed_data,
                             retain_cell_address = FALSE) {
   ok <- FALSE
 
+  defcols_this <- defcols
   if (is.data.frame(composed_data)) {
-    if (all(utils::hasName(composed_data, defcols))) {
+    if (!utils::hasName(composed_data, "table_tag")) {
+      defcols_this <- setdiff(defcols_this, "table_tag")
+    }
+    if (all(utils::hasName(composed_data, defcols_this))) {
       ok <- TRUE
-      dcl <- composed_data %>%
-        split(.$data_block) %>%
+
+      if (utils::hasName(composed_data, "table_tag")) {
+        dcl <- composed_data %>%
+          group_by(data_block, table_tag)
+      } else {
+        dcl <- composed_data %>%
+          group_by(data_block)
+      }
+
+      dcl <- dcl %>%
+        group_split() %>%
         map(~ {
-          .d <- .x
+          .d <- ungroup(.x)
           this_cols <- colnames(.d)
           nm_cols <- this_cols[stringr::str_detect(this_cols, "row|col|corner")]
-          .d <- .d[c(defcols, nm_cols)]
+          nm_cols <- setdiff(nm_cols, defcols_this)
+          if (length(nm_cols) == 0) {
+            nm_cols <- setdiff(this_cols, defcols_this)
+          }
+          .d <- .d[c(defcols_this, nm_cols)]
           na_c <- .d %>% map_lgl(~ is.na(.x) %>% all())
           .d[!na_c]
         })
@@ -48,7 +65,10 @@ collate_columns <- function(composed_data,
     # data.frame is a list,  first data.frame check is required
     if (is.list(composed_data)) {
       if (all(map_lgl(composed_data, is.data.frame))) {
-        if (all(map_lgl(composed_data, ~ all(utils::hasName(.x, defcols))))) {
+        if (!any(map_lgl(composed_data, ~ utils::hasName(.x, "table_tag")))) {
+          defcols_this <- setdiff(defcols_this, "table_tag")
+        }
+        if (all(map_lgl(composed_data, ~ all(utils::hasName(.x, defcols_this))))) {
           ok <- TRUE
           dcl <- composed_data
         }
@@ -62,16 +82,38 @@ collate_columns <- function(composed_data,
     abort("The argument composed_data has to be output of compose_cells. Given composed_data has no known format.")
   }
 
-  out_d <- dcl %>% reduce(reduce_2dfs,
-    combine_th = combine_threshold,
-    rest_cols = rest_cols,
-    retain_other_cols = retain_other_cols
-  )
+  if (length(dcl) == 1) {
+    out_d <- dcl[[1]]
+
+    restcols <- setdiff(colnames(out_d), defcols_this)
+    if (length(restcols) > 0) {
+      cn_map_0 <- tibble(cn = restcols) %>%
+        mutate(is_major = stringr::str_detect(tolower(cn), "major")) %>%
+        arrange(cn) %>%
+        mutate(sn = seq_along(cn), sn_m = sn + is_major * (10^10)) %>%
+        arrange(desc(sn_m)) %>%
+        mutate(fsn = seq_along(cn), new_cn = paste0("collated_", fsn)) %>%
+        select(cn, new_cn)
+
+      for (i in seq_along(cn_map_0$cn)) {
+        colnames(out_d)[which(colnames(out_d) == cn_map_0$cn[i])] <- cn_map_0$new_cn[i]
+      }
+    }
+  } else {
+    out_d <- dcl %>% reduce(reduce_2dfs,
+      combine_th = combine_threshold,
+      rest_cols = rest_cols,
+      retain_other_cols = retain_other_cols
+    )
+  }
 
 
-  if (!retain_other_cols) {
+
+
+
+  if (!retain_cell_address) {
     out_d <- out_d[setdiff(colnames(out_d), c("row", "col", "data_block"))]
   }
 
-  out_d
+  out_d[sort(colnames(out_d))]
 }

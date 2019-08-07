@@ -98,7 +98,7 @@ possible_to_support <- function(print_info = TRUE, return_print_info = FALSE) {
           "\nNote:\n",
           extra_msg,
           cli_bs,
-          cli_b("support is enabled for content type (means it will work even if the extension is wrong)")
+          cli_b("Support is enabled for content type (means it will work even if the extension is wrong)")
         )
     } else {
       st_ok_msg <- NULL

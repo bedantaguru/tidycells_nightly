@@ -19,9 +19,11 @@ similarity_score <- function(x, y) {
   ads_l <- list(ads)
 
   if (rlang::is_installed("stringdist")) {
-    mthds <- c("osa", "jaccard", "soundex", "jw")
-    ads_sdl <- mthds %>% map(~ stringdist::stringdistmatrix(x, y, method = .x, p = 0.1, q = 3))
-    ads_l <- c(ads_l, ads_sdl)
+    suppressMessages(suppressWarnings({
+      mthds <- c("osa", "jaccard", "soundex", "jw")
+      ads_sdl <- mthds %>% map(~ stringdist::stringdistmatrix(x, y, method = .x, p = 0.1, q = 3))
+      ads_l <- c(ads_l, ads_sdl)
+    }))
   }
 
   ascore <- ads_l %>% map_dbl(ads_score)

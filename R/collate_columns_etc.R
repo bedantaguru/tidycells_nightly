@@ -16,4 +16,4 @@ norm_this <- function(x) {
 
 
 # possibly table tag if across table collation is required
-defcols <- c("row", "col", "value", "data_block")
+defcols <- c("row", "col", "value", "data_block", "table_tag")

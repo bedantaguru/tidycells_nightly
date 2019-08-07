@@ -235,13 +235,29 @@ saveRDS(WSS,
 
 # devtools::check_cran() :---> https://github.com/r-lib/revdepcheck
 
+
+
+quick_spell_check <- function(){
+  ft <- "inst/WORDLIST"
+  if(file.exists(ft)){
+    unlink(ft)
+  }else{
+    suppressWarnings(readLines("00_nightly_only/WORDLIST") %>% writeLines(ft))
+    devtools::spell_check()
+    unlink(ft)
+  }
+}
+
 devtools::install(build_vignettes = TRUE)
 devtools::document()
 devtools::build_manual()
 styler::style_pkg()
 lintr::lint_package()
 devtools::spell_check()
+quick_spell_check()
 goodpractice::gp()
+
+
 
 
 

@@ -52,7 +52,9 @@ if (getRversion() >= "2.15.1") {
     "txt_orig", "txt_size_", "type", "val_type",
     "value", "value_chk", "id", "block",
     "cn_id_raw", "cr", "n1", "n2",
-    "new_name", "old_name", "tinf",
+    "new_name", "old_name", "tinf", "fsn",
+    "is_major", "new_cn", "sn", "sn_m",
+    "table_tag",
 
     ########
     # for shiny

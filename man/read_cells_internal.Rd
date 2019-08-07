@@ -7,17 +7,17 @@
 \alias{read_cells.NULL}
 \title{Read Cells from file}
 \usage{
-\method{read_cells}{read_cell_part}(x, at_level = c("compose",
-  "detect_and_read", "make_cells", "va_classify", "analyze"),
+\method{read_cells}{read_cell_part}(x, at_level = c("collate",
+  "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
   omit = NULL, simplify = TRUE, compose_main_cols_only = TRUE,
   from_level, silent = TRUE, ...)
 
-\method{read_cells}{character}(x, at_level = c("compose",
-  "detect_and_read", "make_cells", "va_classify", "analyze"),
+\method{read_cells}{character}(x, at_level = c("collate",
+  "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
   omit = NULL, simplify = TRUE, compose_main_cols_only = TRUE, ...)
 
-\method{read_cells}{default}(x, at_level = c("compose",
-  "detect_and_read", "make_cells", "va_classify", "analyze"),
+\method{read_cells}{default}(x, at_level = c("collate",
+  "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
   omit = NULL, simplify = TRUE, compose_main_cols_only = TRUE,
   from_level, ...)
 

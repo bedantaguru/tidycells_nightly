@@ -57,6 +57,9 @@ NULL
 #' @importFrom dplyr n
 NULL
 
+#' @importFrom dplyr desc
+NULL
+
 #' @importFrom dplyr count
 NULL
 

@@ -117,7 +117,7 @@ reduce_2dfs <- function(dc1, dc2, combine_th = 0.6, rest_cols = Inf, retain_othe
     nc_cols <- colnames(dcnew) %>%
       stringr::str_detect("collated") %>%
       colnames(dcnew)[.]
-    dcnew <- dcnew[c(defcols, nc_cols)]
+    dcnew <- dcnew[c(intersect(defcols, colnames(dcnew)), nc_cols)]
   }
 
   dcnew
