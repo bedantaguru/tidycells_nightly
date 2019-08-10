@@ -49,7 +49,7 @@ read_cell_task_orders <- c("detect_and_read", "make_cells", "va_classify", "anal
 #'
 #' Here is the flowchart of the same:
 #'
-#' \figure{read_cells.svg}{options: width=400}
+#' \figure{read_cells.png}{options: width=400}
 #'
 #' }
 #'

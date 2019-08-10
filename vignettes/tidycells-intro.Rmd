@@ -134,7 +134,7 @@ Now to make you understand what you can do with intermediate results, let's expl
 The flowchart of `read_cells` (_which will make more sence once you go through following section_)
 
 ```{r, out.width = "356px", echo=FALSE, fig.align='center', dpi=300}
-knitr::include_graphics("ext/read_cells.svg")
+knitr::include_graphics("ext/read_cells.png")
 ```
 
 
