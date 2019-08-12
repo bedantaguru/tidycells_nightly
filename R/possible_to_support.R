@@ -103,20 +103,32 @@ possible_to_support <- function(print_info = TRUE, return_print_info = FALSE) {
     } else {
       st_ok_msg <- NULL
     }
+    
+    
 
     if (length(st_not_ok) > 0) {
-      st_not_ok_msg <- st_not_ok %>%
-        paste0(collapse = ", ") %>%
-        cli_br() %>%
-        paste0(
-          cli_b("Support"),
-          cli_bb(" not "),
-          cli_b("present for following type of files: "),
-          .,
+      
+      if(length(pkg_need)>0){
+        pkg_msg <- paste0(
           "\nNote:\n",
           cli_bs,
           cli_b("These packages are required: "),
           cli_br(paste0(pkg_need, collapse = ", "))
+        )
+      }else{
+        pkg_msg <- ""
+      }
+      
+      st_not_ok_msg <- st_not_ok %>%
+        paste0(collapse = ", ") %>%
+        cli_br() %>%
+        paste0(
+          cli_bs,
+          cli_b("Support"),
+          cli_bb(" not "),
+          cli_b("present for following type of files: "),
+          .,
+          pkg_msg
         )
     } else {
       st_not_ok_msg <- NULL
@@ -125,7 +137,7 @@ possible_to_support <- function(print_info = TRUE, return_print_info = FALSE) {
 
     xst <- st %>%
       filter(implemented) %>%
-      select(-implemented) %>%
+      select(-implemented) %>% 
       select(type = file_type, package, present = pkg_installed, support = support_possible)
 
 
