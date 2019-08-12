@@ -116,7 +116,8 @@ devtools::install_github("r-rudra/tidycells")
 ```
 
 To start with `tidycells`, I invite you to see
-`vignette("tidycells-intro")`.
+`vignette("tidycells-intro")` or check out
+[`tidycells`-website](https://r-rudra.github.io/tidycells/).
 
 ## Quick Overview
 
@@ -156,7 +157,7 @@ system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>%
 | Female      | School C    | Name        | S Senapati         | Sheet1     | 61    |
 | Female      | School C    | Name        | U Gupta            | Sheet1     | 38    |
 
-The fucntion `read_cells` is a set of ordered operations connected
+The function `read_cells` is a set of ordered operations connected
 together. The flowchart of
 `read_cells`:
 

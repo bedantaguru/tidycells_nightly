@@ -250,7 +250,7 @@ quick_spell_check <- function(){
     unlink(ft)
   }else{
     suppressWarnings(readLines("00_nightly_only/WORDLIST") %>% writeLines(ft))
-    devtools::spell_check()
+    print(devtools::spell_check())
     unlink(ft)
   }
 }

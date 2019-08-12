@@ -79,7 +79,7 @@ Assuming you have `devtools` you can install this package in R with the followin
 devtools::install_github("r-rudra/tidycells")
 ```
 
-To start with `tidycells`, I invite you to see `vignette("tidycells-intro")`.
+To start with `tidycells`, I invite you to see `vignette("tidycells-intro")` or check out [`tidycells`-website](https://r-rudra.github.io/tidycells/).
 
 ## Quick Overview
 
@@ -110,7 +110,7 @@ if(rlang::is_installed("tidyxl")){
 ```
 
 
-The fucntion `read_cells` is a set of ordered operations connected together. The flowchart of `read_cells`:
+The function `read_cells` is a set of ordered operations connected together. The flowchart of `read_cells`:
 
 ```{r, out.width = "356px", echo=FALSE, fig.align='center', dpi=300}
 knitr::include_graphics("vignettes/ext/read_cells.png")

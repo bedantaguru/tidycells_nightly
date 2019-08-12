@@ -131,7 +131,7 @@ identical(d1, d2)
 
 Now to make you understand what you can do with intermediate results, let's explain to you other functionalities of the package and what are the steps followed by `read_cells`. 
 
-The flowchart of `read_cells` (_which will make more sence once you go through following section_)
+The flowchart of `read_cells` (_which will make more sense once you go through following section_)
 
 ```{r, out.width = "356px", echo=FALSE, fig.align='center', dpi=300}
 knitr::include_graphics("ext/read_cells.png")
@@ -251,7 +251,7 @@ There is an optional interactive version of it, which is explained in the subseq
 
 The data should be consumable after the composition stage, in most of the cases. However, in the presence of extreme variations in the underlying data structure, another step may be required which can be coined as "collation of columns". If somehow the data is a bit cooperative in a sense that from the data itself it can be inferred that which column should be mapped with which column, then this stage is useful. It is a stage which does approximate string matching (which is enhanced if you have optional dependency [`stringdist`](https://CRAN.R-project.org/package=stringdist) package) to find out inter-column mapping among various data blocks (if the data has multiple small tables). In case there is only one table (a single data block) then this stage will do almost nothing except renaming the columns. In `iris` and `dummy_dat` example, this is kind of meaningless. This will be clear to you once you move forward to the next section (_where **"A more complicated example"** is discussed_).
 
-The function `collate_columns` is desgned to carry out this operation. This can be easily done as 
+The function `collate_columns` is designed to carry out this operation. This can be easily done as 
 ```{r, eval=FALSE}
 dcc <- collate_columns(dcomp)
 head(dcc)
