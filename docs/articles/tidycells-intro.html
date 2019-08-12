@@ -257,8 +257,8 @@ text-align: justify}
 <a class="sourceLine" id="cb7-6" title="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/identical">identical</a></span>(d1, d2)</a>
 <a class="sourceLine" id="cb7-7" title="7"><span class="co">#&gt; [1] TRUE</span></a></code></pre></div>
 <p>Now to make you understand what you can do with intermediate results, let’s explain to you other functionalities of the package and what are the steps followed by <code>read_cells</code>.</p>
-<p>The flowchart of <code>read_cells</code> (<em>which will make more sence once you go through following section</em>)</p>
-<p><img src="ext/read_cells.png" width="356px" style="display: block; margin: auto;"></p>
+<p>The flowchart of <code>read_cells</code> (<em>which will make more sense once you go through following section</em>)</p>
+<p><img src="ext/read_cells.svg" width="356px" style="display: block; margin: auto;"></p>
 </div>
 <div id="making-data-tidy" class="section level3">
 <h3 class="hasAnchor">
@@ -465,7 +465,7 @@ text-align: justify}
 <h4 class="hasAnchor">
 <a href="#collate_columns" class="anchor"></a>2.5 collate_columns</h4>
 <p>The data should be consumable after the composition stage, in most of the cases. However, in the presence of extreme variations in the underlying data structure, another step may be required which can be coined as “collation of columns”. If somehow the data is a bit cooperative in a sense that from the data itself it can be inferred that which column should be mapped with which column, then this stage is useful. It is a stage which does approximate string matching (which is enhanced if you have optional dependency <a href="https://CRAN.R-project.org/package=stringdist"><code>stringdist</code></a> package) to find out inter-column mapping among various data blocks (if the data has multiple small tables). In case there is only one table (a single data block) then this stage will do almost nothing except renaming the columns. In <code>iris</code> and <code>dummy_dat</code> example, this is kind of meaningless. This will be clear to you once you move forward to the next section (<em>where <strong>“A more complicated example”</strong> is discussed</em>).</p>
-<p>The function <code>collate_columns</code> is desgned to carry out this operation. This can be easily done as</p>
+<p>The function <code>collate_columns</code> is designed to carry out this operation. This can be easily done as</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">dcc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/collate_columns.html">collate_columns</a></span>(dcomp)</a>
 <a class="sourceLine" id="cb22-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(dcc)</a></code></pre></div>
 <table class="table">

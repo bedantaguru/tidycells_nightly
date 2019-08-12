@@ -109,7 +109,7 @@ if(rlang::is_installed("tidyxl")){
 The function `read_cells` is a set of ordered operations connected together. The flowchart of `read_cells`:
 
 ```{r, out.width = "356px", echo=FALSE, fig.align='center', dpi=300}
-knitr::include_graphics("vignettes/ext/read_cells.png")
+knitr::include_graphics("vignettes/ext/read_cells.svg")
 ```
 
 Let's understand step by step procedures followed by `read_cells`. 

@@ -104,13 +104,9 @@
 
     
     
-<style>
-body {
-text-align: justify}
-</style>
 <div id="tidycells" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#tidycells" class="anchor"></a><strong>tidycells</strong> <img src="articles/ext/logo.png" align="right" width="100">
+<a href="#tidycells" class="anchor"></a><strong>tidycells</strong> <img src="articles/ext/logo.png" align="right" width="200">
 </h1></div>
 <div id="read-tabular-data-from-diverse-sources-and-easily-make-them-tidy" class="section level4">
 <h4 class="hasAnchor">
@@ -154,7 +150,7 @@ text-align: justify}
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>To install the development version from GitHub you’ll need <code>devtools</code> package in R. Assuming you have <code>devtools</code> you can install this package in R with the following command:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"r-rudra/tidycells"</span>)</a></code></pre></div>
-<p>To start with <code>tidycells</code>, I invite you to see <code><a href="articles/tidycells-intro.html">vignette("tidycells-intro")</a></code>.</p>
+<p>To start with <code>tidycells</code>, I invite you to see <code><a href="articles/tidycells-intro.html">vignette("tidycells-intro")</a></code> or check out <a href="https://r-rudra.github.io/tidycells/"><code>tidycells</code>-website</a>.</p>
 </div>
 <div id="quick-overview" class="section level2">
 <h2 class="hasAnchor">
@@ -275,8 +271,8 @@ text-align: justify}
 </tr>
 </tbody>
 </table>
-<p>The fucntion <code>read_cells</code> is a set of ordered operations connected together. The flowchart of <code>read_cells</code>:</p>
-<p><img src="articles/ext/read_cells.png" width="356px" style="display: block; margin: auto;"></p>
+<p>The function <code>read_cells</code> is a set of ordered operations connected together. The flowchart of <code>read_cells</code>:</p>
+<p><img src="articles/ext/read_cells.svg" width="356px" style="display: block; margin: auto;"></p>
 <p>Let’s understand step by step procedures followed by <code>read_cells</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># if you have tidyxl installed</span></a>
 <a class="sourceLine" id="cb5-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>

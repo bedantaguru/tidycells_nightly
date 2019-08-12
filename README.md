@@ -156,7 +156,7 @@ The function `read_cells` is a set of ordered operations connected
 together. The flowchart of
 `read_cells`:
 
-<img src="vignettes/ext/read_cells.png" width="356px" style="display: block; margin: auto;" />
+<img src="vignettes/ext/read_cells.svg" width="356px" style="display: block; margin: auto;" />
 
 Let’s understand step by step procedures followed by `read_cells`.
 

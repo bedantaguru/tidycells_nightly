@@ -61,7 +61,7 @@ It performs following set of actions if called with default \code{at_level}.
 
 Here is the flowchart of the same:
 
-\figure{read_cells.png}{options: width=400}
+\figure{read_cells.svg}{options: width=400}
 
 }
 }
