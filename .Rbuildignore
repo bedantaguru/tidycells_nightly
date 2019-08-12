@@ -10,3 +10,6 @@
 ^cran-comments\.md$
 ^dev-notes\.md$
 ^00_nightly_only$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

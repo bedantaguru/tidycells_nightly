@@ -60,6 +60,13 @@ dcfine <- dc %>%
 # Set up package ---------------------------------------------
 library(usethis)
 
+use_pkgdown()
+
+# not running need to understand
+# use_pkgdown_travis()
+
+pkgdown:::build_site_external()
+
 usethis:::use_readme_rmd()
 
 # r hub thing
