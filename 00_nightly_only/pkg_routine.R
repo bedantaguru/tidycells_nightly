@@ -64,7 +64,9 @@ use_pkgdown()
 
 # not running need to understand
 # use_pkgdown_travis()
-pkgdown:::build_site_external()
+pkgdown::build_favicon()
+pkgdown::build_site()
+#pkgdown:::build_site_external()
 
 usethis:::use_readme_rmd()
 
