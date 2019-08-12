@@ -1,8 +1,3 @@
-<style>
-body {
-text-align: justify}
-</style>
-
 # **tidycells** <img src="vignettes/ext/logo.png" align="right" width="200"/>
 
 #### *Read Tabular Data from Diverse Sources and Easily Make Them Tidy*
