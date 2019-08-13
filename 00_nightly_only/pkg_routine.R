@@ -90,6 +90,10 @@ rh <- x$name %>% map(~check(platform = .x, check_args = "--as-cran", show_status
 
 #  win builder
 
+devtools::check_win_devel()
+devtools::check_win_oldrelease()
+devtools::check_win_release()
+
 usethis::use_package_doc()
 
 
