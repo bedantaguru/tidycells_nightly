@@ -10,7 +10,7 @@ Please omit the "It" at the beginning of the description and just start
 with "Provides".
 
 If there are references describing the methods in your package
----> No public references as of now. methods used in the package is developed soley based on experiences and 
+---> No public citable references as of now present for this work. The methods used in the package is developed soley based on experiences and 
 knowledge of the author. 
 
 

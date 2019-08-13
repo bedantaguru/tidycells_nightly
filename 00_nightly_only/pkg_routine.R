@@ -1,10 +1,20 @@
 
+# check news
+save <- options(browser = NULL)
+news(package = "tidycells")
+options(save)
+
+usethis::use_tidy_description()
+
 tools::toTitleCase(tolower("Read Tabular Data from Diverse Sources and Easily Make Them Tidy"))
 
 "Read Tabular Data from Diverse Sources and Easily Make Them Tidy"
 
-covr::package_coverage(line_exclusions = 
-                         c("R/shiny_etc.R","R/shiny_main.R","R/shiny_parts_server.R","R/shiny_parts_server_components.R","R/shiny_parts_ui.R","R/visual_functions.R"))
+nchar("Read Tabular Data from Diverse Sources and Easily Make Them Tidy")
+
+pc <- covr::package_coverage(type = "all",
+                             line_exclusions = 
+                               c("R/shiny_etc.R","R/shiny_main.R","R/shiny_parts_server.R","R/shiny_parts_server_components.R","R/shiny_parts_ui.R","R/visual_functions.R"))
 
 
 # covr::coveralls(line_exclusions = c("R/shiny_etc.R","R/shiny_main.R","R/shiny_parts_server.R","R/shiny_parts_server_components.R","R/shiny_parts_ui.R","R/visual_functions.R"))
@@ -78,7 +88,9 @@ require(purrr)
 rh <- x$name %>% map(~check(platform = .x, check_args = "--as-cran", show_status = FALSE))
 
 
+#  win builder
 
+usethis::use_package_doc()
 
 
 ####### start stable run ######
