@@ -145,6 +145,13 @@ See other successful builds in [CRAN Comments](https://github.com/r-rudra/tidyce
 
 ### Dependency Explained
 
+To install `tidycells` (with bare minimum functionality) you need do following two things 
+
+* `install.packages("tidyverse")` (_This possibly you have already done. _)
+* `install.packages("unpivotr")`
+
+Rest packages are optional and can be installed as per your requirements. 
+
 Note the package has "Induced System Dependency" which is causing to break the code sometime in [R-hub](https://builder.r-hub.io/). Below table describes the same (note that below table is an indicative list and may not be complete.).
 
 | Package      | Type     | Reason                                                                  | Implied   Critical Dependency | Induced System   Dependency          |

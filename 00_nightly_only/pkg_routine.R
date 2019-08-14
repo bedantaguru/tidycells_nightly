@@ -72,11 +72,52 @@ library(usethis)
 
 use_pkgdown()
 
+
+
 # not running need to understand
 # use_pkgdown_travis()
-pkgdown::build_favicon()
-pkgdown::build_site()
-#pkgdown:::build_site_external()
+##############################
+#  before pkgdown manual tasks
+##############################
+
+require(stringr)
+rd_bk <- tempfile()
+
+file.copy("README.Rmd", rd_bk)
+
+rd_now <- readLines("README.Rmd")
+
+if(rd_now[19]!= "```" | rd_now[18]!= "library(tidycells)"){
+  stop("check manually")
+}else{
+  
+  rd_now <- c(rd_now[1:19], "<style>
+body {
+text-align: justify}
+</style>", rd_now[20:length(rd_now)])
+  
+  rd_now <- rd_now %>% paste0(collapse = "\n")
+  
+  rd_now <- str_replace_all(rd_now, "https://github.com/r-rudra/tidycells/blob/master/dev-notes.md", "dev-notes.html")
+  
+  writeLines(rd_now, "README.Rmd")
+  
+  unlink("docs", recursive = T, force = T)
+  unlink("pkgdown", recursive = T, force = T)
+  pkgdown::build_favicon()
+  pkgdown::build_site()
+  #pkgdown:::build_site_external()
+  ##############################
+  #  after pkgdown manual tasks
+  ##############################
+  file.copy("vignettes/ext/read_cells.svg", "docs/articles/ext/")
+  unlink("README.Rmd")
+  file.copy(rd_bk, "README.Rmd")
+}
+
+
+
+#############
 
 usethis:::use_readme_rmd()
 
@@ -87,12 +128,33 @@ require(purrr)
 # validate_email(email = "nil.gayen@gmail.com", token = "ed728b8460a7460081331fa6ca2e10b7")
 rh <- x$name %>% map(~check(platform = .x, check_args = "--as-cran", show_status = FALSE))
 
+# after done
+u <- rh %>% map(~try(.x$cran_summary(), silent = TRUE))
+
+# sucess
+u %>% map_lgl(~!inherits(.x, "try-error")) %>% x$name[.]
+# fail
+u %>% map_lgl(~inherits(.x, "try-error")) %>% x$name[.]
+
+# fail check
+u %>% map_lgl(~inherits(.x, "try-error")) %>% rh[.]
+
+tibble::tibble( a1 = 
+                  u %>% map_lgl(~inherits(.x, "try-error")) %>% x$name[.], 
+                a2 = 
+                  u %>% map_lgl(~inherits(.x, "try-error")) %>% which())
 
 #  win builder
 
 devtools::check_win_devel()
 devtools::check_win_oldrelease()
 devtools::check_win_release()
+
+
+# min install requires 
+
+install.packages("tidyverse")
+install.packages("unpivotr")
 
 usethis::use_package_doc()
 

@@ -7,13 +7,16 @@
 * Windows 10 x64 Build 17134 
   * R version 3.6.0 (2019-04-26) 
   * R version 3.6.1 (2019-07-05)
+  * R Under development (unstable) (2019-08-11 r76961)
 
 ### Win-Builder
 
 * Platform: x86_64-w64-mingw32 (64-bit), 
   * R version 3.6.1 (2019-07-05)
   * R version 3.5.3 (2019-03-11)
-  * R Under development (unstable) (2019-07-05 r76784)
+
+_Note: in `Win-Builder` + `R Under development (unstable) (2019-07-05 r76784)` the build is failing (Mainly because of this error "`All elements of `...` must be named`"). I could not reproduce the same error in local build of `R Under development (unstable) (2019-08-11 r76961)`. Hence ignoring._
+
 
 ### Travis
 
@@ -66,6 +69,7 @@ New submission`
 
 * **This is a new release.**
 * **This is a first CRAN submission from the author.**
+* **There are _NO_ references describing the methods in this package.** 
 
 **Note**: The methods in the package are purely based on experiences and knowledge of the author and not based on any published article. Hence there are no references to attach currently. 
 
