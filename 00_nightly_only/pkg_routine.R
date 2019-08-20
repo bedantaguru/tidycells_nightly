@@ -1,4 +1,34 @@
 
+
+# using foghorn to check status
+
+require(foghorn)
+
+foghorn::cran_incoming("tidycells")
+
+# may check in https://cransays.itsalocke.com/articles/dashboard.html
+
+summary_cran_results(email = "nil.gayen@gmail.com")
+
+# proxy thing
+
+# library(httr)
+# set_config(use_proxy(url="172.30.1.78",port=3128))
+
+# require(curl)
+# curl::ie_get_proxy_for_url()
+# 
+# h <- curl::handle_setopt(curl::new_handle(proxy = curl::ie_get_proxy_for_url()))
+# 
+# class(curl::curl_fetch_memory('https://www.google.com', handle = h))
+# 
+# # I don't know how to set curl::handle 'h' at global level
+# class(curl::curl_fetch_memory('https://www.google.com'))
+# 
+# 
+# curl::has_internet()
+
+
 # check news
 save <- options(browser = NULL)
 news(package = "tidycells")
@@ -18,40 +48,6 @@ pc <- covr::package_coverage(type = "all",
 
 
 # covr::coveralls(line_exclusions = c("R/shiny_etc.R","R/shiny_main.R","R/shiny_parts_server.R","R/shiny_parts_server_components.R","R/shiny_parts_ui.R","R/visual_functions.R"))
-
-# if you have tidyxl installed
-d <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
-  read_cells(at_level = "make_cells") %>% 
-  .[[1]]
-
-# or you may do 
-d <- system.file("extdata", "marks_cells.rds", package = "tidycells", mustWork = TRUE) %>% 
-  readRDS()
-d <- numeric_values_classifier(d)
-da <- analyze_cells(d)
-dc <- compose_cells(da, print_attribute_overview = TRUE)
-
-# bit tricky and tedious unless you do print_attribute_overview = TRUE in above line
-dcfine <- dc %>% 
-  dplyr::mutate(name = dplyr::case_when(
-    data_block == 1 ~ major_row_left_2_1,
-    data_block == 2 ~ major_col_bottom_1_1,
-    data_block == 3 ~ major_row_left_1_1
-  ),
-  sex = dplyr::case_when(
-    data_block == 1 ~ major_row_left_1_1,
-    data_block == 2 ~ major_col_bottom_2_1,
-    data_block == 3 ~ minor_row_right_1_1
-  ),
-  school = dplyr::case_when(
-    data_block == 1 ~ minor_col_top_1_1,
-    data_block == 2 ~ minor_corner_topLeft_1_1,
-    data_block == 3 ~ minor_col_top_1_1
-  )) %>% 
-  dplyr::select(school,sex, name, value)
-
-
-
 
 
 
