@@ -18,7 +18,7 @@ After the package is release in CRAN (_version 0.2.0 on 2019-08-20_), I just rea
 
 Check the [result now](https://cran.r-project.org/web/checks/check_results_tidycells.html).
 
-I would like to assure you that I'll check myself the feature on failed platforms to see what is happening. Possibly this is something to do with [LibreOffice](https://www.libreoffice.org/) installation (maybe an old version or patched version which does not support headless conversion of doc files to docx (see [ref1](https://askubuntu.com/questions/1039715/convert-ods-document-to-docx-document), [ref2](https://github.com/hrbrmstr/docxtractr/issues/23)). Which is required by [`docxtractr`](https://github.com/hrbrmstr/docxtractr) package) in the CRAN corresponding system. Accordingly, I have adjusted the test to skip on CRAN (it will still be tested on my local machines). Since it is not a major update I'll keep this for next release in CRAN (which possibly will happen after [Release tidyr 1.0.0](https://github.com/tidyverse/tidyr/issues/710).  
+I would like to assure you that I'll check myself the feature on failed platforms to see what is happening (raised [#1](https://github.com/r-rudra/tidycells/issues/1) for this). Possibly this is something to do with [LibreOffice](https://www.libreoffice.org/) installation (maybe an old version or patched version which does not support headless conversion of doc files to docx (see [ref1](https://askubuntu.com/questions/1039715/convert-ods-document-to-docx-document), [ref2](https://github.com/hrbrmstr/docxtractr/issues/23)). Which is required by [`docxtractr`](https://github.com/hrbrmstr/docxtractr) package) in the CRAN corresponding system. Accordingly, I have adjusted the test to skip on CRAN (it will still be tested on my local machines). Since it is not a major update I'll keep this for next release in CRAN (which possibly will happen after [Release tidyr 1.0.0](https://github.com/tidyverse/tidyr/issues/710).  
 
 Meanwhile, if you face a similar issue with doc files kindly let me know (through mail or issues etc.). But I have tested with doc files (in fact all types of files) in local testing environment where it worked perfectly. You can use this package with full confidence. 
 
@@ -74,6 +74,8 @@ Given these difficulties, the shiny tests are tested in the following environmen
 
 ### Current State of Development and Way Forward
 
+Check trackable version [here](https://github.com/r-rudra/tidycells/issues/2).
+
   - [x] Test it in [**r-hub**](https://builder.r-hub.io/)
   - [x] Test for optional shiny modules (series of `visual_*` functions)
   - [x] Write more tests (increase coverage)
@@ -82,8 +84,11 @@ Given these difficulties, the shiny tests are tested in the following environmen
   - [x] Releasing this package to [**CRAN**](https://cran.r-project.org/submit.html)
   - [x] Make [doc test](https://github.com/r-rudra/tidycells/blob/master/tests/testthat/test-etc.R) skip on CRAN.
   - [ ] A `compatibility function` for the "Heuristic Maturation" process (after CRAN)
+  - [ ] Make possibility for `purrr` like formula, e.g. ~ .x for `tidycells::value_attribute_classify`
   - [ ] Write blog + add it to [R blogger](https://www.r-bloggers.com/add-your-blog/) and other sites
   - [ ] Send it to the [r-packages mailing list](https://stat.ethz.ch/mailman/listinfo/r-packages)
+  - [ ] Explore options to add this in [CRAN Task Views](https://cran.r-project.org/web/packages/ctv/vignettes/ctv-howto.pdf)
+  - [ ] make a [cheatsheet](https://www.rstudio.com/resources/cheatsheets/how-to-contribute-a-cheatsheet/)
   - [ ] Explore [SDMX](https://sdmx.org/?page_id=4649) Converter possibility
   - [ ] Explore other formats (containing unorganised tables) possibility. Check out [unoconv](http://dag.wiee.rs/home-made/unoconv/).
   - [ ] Write more vignettes on other topics

@@ -14,7 +14,12 @@ status](https://ci.appveyor.com/api/projects/status/github/r-rudra/tidycells?bra
 Status](https://codecov.io/gh/r-rudra/tidycells/branch/master/graph/badge.svg)](https://codecov.io/gh/r-rudra/tidycells?branch=master)
 [![Coveralls Coverage
 Status](https://coveralls.io/repos/github/r-rudra/tidycells/badge.svg?branch=master)](https://coveralls.io/github/r-rudra/tidycells?branch=master)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![Dependency
+status](https://tinyverse.netlify.com/badge/tidycells)](https://CRAN.R-project.org/package=tidycells)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/r-rudra/tidycells/master/LICENSE.md)
 [![See
 DevNotes](https://img.shields.io/badge/See-DevNotes-blue.svg)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md)
@@ -23,7 +28,7 @@ DevNotes](https://img.shields.io/badge/See-DevNotes-blue.svg)](https://github.co
 
 ## Author
 
-Indranil Gayen
+[Indranil Gayen](https://orcid.org/0000-0003-0197-1944)
 
 ## TL;DR
 
@@ -58,19 +63,29 @@ for further analysis and data wrangling).
 
 ## Installation
 
-To install the development version from GitHub you’ll need `devtools`
-package in R. Assuming you have `devtools` you can install this package
-in R with the following command:
+Install the [CRAN](https://CRAN.R-project.org/package=tidycells)
+version:
 
 ``` r
-devtools::install_github("r-rudra/tidycells")
+install.packages("tidycells")
+```
+
+To install the development version from GitHub you’ll need `remotes`
+package in R (comes with `devtools`). Assuming you have `remotes` you
+can install this package in R with the following command:
+
+``` r
+# devtools::install_github is actually remotes::install_github
+remotes::install_github("r-rudra/tidycells")
 ```
 
 To start with `tidycells`, I invite you to see
-`vignette("tidycells-intro")` (*to see vignette you need to install the
-package with vignette. That can be done in above command by specifying
-`build_vignettes = TRUE`. Note that is might be time consuming*) or
-check out [tidycells-website](https://r-rudra.github.io/tidycells/).
+`vignette("tidycells-intro")` or check out
+[tidycells-website](https://r-rudra.github.io/tidycells/) (*to see
+vignette you need to install the package with vignette. That can be done
+in above command (`remotes::install_github`) by specifying
+`build_vignettes = TRUE`. Note that, it might be time consuming. CRAN
+version comes with prebuilt-vignette*).
 
 ## Quick Overview
 
@@ -85,30 +100,30 @@ The data looks like (in excel)
 
 <img src="vignettes/ext/marks.png" width="451px" />
 
-Let’s try `tidycells` functions
+Let’s try `tidycells` functions in this data
 
-Read at
-once
+Read at once
 
 ``` r
+# you should have tidyxl installed
 system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
   read_cells()
 ```
 
-| collated\_1 | collated\_2 | collated\_3 | collated\_4        | table\_tag | value |
-| :---------- | :---------- | :---------- | :----------------- | :--------- | :---- |
-| Male        | School A    | Score       | Utsyo Roy          | Sheet1     | 95    |
-| Male        | School A    | Score       | Nakshatra Gayen    | Sheet1     | 99    |
-| Female      | School A    | Score       | Titas Gupta        | Sheet1     | 89    |
-| Female      | School A    | Score       | Ujjaini Gayen      | Sheet1     | 100   |
-| Male        | School B    | Score       | Indranil Gayen     | Sheet1     | 70    |
-| Male        | School B    | Score       | S Gayen            | Sheet1     | 75    |
-| Female      | School B    | Score       | Sarmistha Senapati | Sheet1     | 81    |
-| Female      | School B    | Score       | Shtuti Roy         | Sheet1     | 90    |
-| Male        | School C    | Name        | I Roy              | Sheet1     | 50    |
-| Male        | School C    | Name        | S Ghosh            | Sheet1     | 59    |
-| Female      | School C    | Name        | S Senapati         | Sheet1     | 61    |
-| Female      | School C    | Name        | U Gupta            | Sheet1     | 38    |
+| collated\_1 | collated\_2 | collated\_3 | collated\_4  | collated\_5        | table\_tag | value |
+| :---------- | :---------- | :---------- | :----------- | :----------------- | :--------- | :---- |
+| Score       | Male        | School A    | Student Name | Utsyo Roy          | Sheet1     | 95    |
+| Score       | Male        | School A    | Student Name | Nakshatra Gayen    | Sheet1     | 99    |
+| Score       | Female      | School A    | Student Name | Titas Gupta        | Sheet1     | 89    |
+| Score       | Female      | School A    | Student Name | Ujjaini Gayen      | Sheet1     | 100   |
+| Score       | Male        | School B    | Student      | Indranil Gayen     | Sheet1     | 70    |
+| Score       | Male        | School B    | Student      | S Gayen            | Sheet1     | 75    |
+| Score       | Female      | School B    | Student      | Sarmistha Senapati | Sheet1     | 81    |
+| Score       | Female      | School B    | Student      | Shtuti Roy         | Sheet1     | 90    |
+| Score       | Male        | School C    | Name         | I Roy              | Sheet1     | 50    |
+| Score       | Male        | School C    | Name         | S Ghosh            | Sheet1     | 59    |
+| Score       | Female      | School C    | Name         | S Senapati         | Sheet1     | 61    |
+| Score       | Female      | School C    | Name         | U Gupta            | Sheet1     | 38    |
 
 The function `read_cells` is a set of ordered operations connected
 together. The flowchart of
@@ -125,26 +140,31 @@ d <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE
   .[[1]]
 ```
 
+Or
+
 ``` r
 # or you may do
 d <- system.file("extdata", "marks_cells.rds", package = "tidycells", mustWork = TRUE) %>% 
   readRDS()
 ```
 
+Then
+
 ``` r
 d <- numeric_values_classifier(d)
 da <- analyze_cells(d)
 ```
 
-Then you need to run `compose_cells` with additional new argument
-`print_attribute_overview =
-TRUE`
+After this you need to run `compose_cells` (with argument
+`print_attribute_overview = TRUE`)
 
 ``` r
 dc <- compose_cells(da, print_attribute_overview = TRUE)
 ```
 
-<img src="vignettes/ext/compose_cells_cli1.png" width="451px" />
+<img src="vignettes/ext/compose_cells_cli1.png" width="451px" /> If you
+want a well-aligned columns then you may like to
+do
 
 ``` r
 # bit tricky and tedious unless you do print_attribute_overview = TRUE in above line
@@ -179,11 +199,11 @@ dcfine <- dc %>%
 | School B | Male   | S Gayen         |  75   |
 
 This is still not good right\! You had to manually pick some weird
-column-names and spent some brain (when it was evident from data which
-columns should be aligned with whom).
+column-names and spent some time and energy (when it was evident from
+data which columns should be aligned with whom).
 
 The `collate_columns` functions does exactly this for you. So instead of
-manually picking column-names after compose cells you can simply run
+manually picking column-names after *compose cells* you can simply run
 
 ``` r
 # collate_columns(dc) should be same with 
@@ -192,19 +212,19 @@ collate_columns(dc) %>%
   head()
 ```
 
-| collated\_1 | collated\_2 | collated\_3 | collated\_4     | value |
-| :---------- | :---------- | :---------- | :-------------- | :---: |
-| Male        | School A    | Score       | Utsyo Roy       |  95   |
-| Male        | School A    | Score       | Nakshatra Gayen |  99   |
-| Female      | School A    | Score       | Titas Gupta     |  89   |
-| Female      | School A    | Score       | Ujjaini Gayen   |  100  |
-| Male        | School B    | Score       | Indranil Gayen  |  70   |
-| Male        | School B    | Score       | S Gayen         |  75   |
+| collated\_1 | collated\_2 | collated\_3 | collated\_4  | collated\_5     | value |
+| :---------- | :---------- | :---------- | :----------- | :-------------- | :---: |
+| Score       | Male        | School A    | Student Name | Utsyo Roy       |  95   |
+| Score       | Male        | School A    | Student Name | Nakshatra Gayen |  99   |
+| Score       | Female      | School A    | Student Name | Titas Gupta     |  89   |
+| Score       | Female      | School A    | Student Name | Ujjaini Gayen   |  100  |
+| Score       | Male        | School B    | Student      | Indranil Gayen  |  70   |
+| Score       | Male        | School B    | Student      | S Gayen         |  75   |
 
-Looks like staged example\! Yes you are right this is not always perfect
-(same is true for `analyze_cells` also). However, if the data is somehow
-helpful in demystifying underlying columns structure (like this one),
-then this will be useful.
+Looks like staged example\! Yes, you are right this is not always
+perfect (same is true for `analyze_cells` also). However, if the data is
+somehow helpful in demystifying underlying columns structure (like this
+one), then this will be useful.
 
 These functions `read_cells` (all functionalities combined),
 `analyze_cells`, `collate_columns` are here to ease your pain in data
@@ -256,7 +276,7 @@ level only.
 
 ## Reference and Related Projects
 
-  - [tidyxl](https://github.com/nacnudus/tidyxl) : **Read Untidy Excel
+  - [tidyxl](https://github.com/nacnudus/tidyxl): **Read Untidy Excel
     Files:** Imports non-tabular from Excel files into R. Exposes cell
     content, position and formatting in a tidy structure for further
     manipulation. Tokenizes Excel formulas. Supports ‘.xlsx’ and ‘.xlsm’
@@ -282,6 +302,13 @@ level only.
     [jailbreaker](https://github.com/rsheets/jailbreakr),
     [rexcel](https://github.com/rsheets/rexcel) (README of this project
     has a wonderful reference for excel integration with R).
+  - [readabs](https://github.com/MattCowgill/readabs): **Download and
+    Tidy Time Series Data from the Australian Bureau of Statistics** The
+    `readabs` package helps you easily download, import, and tidy time
+    series data from the [Australian Bureau of
+    Statistics](https://www.abs.gov.au/) from within R. This saves you
+    time manually downloading and tediously tidying time series data and
+    allows you to spend more time on your analysis.
   - The [tidyABS](https://github.com/ianmoran11/tidyABS) package: The
     `tidyABS` package converts ABS excel tables to tidy data frames. It
     uses rules-of-thumb to determine the structure of excel tables,
@@ -292,7 +319,7 @@ level only.
 
 This package incomplete without following packages (apart from the
 **unpivotr** which is the core package on which **tidycells** depends
-largely, as mentioned above ). Each of these packages are in suggests
+largely, as mentioned above). Each of these packages are in suggests
 fields of `tidycells`. (The read\_cells basically, performs unification
 on several functions from various packages to give you support for
 different file types. These are listed below.)
