@@ -62,14 +62,31 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
     )
   }
 
-  dcomp <- dam %>%
+  dcomp0 <- dam %>%
     group_by(data_gid) %>%
     group_split() %>%
     map(~ .x %>%
-      group_by(attr_gid, direction, attr_gid_split) %>%
-      group_split() %>%
-      map(~ stitch_direction(.x, ca$cell_df, trace_it = trace_it_back)) %>%
-      reduce(fj_this))
+          group_by(attr_gid, direction, attr_gid_split) %>%
+          group_split() %>%
+          # this try should be removed if unpivotr::enhead is internalized
+          # or similar behaving fucntions is developed.
+          map(~ try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back), silent = TRUE)))
+  
+  chk0 <- dcomp0 %>% map_lgl(~.x %>% map_lgl(~!inherits(.x, "try-error")) %>% any)
+  
+  if(chk0){
+    warn("Some attributes (possibly minor only) failed to compose. Check whether output is as expected.")
+    dcomp0 <- dcomp0 %>% map(~.x %>% map_lgl(~!inherits(.x, "try-error")) %>% .x[.])
+  }
+  
+  chk1 <- dcomp0 %>% map_int(length) %>% sum()
+  
+  if(chk1>0){
+    dcomp <- dcomp0 %>% map(~reduce(.x, fj_this))
+  }else{
+    abort("Failed to compose")
+  }
+  
 
   if (print_col_info) {
     dlinf <- dcomp %>% map(get_all_col_representative, cut_th = 4, lower_it = FALSE)
