@@ -83,8 +83,12 @@ read_cells(file_name)
 
 **Note** 
 
-* Just start with a small file.
-* **A Word of Warning** : Many functions in this package are heuristic-algorithm based. Thus, outcomes may be unexpected. I recommend you to try `read_cells` on the target file. If the outcome is what you are expecting, it is fine. If not try again with `read_cells(file_name, at_level = "compose")`. If after that also the output is not as expected then other functions are required to be used. At that time start again with `read_cells(file_name, at_level = "make_cells")` and proceed to further functions.
+* Just start with a small file, as heuristic-algorithm are not well-optimized (yet).
+* If the target table has numerical values as data and text as their attribute (identifier of the data elements), straight forward method is sufficient in the majority of situations. Otherwise, you may need to utilize other functions. 
+
+**A Word of Warning** : 
+
+_Many functions in this package are heuristic-algorithm based. Thus, outcomes may be unexpected. I recommend you to try `read_cells` on the target file. If the outcome is what you are expecting, it is fine. If not try again with `read_cells(file_name, at_level = "compose")`. If after that also the output is not as expected then other functions are required to be used. At that time start again with `read_cells(file_name, at_level = "make_cells")` and proceed to further functions._
 
 
 ## Introduction

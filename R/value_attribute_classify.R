@@ -67,6 +67,9 @@ value_attribute_classify <- function(d, classifier = basic_classifier()) {
   if (!is_cell_df(d)) {
     abort("Cell DF Expected")
   }
+  
+  classifier <- purrr::as_mapper(classifier)
+  
   if (!is.function(classifier)) {
     abort("classifier is not a function")
   }
