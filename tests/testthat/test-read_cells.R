@@ -12,20 +12,20 @@ test_that("read_cells for external packages works", {
   )
 
   if (rlang::is_installed("cli")) {
-    cli_tick <- cli::symbol$tick
-    cli_cross <- cli::symbol$cross
+    cli_tck <- cli::symbol$tick
+    cli_crs <- cli::symbol$cross
   } else {
-    cli_tick <- "V"
-    cli_cross <- "X"
+    cli_tck <- "V"
+    cli_crs <- "X"
   }
 
   ext_pkgs %>% purrr::map(~ {
     if (!rlang::is_installed(.x)) {
       expect_output(read_cells(), "These packages are required")
       expect_output(read_cells(), .x)
-      expect_output(read_cells(), paste0(.x, " +", cli_cross))
+      expect_output(read_cells(), paste0(.x, " +", cli_crs))
     } else {
-      expect_output(read_cells(), paste0(.x, " +", cli_tick))
+      expect_output(read_cells(), paste0(.x, " +", cli_tck))
     }
   })
 })
@@ -166,9 +166,8 @@ test_that("read_cells: external packages works (except pdf)", {
 
 test_that("read_cells: external packages works (for pdf)", {
 
-  # perform this only in windows
+  # perform this only in windows and linux
   skip_on_os("mac")
-  skip_on_os("linux")
   skip_on_os("solaris")
 
   skip_if_not_installed("tabulizer")
@@ -182,7 +181,7 @@ test_that("read_cells: external packages works (for pdf)", {
         stringr::str_split("\\.") %>%
         purrr::map_chr(1)))
 
-  # this tested on only windows
+  # this tested on only windows and linux (Travis)
   # for known issue https://github.com/ropensci/tabulizer/issues/106
   dm <- dm %>% dplyr::filter(original %in% c("pdf", "csv"))
 

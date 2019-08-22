@@ -24,27 +24,68 @@ library(tidycells)
 
 <!-- badges: start -->
 
+```{r, echo = FALSE}
+# following given low res raster image
+# as https://tinyverse.netlify.com/badge/tidycells pointing to 
+# https://img.shields.io/badge/dependencies-9/43-orange.png?style=flat not 
+# https://img.shields.io/badge/dependencies-9/43-orange.svg
+# [![Dependency status](https://tinyverse.netlify.com/badge/tidycells)](https://CRAN.R-project.org/package=tidycells)
+
+# try to convert url from .png to .svg
+# but it will correspond to last CRAN version only
+# x <- curlGetHeaders("https://tinyverse.netlify.com/badge/tidycells")
+# tg <- which(stringr::str_detect(x, "img.shields.io")) %>% min()
+
+depi <- as.vector(read.dcf('DESCRIPTION')[, 'Imports'])
+imps <- stringr::str_split(depi, ",")[[1]] %>% stringr::str_extract("[a-zA-Z0-9]+")
+
+deps <- as.vector(read.dcf('DESCRIPTION')[, 'Suggests'])
+sugg <- stringr::str_split(deps, ",")[[1]] %>% stringr::str_extract("[a-zA-Z0-9]+")
+
+x <- installed.packages()
+# for inclusion of base and recommended pkgs
+usr_pkgs <- x %>% tibble::as_tibble() %>% dplyr::mutate(pkg = row.names(x)) %>% dplyr::filter(is.na(Priority)) %>% dplyr::pull(pkg)
+
+# excluding only base
+# usr_pkgs <- x %>% tibble::as_tibble() %>% dplyr::mutate(pkg = row.names(x)) %>% dplyr::filter(Priority == "base") %>% dplyr::pull(pkg)
+
+imps <- intersect(imps, usr_pkgs)
+sugg <- intersect(sugg, usr_pkgs)
+
+dep_str <- paste0(length(imps),"/",(length(imps)+length(sugg)))
+
+```
+
 [![CRAN status](https://www.r-pkg.org/badges/version/tidycells)](https://cran.r-project.org/package=tidycells)
+[![CRAN checks](https://cranchecks.info/badges/summary/tidycells)](https://cran.r-project.org/web/checks/check_results_tidycells.html)
 [![Travis build status](https://travis-ci.org/r-rudra/tidycells.svg?branch=master)](https://travis-ci.org/r-rudra/tidycells)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/r-rudra/tidycells?branch=master&svg=true)](https://ci.appveyor.com/project/bedantaguru/tidycells)
 [![Codecov Coverage Status](https://codecov.io/gh/r-rudra/tidycells/branch/master/graph/badge.svg)](https://codecov.io/gh/r-rudra/tidycells?branch=master)
 [![Coveralls Coverage Status](https://coveralls.io/repos/github/r-rudra/tidycells/badge.svg?branch=master)](https://coveralls.io/github/r-rudra/tidycells?branch=master)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![Dependency status](https://img.shields.io/badge/Dependencies-`r dep_str`-orange.svg)](https://CRAN.R-project.org/package=tidycells)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/r-rudra/tidycells/master/LICENSE.md)
 [![See DevNotes](https://img.shields.io/badge/See-DevNotes-blue.svg)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md)
+
 
 <!-- badges: end -->
 
 ## Author
 
-Indranil Gayen
+[Indranil Gayen](https://orcid.org/0000-0003-0197-1944)
 
 ## TL;DR 
 Given a `file_name` which is a path of a file that contains table(s). Run this `read_cells()` in the R-console to see whether support is present for the file type. If support is present, just run
 ```{r, eval=FALSE}
 read_cells(file_name)
 ```
-**Note** Just start with a small file.
+
+**Note** 
+
+* Just start with a small file.
+* **A Word of Warning** : Many functions in this package are heuristic-algorithm based. Thus, outcomes may be unexpected. I recommend you to try `read_cells` on the target file. If the outcome is what you are expecting, it is fine. If not try again with `read_cells(file_name, at_level = "compose")`. If after that also the output is not as expected then other functions are required to be used. At that time start again with `read_cells(file_name, at_level = "make_cells")` and proceed to further functions.
+
 
 ## Introduction
 The package provides utilities to read, cells from complex tabular data and heuristic detection based 'structural assignment' of those cells to a columnar or tidy format. 
@@ -56,13 +97,21 @@ These tools are suitable for unattended conversation of (maybe a pile of) messy 
 
 
 ## Installation
-To install the development version from GitHub you'll need `devtools` package in R.
-Assuming you have `devtools` you can install this package in R with the following command:
+
+Install the [CRAN](https://CRAN.R-project.org/package=tidycells) version:
+
 ```{r, echo = TRUE, eval = FALSE}
-devtools::install_github("r-rudra/tidycells")
+install.packages("tidycells")
 ```
 
-To start with `tidycells`, I invite you to see `vignette("tidycells-intro")` (_to see vignette you need to install the package with vignette. That can be done in above command by specifying `build_vignettes = TRUE`. Note that is might be time consuming_) or check out [tidycells-website](https://r-rudra.github.io/tidycells/).
+To install the development version from GitHub you'll need `remotes` package in R (comes with `devtools`).
+Assuming you have `remotes` you can install this package in R with the following command:
+```{r, echo = TRUE, eval = FALSE}
+# devtools::install_github is actually remotes::install_github
+remotes::install_github("r-rudra/tidycells")
+```
+
+To start with `tidycells`, I invite you to see `vignette("tidycells-intro")` or check out [tidycells-website](https://r-rudra.github.io/tidycells/) (_to see vignette you need to install the package with vignette. That can be done in above command (`remotes::install_github`) by specifying `build_vignettes = TRUE`. Note that, it might be time consuming. CRAN version comes with prebuilt-vignette_).
 
 ## Quick Overview
 
@@ -77,10 +126,11 @@ The data looks like (in excel)
 knitr::include_graphics("vignettes/ext/marks.png")
 ```
 
-Let's try `tidycells` functions
+Let's try `tidycells` functions in this data
 
 Read at once
 ```{r, eval=FALSE}
+# you should have tidyxl installed
 system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
   read_cells()
 ```
@@ -107,17 +157,19 @@ d <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE
   read_cells(at_level = "make_cells") %>% 
   .[[1]]
 ```
+Or
 ```{r}
 # or you may do
 d <- system.file("extdata", "marks_cells.rds", package = "tidycells", mustWork = TRUE) %>% 
   readRDS()
 ```
+Then 
 ```{r}
 d <- numeric_values_classifier(d)
 da <- analyze_cells(d)
 ```
 
-Then you need to run `compose_cells` with additional new argument `print_attribute_overview = TRUE`
+After this you need to run `compose_cells` (with argument `print_attribute_overview = TRUE`)
 
 ```{r, echo=TRUE, eval=FALSE}
 dc <- compose_cells(da, print_attribute_overview = TRUE)
@@ -126,7 +178,7 @@ dc <- compose_cells(da, print_attribute_overview = TRUE)
 knitr::include_graphics("vignettes/ext/compose_cells_cli1.png")
 dc <- compose_cells(da)
 ```
-
+If you want a well-aligned columns then you may like to do
 ```{r}
 # bit tricky and tedious unless you do print_attribute_overview = TRUE in above line
 dcfine <- dc %>% 
@@ -154,9 +206,9 @@ dcfine <- dc %>%
 knitr::kable(head(dcfine), align = c(rep("l", 3), "c"))
 ```
 
-This is still not good right! You had to manually pick some weird column-names and spent some brain (when it was evident from data which columns should be aligned with whom). 
+This is still not good right! You had to manually pick some weird column-names and spent some time and energy (when it was evident from data which columns should be aligned with whom). 
 
-The `collate_columns` functions does exactly this for you. So instead of manually picking column-names after compose cells you can simply run
+The `collate_columns` functions does exactly this for you. So instead of manually picking column-names after _compose cells_ you can simply run
 
 ```{r, eval=FALSE}
 # collate_columns(dc) should be same with 
@@ -165,10 +217,10 @@ collate_columns(dc) %>%
   head()
 ```
 ```{r, echo=FALSE}
-knitr::kable(head(collate_columns(dc)), align = c(rep("l", 4), "c"))
+knitr::kable(head(collate_columns(dc)), align = c(rep("l", 5), "c"))
 ```
 
-Looks like staged example! Yes you are right this is not always perfect (same is true for `analyze_cells` also). However, if the data is somehow helpful in demystifying underlying columns structure (like this one), then this will be useful. 
+Looks like staged example! Yes, you are right this is not always perfect (same is true for `analyze_cells` also). However, if the data is somehow helpful in demystifying underlying columns structure (like this one), then this will be useful. 
 
 These functions `read_cells` (all functionalities combined), `analyze_cells`, `collate_columns` are here to ease your pain in data wrangling and reading from various sources. It may not be full-proof solution to all types of tabular data. It is always recommended to perform these tasks manually whenever expected results are not coming. 
 
@@ -208,19 +260,21 @@ Since all of these modules are entirely optional the dependency is kept at **tid
 
 
 ## Reference and Related Projects
-* [tidyxl](https://github.com/nacnudus/tidyxl) :  **Read Untidy Excel Files:**
+* [tidyxl](https://github.com/nacnudus/tidyxl):  **Read Untidy Excel Files:**
 Imports non-tabular from Excel files into R. Exposes cell content, position and formatting in a tidy structure for further manipulation. Tokenizes Excel formulas. Supports '.xlsx' and '.xlsm' via the embedded 'RapidXML' C++ library <http://rapidxml.sourceforge.net>. Does not support '.xlsb' or '.xls'.
 * [unpivotr](https://github.com/nacnudus/unpivotr): **Unpivot Complex and Irregular Data Layouts**
 Tools for converting data from complex or irregular layouts to a columnar structure. For example, tables with multilevel column or row headers, or spreadsheets. Header and data cells are selected by their contents and position, as well as formatting and comments where available, and are associated with one other by their proximity in given directions. Functions for data frames and HTML tables are provided.
 Major parts of the package right now fully depend on **unpivotr**. The **tidycells** package would have never existed without this wonderful package from [Duncan Garmonsway](https://github.com/nacnudus).
 * The [rsheets](https://github.com/rsheets) project: 
 It hosts several R packages (few of them are in CRAN already) which are in the early stages of importing spreadsheets from Excel and Google Sheets into R.  Specifically, have a look at these projects which seems closely related to these projects : [jailbreaker](https://github.com/rsheets/jailbreakr), [rexcel](https://github.com/rsheets/rexcel) (README of this project has a wonderful reference for excel integration with R).
+* [readabs](https://github.com/MattCowgill/readabs): **Download and Tidy Time Series Data from the Australian Bureau of Statistics**
+The `readabs` package helps you easily download, import, and tidy time series data from the [Australian Bureau of Statistics](https://www.abs.gov.au/) from within R. This saves you time manually downloading and tediously tidying time series data and allows you to spend more time on your analysis.
 * The [tidyABS](https://github.com/ianmoran11/tidyABS) package: 
 The `tidyABS` package converts ABS excel tables to tidy data frames. It uses rules-of-thumb to determine the structure of excel tables, however it sometimes requires pointers from the user. This package is in early development.
 
 
 ## Acknowledgement
-This package incomplete without following packages (apart from the **unpivotr** which is the core package on which **tidycells** depends largely, as mentioned above ). Each of these packages are in suggests fields of `tidycells`.
+This package incomplete without following packages (apart from the **unpivotr** which is the core package on which **tidycells** depends largely, as mentioned above). Each of these packages are in suggests fields of `tidycells`.
 (The read_cells basically, performs unification on several functions from various packages to give you support for different file types. These are listed below.)
 
 * [**readr**](https://cran.r-project.org/package=readr): for csv (in melted format)

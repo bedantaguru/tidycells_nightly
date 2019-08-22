@@ -2,9 +2,10 @@
 % Please edit documentation in R/get_direction_df.R
 \name{get_direction_df}
 \alias{get_direction_df}
-\title{Get Directional Orientation for Attributes corresponding to a given data group}
+\title{Get Directional Orientation for Attributes corresponding to a given data
+group}
 \usage{
-get_direction_df(dp, datt)
+get_direction_df(dp, datt, allow_inside = FALSE)
 }
 \arguments{
 \item{dp}{single data group boundary information}
@@ -15,7 +16,8 @@ get_direction_df(dp, datt)
 Directional Orientation for Attributes
 }
 \description{
-Get Directional Orientation for Attributes corresponding to a given data group
+Get Directional Orientation for Attributes corresponding to a given data
+group
 }
 \details{
 Used internally by get_data_block_information function
