@@ -177,11 +177,7 @@ See other successful builds in [CRAN Comments](https://github.com/r-rudra/tidyce
 
 To install `tidycells` (with bare minimum functionality) you need do following two things 
 
-<<<<<<< HEAD
 * `install.packages("tidyverse")` (This possibly you have already done)
-=======
-* `install.packages("tidyverse")` ( _This possibly you have already done. _ )
->>>>>>> c61af551918946f2756f8e9aa51235308ae11028
 * `install.packages("unpivotr")`
 
 Rest packages are optional and can be installed as per your requirements. 
