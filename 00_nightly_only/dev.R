@@ -1,4 +1,11 @@
 
+
+#  failure for pcd
+
+pcd <- readRDS("00_nightly_only/pcd")
+
+
+
 # after  
 # devtools::install_github("tidyverse/tidyr")
 require(tidyr)
@@ -124,11 +131,77 @@ unpivotr::enhead(d0, a0, "NNE")
 
 
 
+
+
+
+
+
+dam %>%
+  group_by(data_gid) %>%
+  group_split() ->x
+
+y <-  x[[1]] %>%
+  group_by(attr_gid, direction, attr_gid_split) %>%
+  group_split()
+
+stitch_direction(y[[1]], ca$cell_df, trace_it = F)
+
+x[[1]] %>%
+  group_by(attr_gid, direction, attr_gid_split) %>%
+  group_split() %>%
+  map(~ try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back)))
+
+ x[[1]] %>%
+   group_by(attr_gid, direction, attr_gid_split) %>%
+   group_split() %>%
+   map(~ stitch_direction(.x, ca$cell_df, trace_it = trace_it_back)) %>%
+   reduce(fj_this)
+
+
+
 d_att_map <- dat_boundary %>%
   split(.$gid) %>%
   map_df(~ get_direction_df(.x, datt = att_gid_map, allow_inside = TRUE))
 
 # dev for analyze_cells
+
+admap1_major_minor$map %>%
+  rename(md = dist) %>% 
+    group_by(data_gid, direction_group) %>%
+    mutate(m_dist = min(md)) %>%
+    ungroup() %>%
+    filter(md == m_dist) %>%
+    select(-md) %>%
+    rename(dist = m_dist)
+
+admap1_try <- admap0$all_map %>% 
+  rename(attr_gid = gid, dist = md ) %>%
+  filter(direction_group != "corner") %>%
+  ai_get_data_attr_map_details(d_dat, d_att)
+
+
+admap1 <- admap0$map %>%
+  filter(direction_group != "corner") %>%
+  ai_get_data_attr_map_details(d_dat, d_att)
+
+admap0$map %>% group_by(attr_gid, data_gid) %>% mutate(n=n()) %>% ungroup() %>% filter(n>1)
+
+
+rt <- 4; plot(d, no_plot = T)+
+  ggplot2::geom_tile(data =  d_dat$group_id_map %>% filter(gid == d_dat$group_id_boundary$gid[rt]) %>% mutate(value =NA, type = "empty"))
+
+
+rt <- 3; plot(d, no_plot = T)+
+  ggplot2::geom_tile(data = d_att$group_id_map %>%  filter(gid == chk$attr_gid[rt]) %>% mutate(value =NA, type = "empty"))+
+  ggplot2::geom_tile(data = admap_main$raw_map %>% distinct(gid = data_gid, row =row_d, col =col_d) %>%  filter(gid == chk$data_gid[rt]) %>% mutate(value =NA, type = "empty"))
+
+
+
+rt <- 3; am <- admap1$map;plot(d, no_plot = T)+
+  ggplot2::geom_tile(data = d_att$group_id_map %>%  filter(gid == am$attr_gid[rt]) %>% mutate(value =NA, type = "empty"))+
+  ggplot2::geom_tile(data = d_dat$group_id_map %>%  filter(gid == am$data_gid[rt]) %>% mutate(value =NA, type = "empty"))
+
+plot(d, no_plot = T)+ggplot2::geom_tile(data = d_att$group_id_map %>%  filter(gid == 6001) %>% mutate(value =NA, type = "empty"))
 
 plot(d, no_plot = T)+ggplot2::geom_tile(data = d_att$group_id_map %>% filter(gid %in% unmapped_attr_gids[1]) %>% mutate(value =NA, type = "empty"))
 
