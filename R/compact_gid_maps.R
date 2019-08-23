@@ -30,7 +30,7 @@ compact_gid_maps <- function(gid_map, admap_main){
   gid_map$group_id_boundary <- get_group_id_boundary(gid_map_raw_new)
   
   admap_main_raw_map_new <- admap_main$raw_map %>% 
-    left_join(ngmap %>% rename(attr_gid = gid, new_attr_gid = new_gid), Joining, by = "attr_gid")
+    left_join(ngmap %>% rename(attr_gid = gid, new_attr_gid = new_gid), by = "attr_gid")
   admap_main_raw_map_new <- admap_main_raw_map_new %>% 
     mutate(new_attr_gid = ifelse(is.na(new_attr_gid), attr_gid, new_attr_gid)) %>% 
     select(-attr_gid) %>% 

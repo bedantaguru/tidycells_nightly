@@ -174,7 +174,8 @@ analyze_cells_raw <- function(d, silent = TRUE) {
 
 
   # last stage of analysis
-  d_dat$group_id_whole_boundary <- extend_data_block(d_dat$group_id_extended_boundary, admap_fc1$map, d_att)
+  # this is not required 
+  # d_dat$group_id_whole_boundary <- extend_data_block(d_dat$group_id_extended_boundary, admap_fc1$map, d_att)
 
   admap2 <- merge_admaps(admap1, admap_fc1)
   
@@ -213,6 +214,9 @@ analyze_cells_raw <- function(d, silent = TRUE) {
     admap <- admap3
   }
   
+  # once admap is done
+  d_dat$group_id_extended_boundary <- NULL
+  d_dat$group_id_whole_boundary <- extend_data_block(d_dat$group_id_boundary, admap$map, d_att)
   
   
   # str-detection done

@@ -23,6 +23,10 @@ test_that("shiny widgets works", {
   skip_on_os("solaris")
 
   inst_deps()
+  
+  if(!shinytest::dependenciesInstalled()){
+    skip("shinytest - dependencies not installed")
+  }
 
   nowats <- getOption("AutoUnloadShiny")
   options(AutoUnloadShiny = FALSE)

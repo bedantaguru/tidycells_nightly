@@ -1,5 +1,11 @@
 
 
+dcomp02 <- dcomp00 %>%
+  map(~ .x %>%
+        # this try should be removed if unpivotr::enhead is internalized
+        # or similar behaving fucntions is developed.
+        map(~try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back), silent = TRUE)))
+
 dcomp00 <- dam %>%
   group_by(data_gid) %>%
   group_split() %>%

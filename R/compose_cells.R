@@ -10,6 +10,7 @@
 #' @param attr_sep a character string to separate the attributes. (Default is `<space>::<space>`)
 #' @param discard_raw_cols logical scalar. If enabled only main processed columns will be returned. (Default `FALSE`)
 #' @param print_attribute_overview print the overview of the attributes (4 distinct values from each attribute of each block)
+#' @param silent whether to generate warning message on compose failure (Default `TRUE`)
 #'
 #' @return a data.frame (as tibble) in tidy form.
 #' @export
@@ -23,14 +24,18 @@
 #' ca <- analyze_cells(cd)
 #'
 #' compose_cells(ca)
-compose_cells <- function(ca, post_process = TRUE, attr_sep = " :: ", discard_raw_cols = FALSE,
-                          print_attribute_overview = FALSE) {
+compose_cells <- function(ca, post_process = TRUE, 
+                          attr_sep = " :: ", 
+                          discard_raw_cols = FALSE,
+                          print_attribute_overview = FALSE, 
+                          silent = FALSE) {
   compose_cells_raw(
     ca = ca,
     post_process = post_process,
     attr_sep = attr_sep,
     discard_raw_cols = discard_raw_cols,
-    print_col_info = print_attribute_overview
+    print_col_info = print_attribute_overview,
+    silent = silent
   )
 }
 
@@ -39,7 +44,8 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
                               trace_it_back = FALSE,
                               details = FALSE,
                               print_col_info = FALSE, 
-                              silent =  FALSE) {
+                              silent =  FALSE, 
+                              ask_user = TRUE) {
   if (!inherits(ca, "cell_analysis")) {
     abort("A 'Cell Analysis' expected.")
   }
@@ -63,27 +69,67 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
     )
   }
   
-  dcomp0 <- dam %>%
+  dcomp00 <- dam %>%
     group_by(data_gid) %>%
     group_split() %>%
     map(~ .x %>%
           group_by(attr_gid, direction, attr_gid_split) %>%
-          group_split() %>%
+          group_split())
+  
+  dcomp0 <- dcomp00 %>%
+    map(~ .x %>%
           # this try should be removed if unpivotr::enhead is internalized
           # or similar behaving fucntions is developed.
-          map(~ try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back), silent = TRUE)))
+          map(~{
+            e <- try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back), silent = TRUE)
+            .ok <- !inherits(e, "try-error")
+            .d <- NULL
+            if(!.ok) .d <- .x
+            list(ok  = .ok, out = e, dat = .d)
+          }))
   
   chk0 <- dcomp0 %>% 
-    map_lgl(~.x %>% map_lgl(~inherits(.x, "try-error")) %>% any) %>% 
+    map_lgl(~.x %>% map_lgl(~!.x$ok) %>% any) %>% 
     any()
   
   if(chk0){
     if(!silent){
       # Need to show user what has been missed
-      warn("Some attributes (possibly minor only) failed to compose. Check whether output is as expected.")
+      warn(paste0("Some attributes (possibly minor only) failed to compose.",
+                  "\nCheck whether output is as expected.",
+                  "\nYou can disable this by setting silent = TRUE."))
+      if(interactive() & ask_user){
+        user_res <- rstudioapi_ask(
+          title = "Some attributes failed to compose.", 
+          message = "Do you want to return back the failed analysis part? (yes/no)", 
+          default = "yes", 
+          ok = "Yes", cancel = "No", 
+          is_question = TRUE)
+        
+        if(identical(user_res, TRUE)){
+          user_res <- "yes"
+        }
+        
+        if(user_res=="yes"){
+          # return failed analysis part for observing
+          patched_ca <- ca
+          
+          dp0 <- dcomp0 %>% map_df(~.x %>% map_lgl(~!.x$ok) %>% .x[.] %>% map_df(~.x$dat))
+          patched_ca$details$data_attr_map_raw <- unique(dp0[colnames(patched_ca$details$data_attr_map_raw)])
+          
+          warn(paste0(
+            "Failed portion of Cell-Analysis is returned",
+            "\nIn the plots you should see texts, only in failed attributes."
+          ))
+          
+          return(patched_ca)
+        }
+        
+      }
     }
-    dcomp0 <- dcomp0 %>% map(~.x %>% map_lgl(~!inherits(.x, "try-error")) %>% .x[.])
   }
+  
+  dcomp0 <- dcomp0 %>% map(~.x %>% map_lgl(~.x$ok) %>% .x[.] %>% map(~.x$out))
   
   chk1 <- dcomp0 %>% map_int(length) %>% sum()
   

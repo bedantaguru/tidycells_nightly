@@ -27,7 +27,7 @@ test_that("etc works", {
     analyze_cells()
 
   expect_warning(dc00 <- dc0 %>%
-    compose_cells(post_process = FALSE), "failed to compose")
+    compose_cells_raw(post_process = FALSE, ask_user = FALSE), "failed to compose")
 
   dc01 <- dc00 %>%
     collate_columns(combine_threshold = 0.1)

@@ -79,11 +79,11 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
             .ok <- !inherits(e, "try-error")
             .d <- NULL
             if(!.ok) .d <- .x
-            list(notok  = !.ok, out = e, dat = .d)
+            list(ok  = .ok, out = e, dat = .d)
           }))
   
   chk0 <- dcomp0 %>% 
-    map_lgl(~.x %>% map_lgl("notok") %>% any) %>% 
+    map_lgl(~.x %>% map_lgl(~!.x$ok) %>% any) %>% 
     any()
   
   if(chk0){
@@ -91,8 +91,8 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
       # Need to show user what has been missed
       warn("Some attributes (possibly minor only) failed to compose. Check whether output is as expected.")
     }
-    dcomp0 <- dcomp0 %>% map(~.x %>% map_lgl(~!.x$notok) %>% .x[.])
-    dcomp0 <- dcomp0 %>% map(~.x %>% map("out"))
+    dcomp0 <- dcomp0 %>% map(~.x %>% map_lgl(~.x$ok) %>% .x[.] %>% map(~.x$out))
+    
   }
   
   chk1 <- dcomp0 %>% map_int(length) %>% sum()
