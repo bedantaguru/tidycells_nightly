@@ -63,18 +63,27 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
     )
   }
   
-  dcomp0 <- dam %>%
+  dcomp00 <- dam %>%
     group_by(data_gid) %>%
     group_split() %>%
     map(~ .x %>%
           group_by(attr_gid, direction, attr_gid_split) %>%
-          group_split() %>%
+          group_split())
+  
+  dcomp0 <- dcomp00 %>%
+    map(~ .x %>%
           # this try should be removed if unpivotr::enhead is internalized
           # or similar behaving fucntions is developed.
-          map(~ try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back), silent = TRUE)))
+          map(~{
+            e <- try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back), silent = TRUE)
+            .ok <- !inherits(e, "try-error")
+            .d <- NULL
+            if(!.ok) .d <- .x
+            list(notok  = !.ok, out = e, dat = .d)
+          }))
   
   chk0 <- dcomp0 %>% 
-    map_lgl(~.x %>% map_lgl(~inherits(.x, "try-error")) %>% any) %>% 
+    map_lgl(~.x %>% map_lgl("notok") %>% any) %>% 
     any()
   
   if(chk0){
@@ -82,7 +91,8 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
       # Need to show user what has been missed
       warn("Some attributes (possibly minor only) failed to compose. Check whether output is as expected.")
     }
-    dcomp0 <- dcomp0 %>% map(~.x %>% map_lgl(~!inherits(.x, "try-error")) %>% .x[.])
+    dcomp0 <- dcomp0 %>% map(~.x %>% map_lgl(~!.x$notok) %>% .x[.])
+    dcomp0 <- dcomp0 %>% map(~.x %>% map("out"))
   }
   
   chk1 <- dcomp0 %>% map_int(length) %>% sum()

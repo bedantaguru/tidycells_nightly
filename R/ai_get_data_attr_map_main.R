@@ -36,6 +36,7 @@ ai_get_data_attr_map_main <- function(d_dat, d_att, crude_join = TRUE){
     ai_get_data_attr_map_details(d_dat, d_att)
   
   admap1_major_minor_compact <- admap1_major_minor$map %>%
+    filter(attr_group == "major") %>% 
     rename(md = dist) %>% 
     group_by(data_gid, direction_group) %>%
     mutate(m_dist = min(md)) %>%
@@ -45,7 +46,7 @@ ai_get_data_attr_map_main <- function(d_dat, d_att, crude_join = TRUE){
     rename(dist = m_dist)
   
   admap0_pass0 <- admap1_major_minor_compact %>% 
-    filter(attr_group == "major", direction_group != "corner") %>% 
+    filter(direction_group != "corner") %>% 
     unique() %>% 
     select(-attr_group)
   

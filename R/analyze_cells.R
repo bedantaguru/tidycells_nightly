@@ -185,9 +185,35 @@ analyze_cells_raw <- function(d, silent = TRUE) {
     admap2 <- rel_chk$admap
   }
   
-  admap <- admap2$map %>% 
+  cmp <- compact_gid_maps(d_att, admap2)
+  d_att <- cmp$gid_map
+  admap2 <- cmp$admap
+  
+  admap3 <- admap2$map %>% 
     select(-attr_group) %>%
     ai_get_data_attr_map_details(d_dat, d_att)
+  
+  if(!identical(admap3$map, admap2$map)){
+    # I think this can be iterated 
+    # KFL
+    admap3_pass <- admap3$map %>%
+      rename(md = dist) %>% 
+      group_by(data_gid, direction_group, attr_group) %>%
+      mutate(m_dist = min(md)) %>%
+      ungroup() %>%
+      filter(md == m_dist) %>%
+      select(-md) %>%
+      rename(dist = m_dist)
+    
+    admap <- admap3_pass %>% 
+      select(-attr_group) %>%
+      ai_get_data_attr_map_details(d_dat, d_att)
+    
+  }else{
+    admap <- admap3
+  }
+  
+  
   
   # str-detection done
   this_cells <- get_cells_from_admap(admap, d_dat, d_att)

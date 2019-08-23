@@ -74,7 +74,7 @@ test_that("shiny widgets works", {
 
 
   # if testing for images enable this
-  # also set when plotly present
+  # also set when plotly not present (screenshots are with plotly)
   # like test_image <- TRUE
   # else set test_image <- FALSE
   test_image <- FALSE
