@@ -329,6 +329,11 @@ level only.
     Statistics](https://www.abs.gov.au/) from within R. This saves you
     time manually downloading and tediously tidying time series data and
     allows you to spend more time on your analysis.
+  - [ezpickr](https://CRAN.R-project.org/package=ezpickr): **Easy Data
+    Import Using GUI File Picker and Seamless Communication Between an
+    Excel and R** Gives ability for choosing any rectangular data file
+    using interactive GUI dialog box, and seamlessly manipulating tidy
+    data between an ‘Excel’ window and R session.
   - The [tidyABS](https://github.com/ianmoran11/tidyABS) package: The
     `tidyABS` package converts ABS excel tables to tidy data frames. It
     uses rules-of-thumb to determine the structure of excel tables,
