@@ -13,23 +13,23 @@ read_cell_task_orders <- c("detect_and_read", "make_cells", "va_classify", "anal
 #' run `read_cells()` in the console. This function supports the file format based on content and not based on just the file
 #' extension. That means if a file is saved as pdf and then the extension is removed (or extension modified to say `.xlsx`)
 #' then also the `read_cells` will detect it as pdf and read its content.
-#' 
+#'
 #' **Note** :
-#'  
+#'
 #' * `read_cells` is supposed to work for any kind of data. However, if it fails in intermediate stage it will raise
 #' a warning and give results till successfully processed stage.
 #' * The heuristic-algorithm are not well-optimized (yet) so may be slow on large files.
-#' * If the target table has numerical values as data and text as their attribute (identifier of the data elements), 
-#' straight forward method is sufficient in the majority of situations. Otherwise, you may need to utilize other functions. 
-#' 
-#' **A Word of Warning** : 
-#'   
-#' _The functions used inside `read_cells` are heuristic-algorithm based. Thus, outcomes may be unexpected. 
-#' It is recommend to try `read_cells` on the target file. If the outcome is expected., it is fine. 
-#' If not try again with `read_cells(file_name, at_level = "compose")`. If after that also the output is not as expected 
-#' then other functions are required to be used. At that time start again with `read_cells(file_name, at_level = "make_cells")` 
+#' * If the target table has numerical values as data and text as their attribute (identifier of the data elements),
+#' straight forward method is sufficient in the majority of situations. Otherwise, you may need to utilize other functions.
+#'
+#' **A Word of Warning** :
+#'
+#' _The functions used inside `read_cells` are heuristic-algorithm based. Thus, outcomes may be unexpected.
+#' It is recommend to try `read_cells` on the target file. If the outcome is expected., it is fine.
+#' If not try again with `read_cells(file_name, at_level = "compose")`. If after that also the output is not as expected
+#' then other functions are required to be used. At that time start again with `read_cells(file_name, at_level = "make_cells")`
 #' and proceed to further functions._
-#' 
+#'
 #'
 #' @param x either a valid file path or a [`read_cell_part`][read_cell_part-class]
 #' @param at_level till which level to process.
@@ -176,86 +176,88 @@ read_cells.read_cell_part <- function(x,
 
   ran_till <- "init"
   ok_so_far <- TRUE
-  
+
   # detect_and_read
-  if(ok_so_far){
+  if (ok_so_far) {
     stn <- run_stage_safe(do_detect_and_read(at_level, this_level, out_l, simplify, simple, omit))
-    if(stn$ok){
+    if (stn$ok) {
       ran_till <- read_cell_task_orders[1]
       out_l <- stn$out_l
       simple <- stn$simple
-    }else{
+    } else {
       ok_so_far <- FALSE
     }
   }
-  
+
   # make_cells
-  if(ok_so_far){
+  if (ok_so_far) {
     stn <- run_stage_safe(do_make_cells(at_level, this_level, out_l, simplify, simple))
-    if(stn$ok){
+    if (stn$ok) {
       ran_till <- read_cell_task_orders[2]
       out_l <- stn$out_l
       simple <- stn$simple
-    }else{
+    } else {
       ok_so_far <- FALSE
     }
   }
 
   # va_classify
-  if(ok_so_far){
+  if (ok_so_far) {
     stn <- run_stage_safe(do_va_classify(at_level, this_level, out_l, simplify, simple))
-    if(stn$ok){
+    if (stn$ok) {
       ran_till <- read_cell_task_orders[3]
       out_l <- stn$out_l
       simple <- stn$simple
-    }else{
+    } else {
       ok_so_far <- FALSE
     }
   }
-  
+
   # analyze
-  if(ok_so_far){
+  if (ok_so_far) {
     stn <- run_stage_safe(do_analyze(at_level, this_level, out_l, simplify, simple))
-    if(stn$ok){
+    if (stn$ok) {
       ran_till <- read_cell_task_orders[4]
       out_l <- stn$out_l
       simple <- stn$simple
-    }else{
+    } else {
       ok_so_far <- FALSE
     }
   }
 
   # compose
-  if(ok_so_far){
+  if (ok_so_far) {
     stn <- run_stage_safe(do_compose(at_level, this_level, out_l, simplify, simple))
-    if(stn$ok){
+    if (stn$ok) {
       ran_till <- read_cell_task_orders[5]
       out_l <- stn$out_l
       simple <- stn$simple
-    }else{
+    } else {
       ok_so_far <- FALSE
     }
   }
 
   # collate
-  if(ok_so_far){
+  if (ok_so_far) {
     stn <- run_stage_safe(do_collate(at_level, this_level, out_l, simplify, simple))
-    if(stn$ok){
+    if (stn$ok) {
       ran_till <- read_cell_task_orders[6]
       out_l <- stn$out_l
       simple <- stn$simple
-    }else{
+    } else {
       ok_so_far <- FALSE
     }
   }
-  
+
   this_lvl_mx <- min(max(at_level, this_level), length(read_cell_task_orders))
-  reached_lvl <- which(read_cell_task_orders==ran_till)
-  
-  if(reached_lvl < this_lvl_mx){
-    warn(paste0("Supplied at_level is ",read_cell_task_orders[at_level],".",
-             "\nWhile read_cells could reach till ", ran_till, ".",
-             "\nPlease check manually."))
+  reached_lvl <- which(read_cell_task_orders == ran_till)
+
+  if (reached_lvl < this_lvl_mx) {
+    warn(paste0(
+      "Supplied at_level is ", read_cell_task_orders[at_level], ".",
+      "\nWhile read_cells could reach till ", ran_till, ".",
+      "\nPlease check manually."
+    ))
   }
 
   if (simplify) {

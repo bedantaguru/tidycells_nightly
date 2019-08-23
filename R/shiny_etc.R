@@ -61,9 +61,9 @@ rstudioapi_ask <- function(title, message, default = NULL, is_question = FALSE, 
   }
 
   if (ok) {
-    if(is_question){
+    if (is_question) {
       rstudioapi::showQuestion(title = title, message = message, ...)
-    }else{
+    } else {
       rstudioapi::showPrompt(title = title, message = message, default = default)
     }
   } else {

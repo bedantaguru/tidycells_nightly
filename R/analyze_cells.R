@@ -92,12 +92,12 @@ analyze_cells_raw <- function(d, silent = TRUE) {
 
   d_dat_orig <- get_group_id(data_cells)
   d_att_orig <- get_group_id(attr_cells)
-  
+
   d_dat <- d_dat_orig
   d_att <- d_att_orig
-  
+
   setp1 <- ai_get_data_attr_map_main(d_dat, d_att)
-  
+
   d_dat <- setp1$d_dat
   d_att <- setp1$d_att
   admap1 <- setp1$admap
@@ -111,16 +111,15 @@ analyze_cells_raw <- function(d, silent = TRUE) {
     if (!identical(d_dat0, d_dat)) {
       # this means results has been invalidated
       d_dat <- d_dat0
-      
+
       # revert back to original form
       d_att <- d_att_orig
-      
+
       setp2 <- ai_get_data_attr_map_main(d_dat, d_att, crude_join = FALSE)
-      
+
       d_dat <- setp2$d_dat
       d_att <- setp2$d_att
       admap1 <- setp2$admap
-      
     }
   }
 
@@ -174,51 +173,50 @@ analyze_cells_raw <- function(d, silent = TRUE) {
 
 
   # last stage of analysis
-  # this is not required 
+  # this is not required
   # d_dat$group_id_whole_boundary <- extend_data_block(d_dat$group_id_extended_boundary, admap_fc1$map, d_att)
 
   admap2 <- merge_admaps(admap1, admap_fc1)
-  
+
   # join attr based on block merges possible (one more time)
   rel_chk <- ai_relative_data_join_attr(admap_main = admap2, d_att = d_att)
   if (rel_chk$done) {
     d_att <- rel_chk$d_att %>% map(unique)
     admap2 <- rel_chk$admap
   }
-  
+
   cmp <- compact_gid_maps(d_att, admap2)
   d_att <- cmp$gid_map
   admap2 <- cmp$admap
-  
-  admap3 <- admap2$map %>% 
+
+  admap3 <- admap2$map %>%
     select(-attr_group) %>%
     ai_get_data_attr_map_details(d_dat, d_att)
-  
-  if(!identical(admap3$map, admap2$map)){
-    # I think this can be iterated 
+
+  if (!identical(admap3$map, admap2$map)) {
+    # I think this can be iterated
     # KFL
     admap3_pass <- admap3$map %>%
-      rename(md = dist) %>% 
+      rename(md = dist) %>%
       group_by(data_gid, direction_group, attr_group) %>%
       mutate(m_dist = min(md)) %>%
       ungroup() %>%
       filter(md == m_dist) %>%
       select(-md) %>%
       rename(dist = m_dist)
-    
-    admap <- admap3_pass %>% 
+
+    admap <- admap3_pass %>%
       select(-attr_group) %>%
       ai_get_data_attr_map_details(d_dat, d_att)
-    
-  }else{
+  } else {
     admap <- admap3
   }
-  
+
   # once admap is done
   d_dat$group_id_extended_boundary <- NULL
   d_dat$group_id_whole_boundary <- extend_data_block(d_dat$group_id_boundary, admap$map, d_att)
-  
-  
+
+
   # str-detection done
   this_cells <- get_cells_from_admap(admap, d_dat, d_att)
 

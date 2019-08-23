@@ -16,10 +16,10 @@ ai_relative_data_join_attr <- function(admap_main, d_att) {
 
     rel_gids <- chk %>%
       select(-n_att) %>%
-      inner_join(admap_main$raw_map, by = c("attr_gid", "data_gid", "direction","attr_group"))
+      inner_join(admap_main$raw_map, by = c("attr_gid", "data_gid", "direction", "attr_group"))
 
-    d_att_dat_map_raw_rest <- admap_main$raw_map %>% 
-      anti_join(chk, by = c("attr_gid", "data_gid", "direction","attr_group"))
+    d_att_dat_map_raw_rest <- admap_main$raw_map %>%
+      anti_join(chk, by = c("attr_gid", "data_gid", "direction", "attr_group"))
 
     rel_gids_att <- rel_gids %>%
       distinct(attr_gid, data_gid, direction, attr_group, row = row_a, col = col_a) %>%

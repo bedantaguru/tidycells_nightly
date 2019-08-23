@@ -86,8 +86,8 @@ a0 <- structure(
 # remove.packages("unpivotr", lib="~/R/win-library/3.6")
 
 # get CRAN version
-devtools::install_cran("tidyr", quiet = T)
-devtools::install_cran("unpivotr", quiet = T)
+devtools::install_cran("tidyr", quiet = TRUE)
+devtools::install_cran("unpivotr", quiet = TRUE)
 
 #####################
 # test code (start) #
@@ -184,7 +184,7 @@ y <-  x[[1]] %>%
   group_by(attr_gid, direction, attr_gid_split) %>%
   group_split()
 
-stitch_direction(y[[1]], ca$cell_df, trace_it = F)
+stitch_direction(y[[1]], ca$cell_df, trace_it = FALSE)
 
 x[[1]] %>%
   group_by(attr_gid, direction, attr_gid_split) %>%
@@ -229,31 +229,31 @@ admap0$map %>% group_by(attr_gid, data_gid) %>% mutate(n=n()) %>% ungroup() %>% 
 
 "15000"
 
-plot(d, no_plot = T)+
+plot(d, no_plot = TRUE)+
   ggplot2::geom_tile(data =  d_att$group_id_map %>% filter(gid == "13001") %>% mutate(value =NA, type = "empty"))
 
 
-rt <- 3; plot(d, no_plot = T)+
+rt <- 3; plot(d, no_plot = TRUE)+
   ggplot2::geom_tile(data =  d_dat$group_id_map %>% filter(gid == d_dat$group_id_boundary$gid[rt]) %>% mutate(value =NA, type = "empty"))
 
 
-rt <- 3; plot(d, no_plot = T)+
+rt <- 3; plot(d, no_plot = TRUE)+
   ggplot2::geom_tile(data = d_att$group_id_map %>%  filter(gid == chk$attr_gid[rt]) %>% mutate(value =NA, type = "empty"))+
   ggplot2::geom_tile(data = admap_main$raw_map %>% distinct(gid = data_gid, row =row_d, col =col_d) %>%  filter(gid == chk$data_gid[rt]) %>% mutate(value =NA, type = "empty"))
 
 
-plot(dc0$cell_df, no_plot = T)+
+plot(dc0$cell_df, no_plot = TRUE)+
   ggplot2::geom_tile(data = dc0$details$attr_details$group_id_map %>%  filter(gid == "130000_12000_N") %>% mutate(value =NA, type = "empty"))+
   ggplot2::geom_tile(data = dc0$details$data_details$group_id_map %>%  filter(gid == "12000") %>% mutate(value =NA, type = "empty"))
 
 
-rt <- 6; am <- admap2$map %>% filter(data_gid == 12004);plot(d, no_plot = T)+
+rt <- 6; am <- admap2$map %>% filter(data_gid == 12004);plot(d, no_plot = TRUE)+
   ggplot2::geom_tile(data = d_att$group_id_map %>%  filter(gid == am$attr_gid[rt]) %>% mutate(value =NA, type = "empty"))+
   ggplot2::geom_tile(data = d_dat$group_id_map %>%  filter(gid == am$data_gid[rt]) %>% mutate(value =NA, type = "empty"))
 
-plot(d, no_plot = T)+ggplot2::geom_tile(data = d_att$group_id_map %>%  filter(gid == 6001) %>% mutate(value =NA, type = "empty"))
+plot(d, no_plot = TRUE)+ggplot2::geom_tile(data = d_att$group_id_map %>%  filter(gid == 6001) %>% mutate(value =NA, type = "empty"))
 
-plot(d, no_plot = T)+ggplot2::geom_tile(data = d_att$group_id_map %>% filter(gid %in% unmapped_attr_gids[1]) %>% mutate(value =NA, type = "empty"))
+plot(d, no_plot = TRUE)+ggplot2::geom_tile(data = d_att$group_id_map %>% filter(gid %in% unmapped_attr_gids[1]) %>% mutate(value =NA, type = "empty"))
 
 admap$raw_map %>% filter(attr_group == "minor") %>% filter(attr_gid == unique(attr_gid)[3]) %>% ai_attach_direction()
 

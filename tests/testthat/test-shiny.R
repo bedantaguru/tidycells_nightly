@@ -23,8 +23,8 @@ test_that("shiny widgets works", {
   skip_on_os("solaris")
 
   inst_deps()
-  
-  if(!shinytest::dependenciesInstalled()){
+
+  if (!shinytest::dependenciesInstalled()) {
     skip("shinytest - dependencies not installed")
   }
 

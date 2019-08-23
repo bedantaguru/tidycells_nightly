@@ -98,8 +98,8 @@ text-align: justify}
   
   writeLines(rd_now, "README.Rmd")
   
-  unlink("docs", recursive = T, force = T)
-  unlink("pkgdown", recursive = T, force = T)
+  unlink("docs", recursive = TRUE, force = TRUE)
+  unlink("pkgdown", recursive = TRUE, force = TRUE)
   pkgdown::build_favicon()
   pkgdown::build_site()
   #pkgdown:::build_site_external()
@@ -405,6 +405,8 @@ library(strict)
 r_files <- list.files(full.names = TRUE, pattern = ".R$", recursive = TRUE)
 
 require(tidyverse)
+
+xt <- desc::desc()
 
 r_files %>% map(requirements::req_file) %>% unlist() %>% unique()
 

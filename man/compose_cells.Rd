@@ -19,7 +19,7 @@ compose_cells(ca, post_process = TRUE, attr_sep = " :: ",
 
 \item{print_attribute_overview}{print the overview of the attributes (4 distinct values from each attribute of each block)}
 
-\item{silent}{whether to generate warning message on compose failure (Default \code{TRUE})}
+\item{silent}{whether to suppress warning message on compose failure (Default \code{FALSE})}
 }
 \value{
 a data.frame (as tibble) in tidy form.

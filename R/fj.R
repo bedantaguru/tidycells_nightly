@@ -16,10 +16,9 @@ fj <- function(x, y,
       # check first content
       # need to update x, y so using for loop
 
-      fmg_wc <- full_join(x, y, by = join_by, suffix = c(".fj1",".fj2"))
+      fmg_wc <- full_join(x, y, by = join_by, suffix = c(".fj1", ".fj2"))
 
       for (cn in comm_cols) {
-
         xc <- fmg_wc[[paste0(cn, ".fj1")]] %>% stringr::str_trim()
         yc <- fmg_wc[[paste0(cn, ".fj2")]] %>% stringr::str_trim()
 
@@ -30,8 +29,8 @@ fj <- function(x, y,
         fmg_wc[[paste0(cn, ".fj2")]] <- yc
 
         # back to NA again to remove them from comparison
-        xc[nchar(xc)==0] <- NA
-        yc[nchar(yc)==0] <- NA
+        xc[nchar(xc) == 0] <- NA
+        yc[nchar(yc) == 0] <- NA
 
         if (all(xc == yc, na.rm = TRUE)) {
           # both the columns are actually equal
@@ -46,11 +45,9 @@ fj <- function(x, y,
           x[[cn]] <- NULL
           y[[cn]] <- NULL
         }
-
       }
 
       extra <- unique(fmg_wc[c(join_by, comm_cols)])
-
     } else {
       abort(paste(
         "unexpected error while joining.",
@@ -59,10 +56,10 @@ fj <- function(x, y,
     }
   }
   f0 <- full_join(x, y, by = join_by)
-  if(!is.null(extra)){
-    if(is.data.frame(extra)){
-      if(nrow(extra)>0){
-        if(length(setdiff(intersect(colnames(extra),colnames(f0)), join_by))==0){
+  if (!is.null(extra)) {
+    if (is.data.frame(extra)) {
+      if (nrow(extra) > 0) {
+        if (length(setdiff(intersect(colnames(extra), colnames(f0)), join_by)) == 0) {
           f0 <- full_join(f0, extra, by = join_by)
         }
       }
