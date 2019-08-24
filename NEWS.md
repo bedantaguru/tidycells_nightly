@@ -5,11 +5,11 @@
 
 ## New features
 
-* Enhancement in the heuristic based algorithm
+* Enhancement in the heuristic-based algorithm
 
 ## Other changes
 
-* Now if `read_cells` fails in intermediate stage it will give output of last sucessful stage 
+* Now if `read_cells` fails in the intermediate stage, it will give the output of last successful stage 
 
 # tidycells 0.2.0 _(2019-08-20)_
 
@@ -28,5 +28,5 @@
 ## Initial Public Release
 
 * Initial Release to GitHub
-* Prior to this it was private package
+* Prior to this it was a private package
 
