@@ -1,5 +1,155 @@
 
 
+require(dplyr)
+require(purrr)
+
+# cli::cli_sitrep()
+
+
+expression_run_safe <- function(expr, no_class = FALSE){
+  expr_fn <- rlang::as_function(expr)
+  sink(tempfile())
+  e <- suppressMessages(suppressWarnings(
+    try(expr_fn(), silent = TRUE)
+  ))
+  sink(NULL)
+  if(no_class & inherits(e, "try-error")){
+    e <- attr(e, "condition")
+  }
+  e
+}
+
+compatibility_check <- function(expr, old_version, pkg = "cli", repo = getOption("repos"), warn_outdated = TRUE){
+  now_lib_path <- .libPaths()
+  
+  
+  if(!stringr::str_detect(repo, "/$")){
+    repo <- paste0(repo, "/")
+  }
+  
+  on.exit(.libPaths(now_lib_path))
+  
+  output <- list()
+  
+  dnsl <- re_attach(pkg)
+  
+  # current run
+  output$current$ver <- expression_run_safe(~utils::packageVersion(pkg, lib.loc = .libPaths()))
+  output$current$res <- expression_run_safe(expr, no_class = TRUE)
+  
+  # do it for remote
+  temp_dir <- tempfile(pattern = "inst_check", tmpdir = tempdir(check = TRUE))
+  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+  
+  # change libpath
+  .libPaths(c(temp_dir, now_lib_path))
+  if(normalizePath(.libPaths()[1])!=normalizePath(temp_dir)){
+    stop("Failed to change libPaths")
+  }
+  
+  # install package
+  if(!missing(old_version)){
+    old_version_n <- as.numeric_version(old_version)
+    old_url <-  paste0(repo, "src/contrib/Archive/",pkg,"/",pkg,"_",old_version,".tar.gz")
+    loc_path <- paste0(temp_dir, "/",pkg,"_",old_version,".tar.gz")
+    e <- expression_run_safe(~download.file(old_url, loc_path, quiet = TRUE))
+    if(inherits(e, "try-error")){
+      stop("Unable to donwload the package.")
+    }else{
+      # proceed
+      e <- expression_run_safe(~utils::install.packages(loc_path, repos = NULL, quiet = TRUE))
+      if(inherits(e, "try-error")){
+        stop("Unable to install the package.")
+      }else{
+        # proceed
+        chk_ver <- expression_run_safe(~utils::packageVersion(pkg, lib.loc = .libPaths()))
+        if(chk_ver!=old_version_n){
+          stop("Temporary installed version not matching with given version")
+        }
+      }
+    }
+  }else{
+    #  install CRAN version
+    e <- expression_run_safe(~utils::install.packages(pkg, repos = repo, quiet = TRUE))
+    if(inherits(e, "try-error")){
+      stop("Unable to install the package.")
+    }
+  }
+  
+  # this section need to customized for pkgs
+  # all downstream dependency has to be unloaded first
+  re_attach(pkg)
+  
+  output$target$ver <- expression_run_safe(~utils::packageVersion(pkg), no_class = TRUE)
+  output$target$res <- expression_run_safe(expr, no_class = TRUE)
+  
+  output$is_same <- identical(output$target$res, output$current$res)
+  
+  .libPaths(now_lib_path)
+  re_attach(pkg)
+  dnsl %>% map(re_attach)
+  unlink(temp_dir, recursive = TRUE, force = TRUE)
+  
+  if(warn_outdated){
+    if(output$target$ver > output$current$ver){
+      warning("You are using outdated version of the package.")
+    }
+  }
+  
+  output
+}
+
+# compatibility_check(~cli::cli_sitrep(), old_version = "1.0.0")
+# compatibility_check(~cli::cli_sitrep())
+# compatibility_check(~utils::packageVersion("pkgbuild"), pkg = "pkgbuild")
+
+
+deps <- function(pkg){
+  if(!is.data.frame(pkg)){
+    dpt <- tibble(pkg = pkg)
+  }else{
+    dpt <- pkg
+  }
+  if(nrow(dpt)==0) return(NULL)
+  dpt <- dpt %>% mutate(dep = pkg %>% map(getNamespaceUsers)) %>% tidyr::unnest()
+  dpt %>% bind_rows(dpt %>% select(pkg = dep) %>% deps)
+}
+
+
+re_attach <- function(pkg){
+  if(is.null(pkg)) return(invisible(NULL))
+  this_deps <- deps(pkg)
+  detach_list <- NULL
+  if(nrow(this_deps)>0){
+    while (nrow(this_deps)>0) {
+      unloadNamespace(this_deps$dep[nrow(this_deps)])
+      detach_list <- c(this_deps$dep[nrow(this_deps)], detach_list) %>% unique()
+      this_deps <- this_deps %>% filter(!(dep %in% detach_list))
+    }
+  }
+  unloadNamespace(pkg)
+  if(length(detach_list)>0){
+    detach_list %>% map(~try(loadNamespace(.x), silent = TRUE))
+  }
+  loadNamespace(pkg)
+  invisible(detach_list)
+}
+
+# getNamespaceUsers
+deps_one <- function(pkg){
+  ips <- utils::installed.packages() %>% as_tibble()
+  ips_dep <- ips %>% select(Package, Depends, Imports) %>% 
+    mutate(imps = stringr::str_extract_all(Imports, "[a-zA-Z0-9]+"), deps =  stringr::str_extract_all(Depends, "[a-zA-Z0-9]+"))
+  ips_dep_this <-ips_dep %>% 
+    filter((imps %>% map_lgl(~pkg %in% .x)) | (deps %>% map_lgl(~pkg %in% .x)))
+  
+  this_deps <- ips_dep_this$Package %>% unique()
+  this_deps %>% map_lgl(isNamespaceLoaded) %>% this_deps[.]
+}
+
+
+#################
+
 dcomp02 <- dcomp00 %>%
   map(~ .x %>%
         # this try should be removed if unpivotr::enhead is internalized

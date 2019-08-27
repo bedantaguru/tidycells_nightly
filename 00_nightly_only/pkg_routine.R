@@ -1,4 +1,13 @@
 
+# dlstats
+dlstats::cranApp()
+
+require(rvest)
+
+get_res_from_log <- function(log_url){
+  
+}
+
 
 # using foghorn to check status
 
@@ -75,6 +84,8 @@ use_pkgdown()
 ##############################
 #  before pkgdown manual tasks
 ##############################
+
+devtools::install()
 
 require(stringr)
 rd_bk <- tempfile()
