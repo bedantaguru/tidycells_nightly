@@ -5,6 +5,7 @@ require(purrr)
 
 # cli::cli_sitrep()
 
+# compatibility check proto added
 
 expression_run_safe <- function(expr, no_class = FALSE){
   expr_fn <- rlang::as_function(expr)
