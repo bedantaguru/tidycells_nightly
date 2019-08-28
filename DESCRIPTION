@@ -2,7 +2,11 @@ Type: Package
 Package: tidycells
 Title: Read Tabular Data from Diverse Sources and Easily Make
     Them Tidy
+<<<<<<< HEAD
 Version: 0.2.1
+=======
+Version: 0.2.0.99
+>>>>>>> 2d7934dd5c48a728bb79fb5b8e7e256d1a699912
 Authors@R: 
     person(given = "Indranil",
            family = "Gayen",
