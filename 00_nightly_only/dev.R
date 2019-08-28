@@ -120,6 +120,13 @@ compatibility_check <- function(expr, old_version, pkg = "tidycells", repo = get
 #                       read_cells())
 
 
+# getNamespaceExports("cli")
+# exists("cli_sitrep")
+# library(cli)
+# exists("cli_sitrep")
+# unloadNamespace("cli")
+# exists("cli_sitrep")
+
 deps <- function(pkg){
   if(!is.data.frame(pkg)){
     dpt <- tibble(pkg = pkg)
