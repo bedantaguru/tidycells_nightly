@@ -21,12 +21,12 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 Status](https://codecov.io/gh/r-rudra/tidycells/branch/master/graph/badge.svg)](https://codecov.io/gh/r-rudra/tidycells?branch=master)
 [![Coveralls Coverage
 Status](https://coveralls.io/repos/github/r-rudra/tidycells/badge.svg?branch=master&service=github)](https://coveralls.io/github/r-rudra/tidycells?branch=master)
-[![Lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![Lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg?style=flat-square)](https://www.tidyverse.org/lifecycle/#maturing)
 [![Dependency
-status](https://img.shields.io/badge/Depends-9/28-orange.svg)](https://CRAN.R-project.org/package=tidycells)
+status](https://img.shields.io/badge/Depends-9/28-orange.svg?style=flat-square)](https://CRAN.R-project.org/package=tidycells)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/r-rudra/tidycells/master/LICENSE.md)
 [![See
-DevNotes](https://img.shields.io/badge/See-DevNotes-blue.svg)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md)
+DevNotes](https://img.shields.io/badge/See-DevNotes-blue.svg?style=flat-square)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md)
 
 <!-- badges: end -->
 
