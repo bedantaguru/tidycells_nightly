@@ -12,6 +12,8 @@ checks](https://cranchecks.info/badges/summary/tidycells)](https://cran.r-projec
 status](https://travis-ci.org/r-rudra/tidycells.svg?branch=master)](https://travis-ci.org/r-rudra/tidycells)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/r-rudra/tidycells?branch=master&svg=true)](https://ci.appveyor.com/project/bedantaguru/tidycells)
+[![R-hub
+checks](https://img.shields.io/badge/R_Hub-11/20_OK-green?logo=R)](https://cran.r-project.org/web/checks/check_results_tidycells.html)
 [![Codecov Coverage
 Status](https://codecov.io/gh/r-rudra/tidycells/branch/master/graph/badge.svg)](https://codecov.io/gh/r-rudra/tidycells?branch=master)
 [![Coveralls Coverage

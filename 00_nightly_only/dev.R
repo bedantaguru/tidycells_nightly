@@ -20,7 +20,7 @@ expression_run_safe <- function(expr, no_class = FALSE){
   e
 }
 
-compatibility_check <- function(expr, old_version, pkg = "cli", repo = getOption("repos"), warn_outdated = TRUE){
+compatibility_check <- function(expr, old_version, pkg = "tidycells", repo = getOption("repos"), warn_outdated = TRUE){
   now_lib_path <- .libPaths()
   
   
@@ -33,7 +33,10 @@ compatibility_check <- function(expr, old_version, pkg = "cli", repo = getOption
   output <- list()
   
   dnsl <- re_attach(pkg)
-  
+  expression_run_safe(~{
+    es <- loadNamespace(pkg)
+    attachNamespace(es)
+  })
   # current run
   output$current$ver <- expression_run_safe(~utils::packageVersion(pkg, lib.loc = .libPaths()))
   output$current$res <- expression_run_safe(expr, no_class = TRUE)
@@ -80,6 +83,12 @@ compatibility_check <- function(expr, old_version, pkg = "cli", repo = getOption
   # this section need to customized for pkgs
   # all downstream dependency has to be unloaded first
   re_attach(pkg)
+  expression_run_safe(~{
+    es <- loadNamespace(pkg)
+    attachNamespace(es)
+  })
+  
+  
   
   output$target$ver <- expression_run_safe(~utils::packageVersion(pkg), no_class = TRUE)
   output$target$res <- expression_run_safe(expr, no_class = TRUE)
@@ -88,6 +97,10 @@ compatibility_check <- function(expr, old_version, pkg = "cli", repo = getOption
   
   .libPaths(now_lib_path)
   re_attach(pkg)
+  expression_run_safe(~{
+    es <- loadNamespace(pkg)
+    attachNamespace(es)
+  })
   dnsl %>% map(re_attach)
   unlink(temp_dir, recursive = TRUE, force = TRUE)
   
@@ -103,6 +116,8 @@ compatibility_check <- function(expr, old_version, pkg = "cli", repo = getOption
 # compatibility_check(~cli::cli_sitrep(), old_version = "1.0.0")
 # compatibility_check(~cli::cli_sitrep())
 # compatibility_check(~utils::packageVersion("pkgbuild"), pkg = "pkgbuild")
+# compatibility_check(~system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
+#                       read_cells())
 
 
 deps <- function(pkg){
