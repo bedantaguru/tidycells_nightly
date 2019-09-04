@@ -2,6 +2,15 @@
 
 #### *Read Tabular Data from Diverse Sources and Easily Make Them Tidy*
 
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+
 <!-- badges: start -->
 
 [![CRAN
