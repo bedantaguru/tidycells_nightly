@@ -2,15 +2,6 @@
 
 #### *Read Tabular Data from Diverse Sources and Easily Make Them Tidy*
 
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
-
-
 <!-- badges: start -->
 
 [![CRAN
@@ -124,7 +115,7 @@ Let’s take a quick look at an example data as given
 in
 
 ``` r
-system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
+filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
 ```
 
 The data looks like (in excel)
@@ -137,8 +128,7 @@ Read at once
 
 ``` r
 # you should have tidyxl installed
-system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
-  read_cells()
+read_cells(filename)
 ```
 
 | collated\_1 | collated\_2 | collated\_3 | collated\_4  | collated\_5        | table\_tag | value |

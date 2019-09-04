@@ -122,8 +122,8 @@ To start with `tidycells`, I invite you to see `vignette("tidycells-intro")` or 
 
 Let's take a quick look at an example data as given in 
 
-```{r, eval=FALSE}
-system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
+```{r}
+filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
 ```
 
 The data looks like (in excel)
@@ -138,12 +138,11 @@ Read at once
 
 ```{r, eval=FALSE}
 # you should have tidyxl installed
-system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
-  read_cells()
+read_cells(filename)
 ```
 ```{r, echo=FALSE}
 if(rlang::is_installed("tidyxl")){
-  system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
+  filename %>% 
     read_cells() %>% 
     knitr::kable()
 }
