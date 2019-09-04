@@ -1,5 +1,7 @@
 
 
+# https://github.com/gitbucket/gitbucket/wiki/How-to-Close-Reference-issues-and-pull-request
+
 require(dplyr)
 require(purrr)
 
