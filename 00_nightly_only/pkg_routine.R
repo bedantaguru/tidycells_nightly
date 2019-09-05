@@ -1,6 +1,7 @@
 
 # dlstats
 dlstats::cranApp()
+# https://cranlogs.r-pkg.org/badges/tidycells
 
 require(rvest)
 
@@ -423,6 +424,8 @@ r_files %>% map(requirements::req_file) %>% unlist() %>% unique()
 
 rf <- r_files %>% as.list()
 names(rf) <- r_files
+
+rf %>% map(readLines) %>% map(~.x[str_detect(.x,"@Dev")]) %>% unlist()
 # fix TRUE --> TRUE
 # fix FALSE --> FALSE
 #rf %>% map(readLines) %>% map(~.x[str_detect(.x,"[- \\=]F")]) %>% unlist()

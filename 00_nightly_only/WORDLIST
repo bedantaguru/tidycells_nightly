@@ -1,4 +1,5 @@
 prebuilt
+Excel’
 Acknowledgement
 Analyse
 reproducibility
@@ -28,6 +29,8 @@ csv
 DevNotes
 df
 DF
+ezpickr
+hypoparsr
 stringdist
 tidyABS
 docx
