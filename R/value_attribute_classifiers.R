@@ -4,6 +4,7 @@
 #' @param x Either a [`cell_df`][cell_df-class] or leave blank for function output
 #' (required by [`value_attribute_classify`][value_attribute_classify()])
 #'
+#' @family Value/Attribute Classifier
 #' @rdname basic_classifier
 #' @keywords internal
 #' @export
@@ -39,6 +40,7 @@ basic_classifier.cell_df <- function(x, ...) {
 #' @param case_insensitive Logical scalar indicating whether match will be case insensitive. (Default `FALSE`)
 #' @param verbose Logical scalar for printing discovered cells (which gets new type by this rule)
 #'
+#' @family Value/Attribute Classifier
 #' @rdname sample_based_classifier
 #' @keywords internal
 #' @export
@@ -100,6 +102,7 @@ sample_based_classifier.cell_df <- function(x, ...,
 #' @param allow_chars (Optional) Allow characters together with numbers. (a character vector)
 #' @param verbose Logical scalar for printing discovered cells (which gets new type by this rule)
 #'
+#' @family Value/Attribute Classifier
 #' @rdname numeric_values_classifier
 #' @keywords internal
 #' @export

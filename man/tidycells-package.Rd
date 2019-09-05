@@ -23,7 +23,30 @@ Provides utilities to read, cells from complex
 }
 \section{Get Started}{
 
+
 To get started check out \href{../doc/tidycells-intro.html}{\code{vignette("tidycells-intro")}}.
+
+Alternatively, You can check out \href{A-Brief-Introduction.html}{A Brief Introduction} for
+quick start (and useful information about how to utilize help for \code{tidycells}).
+}
+
+\section{Main Functions}{
+
+
+Here is a glimpse of main functions from this package. (\emph{There are other functionality available
+which are briefed in \href{A-Brief-Introduction.html}{A Brief Introduction}.})
+\itemize{
+\item \code{\link[=as_cell_df]{as_cell_df}}
+\item \code{\link[=value_attribute_classify]{value_attribute_classify}}
+\item \code{\link[=analyze_cells]{analyze_cells}}
+\item \code{\link[=compose_cells]{compose_cells}}
+\item \code{\link[=collate_columns]{collate_columns}}
+}
+
+And a function to combine all these (above listed) functionality:
+\itemize{
+\item \code{\link[=read_cells]{read_cells}}
+}
 }
 
 \seealso{

@@ -39,5 +39,9 @@ Sample Based Value/Attribute Classifier
 }
 \seealso{
 \link[=value_attribute_classify]{value_attribute_classify}
+
+Other Value/Attribute Classifier: \code{\link{basic_classifier}},
+  \code{\link{numeric_values_classifier}}
 }
+\concept{Value/Attribute Classifier}
 \keyword{internal}
