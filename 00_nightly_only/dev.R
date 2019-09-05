@@ -10,8 +10,14 @@ require(purrr)
 # compatibility check proto added
 
 x0 <- current_state_of_pkgs()
-compatibility_check(cli::cli_sitrep(), pkg = "cli", old_version = "1.0.0")
+cc1 <- compatibility_check(cli::cli_sitrep(), pkg = "cli", old_version = "1.0.0")
 x1 <- current_state_of_pkgs()
+
+expect_equal(x0, x1)
+expect_false(cc1$is_same)
+
+usethis::use_test("compatibility_check")
+
 # debug(compatibility_check)
 # compatibility_check(cli::cli_sitrep(), old_version = "1.0.0")
 # compatibility_check(~cli::cli_sitrep(), old_version = "1.0.0")
@@ -31,9 +37,9 @@ x1 <- current_state_of_pkgs()
 current_state_of_pkgs <- function(){
   x <- utils::sessionInfo()
   lo <- list()
-  lo$base <- names(x$basePkgs)
-  lo$ns_attached <- names(x$otherPkgs)
-  lo$ns_loaded <- names(x$loadedOnly)
+  lo$base <- sort(x$basePkgs)
+  lo$ns_attached <- sort(names(x$otherPkgs))
+  lo$ns_loaded <- sort(names(x$loadedOnly))
   lo
 }
 

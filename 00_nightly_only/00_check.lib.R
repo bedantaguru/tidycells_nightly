@@ -31,6 +31,8 @@ check_dev_mark <- function(){
   rf %>% map(readLines) %>% map(~.x[stringr::str_detect(.x,"@Dev")]) %>% map_lgl(~length(.x)>0) %>% which() %>% names() %>% print()
   rf %>% map(readLines) %>% map(~.x[stringr::str_detect(.x,"TODO")]) %>% map_lgl(~length(.x)>0) %>% which() %>% names() %>% print()
   rf %>% map(readLines) %>% map(~.x[stringr::str_detect(.x,"browser")]) %>% map_lgl(~length(.x)>0) %>% which() %>% names() %>% print()
+  rf %>% map(readLines) %>% map(~.x[stringr::str_detect(.x," warning\\(")]) %>% map_lgl(~length(.x)>0) %>% which() %>% names() %>% print()
+  rf %>% map(readLines) %>% map(~.x[stringr::str_detect(.x," stop\\(")]) %>% map_lgl(~length(.x)>0) %>% which() %>% names() %>% print()
   rf %>% map(readLines) %>% map(~.x[stringr::str_detect(.x,":::")]) %>% map_lgl(~length(.x)>0) %>% which() %>% names() %>% print()
   
 }
@@ -90,5 +92,22 @@ TF_replace <- function(){
   }
   
   rf %>% map_int(~tf_replacement(.x, write_back = TRUE)) %>% unique()
+  
+}
+
+this_pkg_deps <- function(){
+  r_files <- list.files(full.names = TRUE, pattern = ".R$", recursive = TRUE)
+  r_files <- r_files[!stringr::str_detect(r_files, "00_nightly_only/")]
+  rf <- r_files %>% as.list()
+  names(rf) <- r_files
+  
+  this_dep <- rf %>% map(requirements::req_file) %>% unlist() %>% unique()
+  
+  xt <- desc::desc()
+  
+  dps <- xt$get_deps()
+  this_dep_desc <- dps$package[dps$type %in% c("Imports", "Suggests")]
+  
+  this_dep %>% setdiff(this_dep_desc) %>% print()
   
 }

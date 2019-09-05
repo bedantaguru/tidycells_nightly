@@ -33,17 +33,19 @@ deps <- function(pkg){
   dpt %>% bind_rows(dpt %>% select(pkg = dep) %>% deps)
 }
 
-is_pkg_loaded <- function(pkg, type = c("ns","si")){
-  type <- match.arg(type)
-  if(type == "ns"){
-    any_f <- getNamespaceExports(pkg)
-    if(length(any_f)<1) return(FALSE)
-    any_f <- any_f[1]
-    return(exists(any_f))
-  }else{
-    x<- utils::sessionInfo()
-    return(pkg %in% names(x$otherPkgs))
+is_pkg_loaded <- function(pkg){
+  x<- utils::sessionInfo()
+  return(pkg %in% c(names(x$otherPkgs), x$basePkgs))
+}
+
+# inspired by callr::default_repos
+# required in non-interactive session
+default_repo <- function(){
+  op <- getOption("repos")
+  if (!"CRAN" %in% names(op) || op[["CRAN"]] == "@CRAN@") {
+    op[["CRAN"]] <- "https://cloud.r-project.org"
   }
+  op
 }
 
 re_attach <- function(pkg, force_attach = FALSE){
