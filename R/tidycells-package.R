@@ -28,3 +28,5 @@
 tidycells_pkg_env <- new.env()
 # used in --> is_available.R
 assign("na_pkgs", NULL, envir = tidycells_pkg_env)
+# used in --> compatibility_check.R
+assign("inst_pkg_for_check_dir", NULL, envir = tidycells_pkg_env)

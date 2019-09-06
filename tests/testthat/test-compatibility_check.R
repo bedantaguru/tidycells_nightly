@@ -6,7 +6,7 @@ test_that("compatibility_check works I", {
   # skip on CRAN
   skip_on_cran()
   
-  skip_if_offline()
+  # skip_if_offline()
   
   skip_if_not_installed("cli")
   

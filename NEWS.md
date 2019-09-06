@@ -3,11 +3,11 @@
 
 # tidycells 0.2.1 _(2019-08-27)_
 
-## New features
+## New Features
 
 * Enhancement in the heuristic-based algorithm
 
-## Other changes
+## Other Changes
 
 * Now if `read_cells` fails in the intermediate stage, it will give the output of last successful stage 
 
@@ -19,7 +19,7 @@
 
 # tidycells 0.1.9 _(2019-08-12)_
 
-## New Features`
+## New Features
 
 * Added `collate_columns` to collate attribute-columns having similar content.
 

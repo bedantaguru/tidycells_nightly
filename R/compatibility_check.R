@@ -31,7 +31,33 @@ compatibility_check <- function(expr,
   output$current$res <- expression_run_safe(~ef(), no_class = TRUE)
   
   # do it for remote
-  temp_dir <- tempfile(pattern = "inst_check", tmpdir = tempdir(check = TRUE))
+  need_new_dir <- FALSE
+  inst_require <- TRUE
+  if(is.null(tidycells_pkg_env$inst_pkg_for_check_dir)){
+    need_new_dir <- TRUE
+  }else{
+    if(!file.exists(tidycells_pkg_env$inst_pkg_for_check_dir)){
+      need_new_dir <- TRUE
+    }else{
+      # folder exists, need to check pkg version
+      browser()
+      exists_pkg <- expression_run_safe(~{
+        utils::packageVersion(pkg, lib.loc = tidycells_pkg_env$inst_pkg_for_check_dir)
+      })
+      
+      if(!missing(old_version)){
+        inst_require <- !identical(as.numeric_version(old_version), exists_pkg)
+      }
+    }
+  }
+  
+  if(need_new_dir){
+    temp_dir <- tempfile(pattern = "inst_check", tmpdir = tempdir(check = TRUE))
+    tidycells_pkg_env$inst_pkg_for_check_dir <- temp_dir
+  }else{
+    tidycells_pkg_env$inst_pkg_for_check_dir -> temp_dir
+  }
+  
   dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
   
   # change libpath
@@ -90,7 +116,6 @@ compatibility_check <- function(expr,
   })
   dnsl$d %>% map(re_attach)
   dnsl$a %>% map(~re_attach(.x, force_attach = TRUE))
-  unlink(temp_dir, recursive = TRUE, force = TRUE)
   
   if(warn_outdated){
     if(output$target$ver > output$current$ver){

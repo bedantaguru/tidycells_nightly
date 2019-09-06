@@ -1,4 +1,13 @@
 
+# exploring Rcpp
+# https://adv-r.hadley.nz/rcpp.html
+
+library(Rcpp)
+
+cppFunction('int add(int x, int y, int z) {
+  int sum = x + y + z;
+  return sum;
+}')
 
 # https://github.com/gitbucket/gitbucket/wiki/How-to-Close-Reference-issues-and-pull-request
 
