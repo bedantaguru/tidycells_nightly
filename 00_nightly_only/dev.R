@@ -16,6 +16,13 @@ require(purrr)
 
 # cli::cli_sitrep()
 
+# 0.7.6
+
+tidycells::compatibility_check(dplyr::group_split, pkg = "dplyr", old_version = "0.7.6")
+
+# how this solves
+remotes::install_version("dplyr", version = "0.7.6")
+
 # compatibility check proto added
 
 x0 <- current_state_of_pkgs()
