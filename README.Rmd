@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(tidycells)
 ```
 
-# **tidycells** <img src="vignettes/ext/logo.png" align="right" width="200"/>
+# **tidycells** <img src="vignettes/ext/logo.svg" align="right" width="200"/>
 
 #### _Read Tabular Data from Diverse Sources and Easily Make Them Tidy_
 

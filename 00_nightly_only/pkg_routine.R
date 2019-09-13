@@ -198,10 +198,7 @@ devtools::check_win_devel()
 library(hexbin)
 library(ggplot2)
 # later todo
-sticker("00_nightly_only/logo_bg.jpg",
-        package = "tidycells",
-        p_size=8, s_x=1, s_y=.75, s_width=.6,
-        filename="00_nightly_only/logo.png")
+# this is done in inkscape
 
 
 library(covr)

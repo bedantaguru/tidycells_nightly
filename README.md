@@ -1,4 +1,4 @@
-# **tidycells** <img src="vignettes/ext/logo.png" align="right" width="200"/>
+# **tidycells** <img src="vignettes/ext/logo.svg" align="right" width="200"/>
 
 #### *Read Tabular Data from Diverse Sources and Easily Make Them Tidy*
 
