@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Interactive operations and Visualizations — visual_crop • tidycells</title>
+<title>Welcome to <code>tidycells</code> package — A Brief Introduction • tidycells</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -39,11 +39,9 @@
 
 
 
-<meta property="og:title" content="Interactive operations and Visualizations — visual_crop" />
+<meta property="og:title" content="Welcome to <code>tidycells</code> package — A Brief Introduction" />
 
-<meta property="og:description" content="These functions require shiny and miniUI.
-Each of these modules has option for interactive plots (using plotly).
-However, for the same you need to have plotly installed." />
+<meta property="og:description" content="This is a quick guide on how to utilize documentation for tidycells." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -129,90 +127,42 @@ However, for the same you need to have plotly installed." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Interactive operations and Visualizations</h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-rudra/tidycells/blob/master/R/visual_functions.R'><code>R/visual_functions.R</code></a></small>
-    <div class="hidden name"><code>visual_functions.Rd</code></div>
+    <h1>Welcome to <code>tidycells</code> package</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-rudra/tidycells/blob/master/R/intro_for_docs.R'><code>R/intro_for_docs.R</code></a></small>
+    <div class="hidden name"><code>A-Brief-Introduction.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>These functions require <code><a href='https://rdrr.io/pkg/shiny/man/shiny-package.html'>shiny</a></code> and <code>miniUI</code>.
-Each of these modules has option for interactive plots (using <code>plotly</code>).
-However, for the same you need to have <code>plotly</code> installed.</p>
+    <p>This is a quick guide on <em>how to utilize documentation</em> for <code>tidycells</code>.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>visual_crop</span>(<span class='no'>d</span>)
+        
+    <h2 class="hasAnchor" id="tl-dr-"><a class="anchor" href="#tl-dr-"></a>TL;DR </h2>
 
-<span class='fu'>visual_va_classify</span>(<span class='no'>d</span>)
-
-<span class='fu'>visual_data_block_inspection</span>(<span class='no'>x</span>)
-
-<span class='fu'>visual_orientation_modification</span>(<span class='no'>x</span>)
-
-<span class='fu'>visual_traceback</span>(<span class='no'>x</span>, <span class='no'>dcomp</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>d</th>
-      <td><p>a cell_df.</p></td>
-    </tr>
-    <tr>
-      <th>x</th>
-      <td><p>a cell_analysis.</p></td>
-    </tr>
-    <tr>
-      <th>dcomp</th>
-      <td><p>a composition (a tibble rendered by <code><a href='compose_cells.html'>compose_cells</a></code>).</p></td>
-    </tr>
-    </table>
+
+
+<p>If you are not sure about what package functions actually do or how they work together,
+please start with <a href='../doc/tidycells-intro.html'><code><a href='../articles/tidycells-intro.html'>vignette("tidycells-intro")</a></code></a>.</p>
     
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="introduction-"><a class="anchor" href="#introduction-"></a>Introduction </h2>
 
-    <p><code>visual_crop</code> returns a cell_df after the interactive operations.</p>
-<p><code>visual_va_classify</code> returns a cell_df after the interactive operations.</p>
-<p><code>visual_orientation_modification</code> returns a cell_analysis after the interactive operations.</p>
-<p><code>visual_traceback</code> returns a composed tidy data (as a tibble).</p>
     
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Each of these functions are designed for interactive sessions only.
-Arguments to these functions are optional as it tries to pick those from global environment.
-If there are multiple variables defined in global environment which are of same desired class then you will get option to choose
-one of them. These are also available as <a href='https://rstudio.github.io/rstudioaddins/'>RStudio Addin</a>
-(if you are using RStudio IDE you'll get those addin in the RStudio addin panel).</p>
-<p>Following are the names used in RStudio Addin</p><ul>
-<li><p><em>Crop Cells</em>: <code>visual_crop</code></p></li>
-<li><p><em>Cell Analysis Inspection</em>: <code>visual_data_block_inspection</code></p></li>
-<li><p><em>Orientation Modification</em>: <code>visual_orientation_modification</code></p></li>
-<li><p><em>Traceback Composition</em>: <code>visual_traceback</code></p></li>
-<li><p><em>Classify Value/Attribute</em>: <code>visual_va_classify</code></p></li>
-</ul>
 
-<p>For each of the modules it tries to load and unload <code>shiny</code> before and after the execution of the module.
-You can disable the same by setting <code><a href='https://rdrr.io/r/base/options.html'>options(AutoUnloadShiny = FALSE)</a></code>.</p>
-<p><code>visual_traceback</code> requires package <code>DT</code>.
-If <code>DT</code> is not present you may use <code><a href='cell_composition_traceback.html'>cell_composition_traceback</a></code></p>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='value_attribute_classify.html'>value_attribute_classify</a></code></p>
-<p><code><a href='cell_composition_traceback.html'>cell_composition_traceback</a></code></p></div>
+<p><code>tidycells</code> hosts various functions for ...</p>
     
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
+      <li><a href="#tl-dr-">TL;DR </a></li>
 
-      <li><a href="#details">Details</a></li>
-
-      <li><a href="#see-also">See also</a></li>
+      <li><a href="#introduction-">Introduction </a></li>
           </ul>
 
   </div>
