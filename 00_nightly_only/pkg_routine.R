@@ -1,4 +1,6 @@
 
+# https://docs.travis-ci.com/user/customizing-the-build/#skipping-a-build
+
 # dlstats
 dlstats::cranApp()
 # https://cranlogs.r-pkg.org/badges/tidycells
