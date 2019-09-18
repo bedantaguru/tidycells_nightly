@@ -112,7 +112,8 @@ text-align: justify}
   
   unlink("docs", recursive = TRUE, force = TRUE)
   unlink("pkgdown", recursive = TRUE, force = TRUE)
-  pkgdown::build_favicons(overwrite = TRUE)
+  # this is not required after 1.4.1 
+  # pkgdown::build_favicons(overwrite = TRUE)
   pkgdown::build_site()
   #pkgdown:::build_site_external()
   ##############################
