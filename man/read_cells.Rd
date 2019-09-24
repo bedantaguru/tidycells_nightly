@@ -78,6 +78,10 @@ It performs following set of actions if called with default \code{at_level}.
 
 Here is the flowchart of the same:
 
+}
+
+\if{html}{ 
+
 \figure{read_cells.svg}{options: width=400}
 
 }

@@ -1,3 +1,4 @@
+
 this_file_ext <- function(fn) {
   x <- stringr::str_split(fn, "\\.")
 
@@ -16,8 +17,6 @@ is_txt_file <- function(fn) {
   close(f)
   return(max(bytes) <= 128)
 }
-
-
 
 common_file_error <- function(fn) {
   if (missing(fn)) {

@@ -28,5 +28,7 @@
 tidycells_pkg_env <- new.env()
 # used in --> is_available.R
 assign("na_pkgs", NULL, envir = tidycells_pkg_env)
-# used in --> compatibility_check.R
-assign("inst_pkg_for_check_dir", NULL, envir = tidycells_pkg_env)
+# used in --> wand_link.R
+assign("wand_link", NULL, envir = tidycells_pkg_env)
+# used in --> file_type_from_magic_numbers.R
+assign("magic_numbers", NULL, envir = tidycells_pkg_env)

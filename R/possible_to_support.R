@@ -1,6 +1,7 @@
 
 supported_types <- tibble(
   file_type = c("csv{utils}", "csv", "xls{readxl}", "xls", "xlsx", "doc", "docx", "pdf", "html"),
+  file_type_raw = c("csv", "csv", "xls", "xls", "xlsx", "doc", "docx", "pdf", "html"),
   implemented = TRUE,
   package = c("utils", "readr", "readxl", "xlsx", "tidyxl", "docxtractr", "docxtractr", "tabulizer", "XML")
 )

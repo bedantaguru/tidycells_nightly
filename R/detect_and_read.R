@@ -1,4 +1,8 @@
 
+#@ File Deps
+#@ "R/file_etc.R" 
+
+
 finalize_lo <- function(lo) {
   if (length(lo$type) == 0) {
     lo$type <- c("unknown", lo$ext) %>% unique()

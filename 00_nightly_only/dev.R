@@ -1,4 +1,39 @@
 
+######## check wand
+
+
+
+
+
+
+wand::simplemagic_mime_db
+
+wand::get_content_type(system.file("extdata", "messy", "csv.docx", package = "tidycells", mustWork = TRUE))
+
+# env <- environment(wand::get_content_type)
+# env2 <- as.environment(as.list(env, all.names=TRUE))
+
+env <- as.environment(as.list(environment(wand::get_content_type), all.names=TRUE))
+
+
+tf <- tempfile()
+dput(wand::get_content_type, tf)
+ft <- dget(tf)
+unlink(tf)
+
+env <- environment(ft)
+env$guess_content_type <- function(...) {"???"}
+
+assign("get_content_type", ft, envir = env)
+
+# env$get_content_type <- dput(env$get_content_type, file = nullfile())
+# 
+# assign("get_content_type", dput(env$get_content_type, file = nullfile()), envir = env)
+
+env$get_content_type(system.file("extdata", "messy", "csv.docx", package = "tidycells", mustWork = TRUE))
+
+
+
 # exploring Rcpp
 # https://adv-r.hadley.nz/rcpp.html
 

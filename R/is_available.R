@@ -1,6 +1,9 @@
 
+#' @include tidycells-package.R
+
 # this is designed to test and simulate
 # non availability of certain packages
+
 is_available <- function(pkgname) {
   if (pkgname %in% tidycells_pkg_env$na_pkgs) {
     return(FALSE)
@@ -16,7 +19,7 @@ not_available <- function(pkgs, add = TRUE) {
       if (is.character(pkgs)) {
         if (add) {
           old <- tidycells_pkg_env$na_pkgs
-          pkgs <- c(old, pkgs)
+          pkgs <- c(old, pkgs) %>% unique()
         }
         tidycells_pkg_env$na_pkgs <- pkgs
       }
