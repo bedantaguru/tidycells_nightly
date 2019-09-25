@@ -1,0 +1,24 @@
+File Format (Extension type)	Implemented	What is this	Compressed	Archived
+xls	yes	TableField Container	no	no
+xlsx	yes	TableField Container	no	no
+doc	yes	TableField Container	no	no
+docx	yes	TableField Container	no	no
+ppt	yes	TableField Container	no	no
+pptx	yes	TableField Container	no	no
+pdf	yes	TableField Container	no	no
+tsv	yes	TableField	no	no
+csv	yes	TableField	no	no
+html	yes	TableField Container	no	no
+xml	yes	TableField Container	no	no
+sas	yes	TableField	no	no
+sav	yes	TableField	no	no
+zsav	yes	TableField	no	no
+por	yes	TableField	no	no
+dta	yes	TableField	no	no
+zip	yes	FileField	yes	yes
+rar	no	FileField	yes	yes
+7z	no	FileField	yes	yes
+tar	yes	FileField	no	yes
+gz	yes	FileField	yes	no
+xy	yes	FileField	yes	no
+bz2	yes	FileField	yes	no

@@ -30,6 +30,21 @@ common_file_error <- function(fn) {
   }
 }
 
+detect_file_type <- function(fn){
+  if(length(fn)>1){
+    map_chr(fn, detect_file_type)
+  }else{
+    common_file_error(fn)
+    is_txt <- is_txt_file(fn)
+    if(is_txt){
+      "text"
+    }else{
+      file_type_from_magic_numbers(fn)
+    }
+  }
+}
+
+
 crude_format_from_signature <- function(fn) {
   common_file_error(fn)
 

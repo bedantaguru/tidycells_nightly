@@ -1,9 +1,69 @@
 
+# Compound Binary File format by Microsoft
+# in https://www.garykessler.net/library/file_sigs.html
+
+
+# important ref 
+# http://guides.dataverse.org/en/latest/user/tabulardataingest/spss.html
+
+# ref 
+# https://github.com/minad/mimemagic
+# https://stackoverflow.com/questions/48188346/how-to-distinguish-xlsx-and-docx-files-from-zip-archives
+# https://stackoverflow.com/questions/51432256/determine-if-a-file-is-a-zip-file-or-an-xlsx-file
+# https://github.com/minad/mimemagic/blob/master/lib/mimemagic/overlay.rb
+
 ######## check wand
 
 
+get_raw <- function(x){
+  xtr <- paste0(" ", x) %>% stringr::str_replace_all(" "," 0x") %>% strsplit(" ") %>% unlist() 
+  xtr <- xtr[nchar(xtr)>0]
+  as.raw(xtr) %>% dput()
+}
+
+#PPT
+# https://www.filesignatures.net/index.php?search=ppt&mode=EXT
+
+"09 08 10 00 00 06 05 00
+FD FF FF FF 10
+FD FF FF FF 1F
+FD FF FF FF 22
+FD FF FF FF 23
+FD FF FF FF 28
+FD FF FF FF 29
+" %>% strsplit("\n") %>% unlist() %>% map(get_raw) ->xx
+
+dput(xx)
 
 
+#Impress MS PowerPoint 2007 XML
+
+cmd <- sprintf("\"%s\" --convert-to pptx:\"Impress MS PowerPoint 2007 XML\" --headless --outdir \"%s\" \"%s\"", 
+               lo_path, docx_dir, doc_file)
+
+cmd <- sprintf("\"%s\" -convert-to docx:\"MS Word 2007 XML\" -headless -outdir \"%s\" \"%s\"", 
+               lo_path, docx_dir, doc_file)
+system(cmd, show.output.on.console = FALSE)
+
+system(cmd)
+
+cmd <- sprintf("\"%s\" -convert-to pdf -headless -outdir \"%s\" \"%s\"", 
+               lo_path, docx_dir, doc_file)
+
+
+
+
+fls <- list.files("00_nightly_only/file_samples/", full.names = T)
+
+dd <- tibble(fn = fls)
+
+dd %>% mutate(type = detect_file_type(fn))
+
+dd <- dd %>% mutate(bts = fls %>% map(~readBin(.x, what = "raw", n = 20))) %>% as.data.frame()
+
+dd <- dd %>% mutate(ext = tools::file_ext(fn))
+
+dd %>% filter(ext=="bz2") %>% pull(bts) %>% .[[1]] %>% .[1:3] %>% dput()
 
 
 wand::simplemagic_mime_db
