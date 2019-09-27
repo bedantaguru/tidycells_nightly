@@ -2,8 +2,9 @@
 
 # sallow level detection of LibreOffice for support of doc
 # check this https://github.com/hrbrmstr/docxtractr/issues/23
-detect_LibreOffice <- function(type = 1) {
+detect_LibreOffice <- function(type = 1, return_LibreOffice_path = FALSE) {
   out <- FALSE
+  LO_path <- NULL
   if (is_available("docxtractr")) {
     if (!identical(type, 2)) {
       get_lo <- function() {
@@ -19,6 +20,7 @@ detect_LibreOffice <- function(type = 1) {
         if (is.character(test)) {
           if (file.exists(test)) {
             out <- TRUE
+            LO_path <- test
           }
         }
       }
@@ -33,10 +35,14 @@ detect_LibreOffice <- function(type = 1) {
         if (is.character(test_op)) {
           if (file.exists(test_op)) {
             out <- TRUE
+            LO_path <- test_op
           }
         }
       }
     }
+  }
+  if(return_LibreOffice_path){
+    return(LO_path)
   }
   out
 }

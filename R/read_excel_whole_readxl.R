@@ -28,6 +28,7 @@ read_excel_whole_part_readxl <- function(fn, sheet = 1L, possible_date_range = c
     tibble::as_tibble()
 }
 
+# @Dev limiter needed
 read_excel_whole_readxl <- function(fn) {
   if (!is_available("readxl")) {
     abort("'readxl' package is required")

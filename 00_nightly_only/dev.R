@@ -35,6 +35,33 @@
 # https://stackoverflow.com/questions/51432256/determine-if-a-file-is-a-zip-file-or-an-xlsx-file
 # https://github.com/minad/mimemagic/blob/master/lib/mimemagic/overlay.rb
 
+########## try ppt, pptx, docx alternative , xlsx alternative etc
+
+docxtractr::read_docx("00_nightly_only/file_samples/two_tabs.docx") %>% docxtractr::docx_extract_all_tbls(guess_header = F)
+
+doc <- officer::read_docx("00_nightly_only/file_samples/two_tabs.docx")
+doc_content <- officer::docx_summary(doc)
+
+#doc_content %>% filter(content_type == "table cell") %>% split(.$doc_index)
+
+
+
+example_pptx <- system.file(package = "officer", "doc_examples/example.pptx")
+doc <- read_pptx(example_pptx)
+content <- pptx_summary(doc)
+head(content)
+
+
+
+
+
+
+
+doc_tables %>% map(~as_cell_df(.x) %>% as.data.frame %>% as_tibble)
+
+xl <- officer::read_xlsx("00_nightly_only/file_samples/xlsx.csv")
+
+
 ######## check wand
 
 readBin("00_nightly_only/file_samples/pdf.docx", n = 5, what = "raw") %>% rawToChar()
