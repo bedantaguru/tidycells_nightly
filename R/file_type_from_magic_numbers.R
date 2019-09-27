@@ -26,8 +26,6 @@ file_type_from_magic_numbers <- function(filename) {
     micro_lvl <- check_office_ole(fbytes, filename)
     if(!is.null(micro_lvl)){
       ftype <- micro_lvl
-    }else{
-      ftype <- setdiff(ftype, "xls_doc")
     }
   }
   
@@ -36,23 +34,6 @@ file_type_from_magic_numbers <- function(filename) {
     micro_lvl <- wand_check_office_clone(fbytes, filename)
     if(!is.null(micro_lvl)){
       ftype <- micro_lvl
-    }else{
-      ftype <- setdiff(ftype, "xlsx_docx")
-    }
-  }
-  
-  # @Dev
-  # this may be removed later
-  # complete dependency removal from wand
-  if(length(ftype)==0){
-    # try wand
-    wand_type <- detect_type_by_wand(filename)
-    if(!identical(wand_type, "???")){
-      if(is.character(wand_type)){
-        if(length(wand_type)>0){
-          ftype <- wand_type[1]
-        }
-      }
     }
   }
   

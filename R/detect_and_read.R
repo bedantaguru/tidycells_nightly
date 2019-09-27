@@ -1,21 +1,15 @@
 
 #@ File Deps
 #@ "R/file_etc.R" 
+#@ "R/detect_and_read_shafts.R" 
 
-
-finalize_lo <- function(lo) {
-  if (length(lo$type) == 0) {
-    lo$type <- c("unknown", lo$ext) %>% unique()
-  }
-  lo
-}
 
 # detect and read file type (and potentially read) based on content type
 detect_and_read <- function(fn, silent = FALSE, omit = NULL) {
   common_file_error(fn)
 
   ext <- this_file_ext(fn)
-  lo <- list(type = NULL, content = NULL, ext = ext)
+  lo <- list(file_name = fn, type = NULL, content = NULL, ext = ext, omit = omit)
   if (is_txt_file(fn)) {
     # the file is flat file [possible csv or html]
     lo$type <- c("csv", "html", "csv{utils}")
@@ -72,6 +66,7 @@ detect_and_read <- function(fn, silent = FALSE, omit = NULL) {
         lo$type <- setdiff(lo$type, "csv{utils}")
       }
     }
+    
   } else {
     # binary formats
     cft <- crude_format_from_signature(fn)

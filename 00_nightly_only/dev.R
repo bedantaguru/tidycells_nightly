@@ -1,4 +1,27 @@
 
+# https://github.com/fralonra/isbinary
+# # UTF-8 BOM
+# 0xef  0xbb  0xbf
+# 
+# # UTF-32 BOM
+# 0x00  0x00  0xfe  0xff
+# 
+# # UTF-32 LE BOM
+# 0xff  0xfe  0x00  0x00
+# 
+# # GB BOM
+# 0x84  0x31  0x95  0x33
+# 
+# 
+# # UTF-16 BE BOM
+# 0xfe  0xff
+# 
+# # UTF-16 LE BOM
+# 0xff  0xfe
+
+# encoding another beast 
+# https://ericeikrem.com/r-blog/r-dealing-with-file-encodings-using-readrguess_encoding-and-stringistri_enc_detect/
+
 # Compound Binary File format by Microsoft
 # in https://www.garykessler.net/library/file_sigs.html
 
@@ -13,6 +36,8 @@
 # https://github.com/minad/mimemagic/blob/master/lib/mimemagic/overlay.rb
 
 ######## check wand
+
+readBin("00_nightly_only/file_samples/pdf.docx", n = 5, what = "raw") %>% rawToChar()
 
 
 get_raw <- function(x){
@@ -57,9 +82,40 @@ fls <- list.files("00_nightly_only/file_samples/", full.names = T)
 
 dd <- tibble(fn = fls)
 
+#fls %>% map(~detect_and_read_new(.x, omit = "doc"))
+for(i in 1: length(fls)){
+  print(i)
+  detect_and_read_new(fls[i])
+}
+
+
+for(i in 1: length(fls)){
+  print(i)
+  detect_and_read(fls[i])
+}
+
+
+fls %>% map_lgl(is_txt_file) %>% fls[.]
+
+#dd <- dd %>% mutate(dn_new = fn %>% map(~detect_and_read_new(.x, omit = "doc")))
+#dd <- dd %>% mutate(dn_new = fn %>% map(~detect_and_read_new(.x)))
+
+dd <- dd %>% mutate(dn_new = fn %>% map(~detect_and_read_new(.x)), dn_old = fn %>% map(~detect_and_read(.x)))
+
+dd <- dd %>% mutate(ft =  dn_new %>% map_chr("file_type"), fty = dn_new %>% map("type") %>% map_chr(1))
+
+dd <- dd %>% mutate(ftyo = dn_old %>% map("type") %>% map_chr(1))
+
+dd %>% filter(fty!=ftyo)
+
+dd %>% mutate(cchk = dn_new %>% purrr::imap_lgl(~{
+  identical(.x$content, dn_old[[.y]]$content)
+})) -> dd
+
+
 dd %>% mutate(type = detect_file_type(fn))
 
-dd <- dd %>% mutate(bts = fls %>% map(~readBin(.x, what = "raw", n = 20))) %>% as.data.frame()
+dd <- dd %>% mutate(bts = fn %>% map(~readBin(.x, what = "raw", n = 20))) %>% as.data.frame()
 
 dd <- dd %>% mutate(ext = tools::file_ext(fn))
 

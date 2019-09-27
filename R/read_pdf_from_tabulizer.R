@@ -1,14 +1,14 @@
 
 
-read_pdf_from_tabulizer <- function(fn) {
+read_pdf_from_tabulizer <- function(fn, ...) {
   if (!is_available("tabulizer")) {
     abort("'tabulizer' package is required")
   }
 
   # read in both ways [time consuming!]
-  # as decide may not function as expected
-  pl <- try(tabulizer::extract_tables(fn, method = "lattice"), silent = TRUE)
-  ps <- try(tabulizer::extract_tables(fn, method = "stream"), silent = TRUE)
+  # as method="decide" may not function as expected
+  pl <- try(tabulizer::extract_tables(fn, method = "lattice", ...), silent = TRUE)
+  ps <- try(tabulizer::extract_tables(fn, method = "stream", ...), silent = TRUE)
 
   # final
   pf <- NULL
