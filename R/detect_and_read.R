@@ -4,6 +4,7 @@
 #' @include file_etc.R
 #' @include detect_and_read_shafts.R
 
+
 # detect and read file type (and potentially read) based on content type
 detect_and_read <- function(fn, silent = FALSE, omit = NULL) {
   common_file_error(fn, silent = silent)
