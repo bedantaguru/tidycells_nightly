@@ -92,7 +92,6 @@ Collate:
     'compose_cells.R'
     'detect_LibreOffice.R'
     'detect_and_read.R'
-    'detect_and_read_new.R'
     'detect_and_read_shafts.R'
     'extend_data_block.R'
     'file_etc.R'

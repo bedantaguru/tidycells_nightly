@@ -101,7 +101,10 @@ possible_to_support <- function(print_info = TRUE, return_print_info = FALSE) {
           "\nNote:\n",
           extra_msg,
           cli_bs(),
-          cli_b("Support is enabled for content type (means it will work even if the extension is wrong)")
+          cli_b("Support is enabled for content type (means it will work even if the extension is wrong)"),
+          "\n",
+          cli_bs(),
+          cli_b("{csv} means flat-file (tsv, dat kind of file) i.e. all kinds of delimited files (comma and tab)")
         )
     } else {
       st_ok_msg <- NULL

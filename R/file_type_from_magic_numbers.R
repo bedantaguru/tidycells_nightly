@@ -13,7 +13,7 @@
 file_type_from_magic_numbers <- function(filename) {
   fbytes <- readBin(filename, n = tidycells_pkg_env$magic_numbers$mx_length, what = "raw")
   mns_this <- tidycells_pkg_env$magic_numbers
-  mns_this$mx_length <- NULL
+  mns_this <- mns_this[stringr::str_detect(names(mns_this), "_magic$")]
   mn_chk_res <- mns_this %>% map_lgl(~ mn_check(fbytes, .x))
   mn_chk_res_ftypes <- mn_chk_res[mn_chk_res] %>%
     names() %>%
@@ -83,12 +83,16 @@ this_get_pstart_for_magic_numbers <- function(x, get_length = FALSE) {
 }
 
 this_domain_magic_numbers <- function() {
-  mns <- list(mx_length = 0)
+  mns <- list(mx_length = 0, file_types = NULL)
   
   # as xls and doc both have same magic number "D0 CF 11 E0 A1 B1 1A E1"
   # many other have it though
   # ref : https://asecuritysite.com/forensics/magic
   mns$xls_doc_magic <- as.raw(c(0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1))
+  # these are kept for implementation status checks
+  mns$xls_magic <- mns$xls_doc_magic
+  mns$doc_magic <- mns$xls_doc_magic
+  mns$ppt_magic <- mns$xls_doc_magic
   # either xlsx or docx
   # as xlsx and docx both have same magic number "50 4B 03 04"
   mns$xlsx_docx_magic <- list(
@@ -96,6 +100,11 @@ this_domain_magic_numbers <- function() {
     as.raw(c(0x50, 0x4b, 0x03, 0x04, 0x14, 0x00, 0x06, 0x00)),
     as.raw(c(0x50, 0x4b, 0x03, 0x04))
   )
+  
+  # these are kept for implementation status checks
+  mns$xlsx_magic <- mns$xlsx_docx_magic
+  mns$docx_magic <- mns$xlsx_docx_magic
+  mns$pptx_magic <- mns$xlsx_docx_magic
   
   mns$pdf_magic <- as.raw(c(0x25, 0x50, 0x44, 0x46))
   
@@ -208,13 +217,21 @@ this_domain_magic_numbers <- function() {
   
   ################
   # max length
-  mns$mx_length <- mns[setdiff(names(mns), "mx_length")] %>%
+  mns$mx_length <- mns[stringr::str_detect(names(mns), "_magic$")] %>%
     map_int(~ if (is.list(.x)) {
       map_int(.x, this_get_pstart_for_magic_numbers, get_length = TRUE) %>% max()
     } else {
       this_get_pstart_for_magic_numbers(.x, get_length = TRUE)
     }) %>%
     max()
+  
+  ################
+  mns$file_types <- mns[stringr::str_detect(names(mns), "_magic$")] %>%
+    names() %>%
+    stringr::str_remove_all("^file_") %>%
+    stringr::str_remove_all("_magic$") %>% 
+    # manully adding these
+    c("csv", "html", "text")
   
   mns
 }
