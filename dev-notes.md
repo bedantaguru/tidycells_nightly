@@ -68,6 +68,10 @@ Apart from these badges few other badges (some of them may make no sense yet):
 [![status](https://tinyverse.netlify.com/badge/tidycells)](https://CRAN.R-project.org/package=tidycells)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d3a474fbfb04935829c38e7b61c4a17)](https://www.codacy.com/manual/bedantaguru/tidycells?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=r-rudra/tidycells&amp;utm_campaign=Badge_Grade)
 
+Development Status badges
+[![Travis dev build
+status](https://travis-ci.org/bedantaguru/tidycells_nightly.svg?branch=master)](https://travis-ci.org/bedantaguru/tidycells_nightly)
+
 ### FAQs
 
 ##### 1) **Why there are two code coverages?**

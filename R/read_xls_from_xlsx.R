@@ -1,8 +1,7 @@
 
 read_xls_from_xlsx <- function(fn, sheet = NULL, n_max = Inf, n_col_max = Inf) {
-  
   sheets_to_read <- sheet
-  
+
   if (!is_available("xlsx")) {
     abort("'xlsx' package is required")
   }
@@ -25,20 +24,22 @@ read_xls_from_xlsx <- function(fn, sheet = NULL, n_max = Inf, n_col_max = Inf) {
     if (length(rows) == 0) {
       # exit early
       return(NULL)
-    } 
-    
+    }
+
     # n_max and n_col_max are parent variable
     rows <- rows[seq(min(length(rows), n_max))]
 
     cells <- xlsx::getCells(rows)
-    
+
     cells <- cells[seq(min(length(cells), n_col_max))]
-    
+
     res <- cells %>% map(xlsx::getCellValue)
 
     dat <- names(res) %>%
       stringr::str_split("\\.") %>%
-      map(~.x %>% as.integer %>% t) %>%
+      map(~ .x %>%
+        as.integer() %>%
+        t()) %>%
       reduce(rbind) %>%
       as_tibble(.name_repair = "minimal")
 
@@ -128,22 +129,22 @@ read_xls_from_xlsx <- function(fn, sheet = NULL, n_max = Inf, n_col_max = Inf) {
   read_xls_for_tidycells <- function(filename) {
     wb <- xlsx::loadWorkbook(filename)
     sheets <- xlsx::getSheets(wb)
-    
+
     # sheets_to_read is parent variable
-    if(length(sheets_to_read)>0){
-      if(is.character(sheets_to_read)){
+    if (length(sheets_to_read) > 0) {
+      if (is.character(sheets_to_read)) {
         sheets_to_read <- intersect(sheets_to_read, names(sheets))
-        if(length(sheets_to_read)>0) {
+        if (length(sheets_to_read) > 0) {
           sheets <- sheets[sheets_to_read]
         }
       }
-      
-      if(is.numeric(sheets_to_read)){
+
+      if (is.numeric(sheets_to_read)) {
         sheets_to_read <- as.integer(sheets_to_read)
-        sheets_to_read <- sheets_to_read[!is.na(sheets_to_read)|!is.infinite(sheets_to_read)]
-        if(length(sheets_to_read)>0){
-          if(all(sheets_to_read>0)){
-            if(max(sheets_to_read)<=length(sheets)){
+        sheets_to_read <- sheets_to_read[!is.na(sheets_to_read) | !is.infinite(sheets_to_read)]
+        if (length(sheets_to_read) > 0) {
+          if (all(sheets_to_read > 0)) {
+            if (max(sheets_to_read) <= length(sheets)) {
               sheets <- sheets[sheets_to_read]
             }
           }

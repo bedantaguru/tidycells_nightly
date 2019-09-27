@@ -1,6 +1,6 @@
 
 
-current_state_of_pkgs <- function(){
+current_state_of_pkgs <- function() {
   x <- utils::sessionInfo()
   lo <- list()
   lo$base <- sort(x$basePkgs)
