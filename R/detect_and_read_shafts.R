@@ -115,8 +115,6 @@ shaft_csv_utils <- function(prior_shaft, lo, ignore_fty = FALSE) {
   fn <- lo$file_name
   omit <- lo$omit
 
-
-
   if (!("csv{utils}" %in% omit)) {
     if (("csv" %in% lo$type) | ignore_fty) {
       read_try <- try(utils::read.csv(fn, header = FALSE, nrows = 1), silent = TRUE)
@@ -157,7 +155,6 @@ shaft_doc <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE) {
 
   fn <- lo$file_name
   omit <- lo$omit
-
 
   if (!("doc" %in% omit)) {
     if (("doc" %in% lo$type) | ignore_fty) {
@@ -291,6 +288,7 @@ shaft_docx <- function(prior_shaft, lo, ignore_fty = FALSE) {
   make_shaft(lo, lo_done)
 }
 
+# this can be used for xlsx also (but with less reliability)
 shaft_xls <- function(prior_shaft, lo, ignore_fty = FALSE) {
   lo_done <- FALSE
 

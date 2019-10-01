@@ -1,11 +1,7 @@
 
-#' @include tidycells-package.R
-
-############# wand clone ###############
-# Few functions rewritten from wand to #
-# make it available to the users even  #
-# when wand is not present             #
-########################################
+############# wand clone ############
+# Few functions rewritten from wand #
+#####################################
 
 # Ref
 # https://github.com/minad/mimemagic

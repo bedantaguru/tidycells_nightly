@@ -68,6 +68,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Collate: 
+    'LibreOffice_convert_to_pdf_and_read.R'
     'ai_attach_direction.R'
     'ai_crude_data_block_joins.R'
     'ai_data_gid_join.R'
@@ -90,12 +91,15 @@ Collate:
     'collate_columns_etc.R'
     'compact_gid_maps.R'
     'compose_cells.R'
+    'decompress_file.R'
+    'decompression_rules.R'
     'detect_LibreOffice.R'
     'detect_and_read_shafts.R'
     'file_etc.R'
     'detect_and_read.R'
     'extend_data_block.R'
     'tidycells-package.R'
+    'file_kind_identifier.R'
     'file_type_from_magic_numbers.R'
     'fj.R'
     'generics-cell_df.R'

@@ -1,4 +1,7 @@
 
+
+
+
 # https://github.com/fralonra/isbinary
 # # UTF-8 BOM
 # 0xef  0xbb  0xbf
@@ -36,6 +39,104 @@
 # https://github.com/minad/mimemagic/blob/master/lib/mimemagic/overlay.rb
 
 ########## try ppt, pptx, docx alternative , xlsx alternative etc
+
+file_name <- "00_nightly_only/file_samples/"
+debug(explore_it_internal.TableField)
+debug(explore_it_internal.TableFieldContainer)
+debug(explore_it_internal.FileField)
+debug(explore_it_internal.default)
+debug(explore_it_internal.FileFieldCompressed)
+
+
+
+
+
+
+
+file_kinds <- dat
+
+usethis::use_data(file_kinds, internal = TRUE)
+
+
+R.utils::gunzip("00_nightly_only/file_samples/multi_files.zip.gz", 
+                file.path(dest, "test"), remove = FALSE, overwrite = TRUE)
+
+
+# install.packages("collapsibleTree")
+
+require(collapsibleTree)
+
+
+
+as.data.frame(Titanic)->d
+collapsibleTree(d,hierarchy = colnames(d) %>% setdiff("Freq"))
+
+d3tree(list(root = df2tree(rootname='Titanic',
+                           struct=as.data.frame(Titanic)
+),
+layout = 'collapse')
+)
+
+
+
+
+decompress_common_type_1("00_nightly_only/file_samples/multi_files.zip.gz", dest_fold = "00_nightly_only/test/", fcon_f = gzfile)
+
+
+
+cmd <- sprintf('"%s" --headless --version',lobin)
+
+# https://help.libreoffice.org/Common/Starting_the_Software_With_Parameters
+LibreOffice_convert <- function(){
+  
+  lobin <- detect_LibreOffice(return_LibreOffice_path = T)
+  
+  tdir <- tempfile("extract")
+  dir.create(tdir)
+  
+  srcfile
+  
+  cmd <- sprintf('"%s" --convert-to pptx:"Impress MS PowerPoint 2007 XML" --headless --outdir "%s" "%s"', 
+                 lobin, tdir, srcfile)
+  cmd <- sprintf("\"%s\" --convert-to docx:\"MS Word 2007 XML\" --headless --outdir \"%s\" \"%s\"", 
+                 lobin, tdir, srcfile)
+  
+  cmd <- sprintf("\"%s\" --convert-to pdf --headless --outdir \"%s\" \"%s\"", 
+                 lobin, tdir, srcfile)
+  
+  system(cmd)
+  
+  cmd <- sprintf("\"%s\" --convert-to docx:\"MS Word 2007 XML\" --headless --outdir \"%s\" \"%s\"", 
+                 lobin, docx_dir, doc_file)
+  
+  
+}
+
+class(src_file) <- c("file", "file_zip")
+
+attach_class <- function(src_file){
+  
+  common_file_error(src_file)
+  
+  if(inherits(src_file, "file")){
+    return(src_file)
+  }
+  
+  if(file.exists(src_file)){
+    type <- file_type_from_magic_numbers(src_file)
+  }
+}
+
+decompress <- function(src_file){
+  tdir <- tempfile(pattern = "decompress", tmpdir = tempdir(check = TRUE))
+  unlink(tdir, recursive = TRUE, force = TRUE)
+  dir.create(tdir, showWarnings = FALSE)
+  
+}
+
+
+
+
 
 docxtractr::read_docx("00_nightly_only/file_samples/two_tabs.docx") %>% docxtractr::docx_extract_all_tbls(guess_header = F)
 

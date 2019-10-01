@@ -38,6 +38,10 @@ file_type_from_magic_numbers <- function(filename) {
   }
 
   if (length(ftype) > 1) {
+    # special case for zip and xlsx_docx
+    if(("zip" %in% ftype) & ("xlsx_docx" %in% ftype)){
+      ftype <- "zip"
+    }
     ftype <- ftype[1]
   }
 
