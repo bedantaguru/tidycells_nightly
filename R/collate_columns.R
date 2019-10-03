@@ -43,13 +43,13 @@ collate_columns <- function(composed_data,
 
   defcols_this <- defcols
   if (is.data.frame(composed_data)) {
-    if (!utils::hasName(composed_data, "table_tag")) {
+    if (!hasName(composed_data, "table_tag")) {
       defcols_this <- setdiff(defcols_this, "table_tag")
     }
-    if (all(utils::hasName(composed_data, defcols_this))) {
+    if (all(hasName(composed_data, defcols_this))) {
       ok <- TRUE
 
-      if (utils::hasName(composed_data, "table_tag")) {
+      if (hasName(composed_data, "table_tag")) {
         dcl <- composed_data %>%
           group_by(data_block, table_tag)
       } else {
@@ -76,10 +76,10 @@ collate_columns <- function(composed_data,
     # data.frame is a list,  first data.frame check is required
     if (is.list(composed_data)) {
       if (all(map_lgl(composed_data, is.data.frame))) {
-        if (!any(map_lgl(composed_data, ~ utils::hasName(.x, "table_tag")))) {
+        if (!any(map_lgl(composed_data, ~ hasName(.x, "table_tag")))) {
           defcols_this <- setdiff(defcols_this, "table_tag")
         }
-        if (all(map_lgl(composed_data, ~ all(utils::hasName(.x, defcols_this))))) {
+        if (all(map_lgl(composed_data, ~ all(hasName(.x, defcols_this))))) {
           ok <- TRUE
           dcl <- composed_data
         }

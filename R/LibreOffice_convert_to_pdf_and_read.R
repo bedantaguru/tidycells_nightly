@@ -14,10 +14,10 @@ LibreOffice_convert_to_pdf_and_read <- function(srcfile, ...){
   
   if(!is.null(lobin)){
     if(file.exists(lobin)){
-      tdir <- tempfile("extract")
+      tdir <- this_temp_file("pdf_out")
       unlink(tdir, recursive = TRUE, force = TRUE)
       dir.create(tdir, showWarnings = FALSE)
-      on.exit(unlink(tdir, recursive = TRUE, force = TRUE))
+      on.exit(rem_temp_file(tdir))
       
       # for pptx :: pptx:"Impress MS PowerPoint 2007 XML" (but it is not working with officer)
       # So going for tabulizer and pdf

@@ -161,7 +161,7 @@ shaft_doc <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE) {
       if (is_available("docxtractr")) {
         if (lo$ext != "doc") {
           # need to rename the file as docxtractr detects by ext name
-          tf <- tempfile(fileext = ".doc")
+          tf <- this_temp_file(fileext = ".doc")
           file.copy(fn, tf, overwrite = TRUE)
           remove_at_end <- TRUE
         } else {
@@ -211,7 +211,7 @@ shaft_doc <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE) {
         }
 
         if (remove_at_end) {
-          unlink(tf, recursive = TRUE)
+          rem_temp_file(tf)
         }
       }
     }
@@ -242,7 +242,7 @@ shaft_docx <- function(prior_shaft, lo, ignore_fty = FALSE) {
       if (is_available("docxtractr")) {
         if (lo$ext != "docx") {
           # need to rename the file as docxtractr detects by ext name
-          tf <- tempfile(fileext = ".docx")
+          tf <- this_temp_file(fileext = ".docx")
           file.copy(fn, tf, overwrite = TRUE)
           remove_at_end <- TRUE
         } else {
@@ -279,7 +279,7 @@ shaft_docx <- function(prior_shaft, lo, ignore_fty = FALSE) {
         }
 
         if (remove_at_end) {
-          unlink(tf, recursive = TRUE)
+          rem_temp_file(tf)
         }
       }
     }

@@ -35,7 +35,7 @@ decompress_common_type_1 <- function(fn, dest_fold, fcon_f, buffer_size = 1e7){
 }
 
 
-decompress <- function(src, dest, ...){
+decompress <- function(src, dest){
   UseMethod("decompress")
 }
 
@@ -59,4 +59,8 @@ decompress.file_bz2 <- function(src, dest){
 
 decompress.file_xz <- function(src, dest){
   decompress_common_type_1(src, dest, fcon_f = xzfile)
+}
+
+decompress.default <- function(src, dest){
+  invisible(NULL)
 }

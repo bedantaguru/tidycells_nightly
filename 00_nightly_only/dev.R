@@ -40,12 +40,9 @@
 
 ########## try ppt, pptx, docx alternative , xlsx alternative etc
 
-file_name <- "00_nightly_only/file_samples/"
-debug(explore_it_internal.TableField)
-debug(explore_it_internal.TableFieldContainer)
-debug(explore_it_internal.FileField)
-debug(explore_it_internal.default)
-debug(explore_it_internal.FileFieldCompressed)
+
+
+
 
 
 
@@ -66,6 +63,72 @@ R.utils::gunzip("00_nightly_only/file_samples/multi_files.zip.gz",
 
 require(collapsibleTree)
 
+
+org <- data.frame(
+  Manager = c(
+    NA, "Ana", "Ana", "Bill", "Bill", "Bill", "Claudette", "Claudette", "Danny",
+    "Fred", "Fred", "Grace", "Larry", "Larry", "Nicholas", "Nicholas"
+  ),
+  Employee = c(
+    "Ana", "Bill", "Larry", "Claudette", "Danny", "Erika", "Fred", "Grace",
+    "Henri", "Ida", "Joaquin", "Kate", "Mindy", "Nicholas", "Odette", "Peter"
+  ),
+  Title = c(
+    "President", "VP Operations", "VP Finance", "Director", "Director", "Scientist",
+    "Manager", "Manager", "Jr Scientist", "Operator", "Operator", "Associate",
+    "Analyst", "Director", "Accountant", "Accountant"
+  )
+)
+
+
+
+x <- explore_it("00_nightly_only/file_samples")
+
+
+# nice network
+
+
+collapsibleTree::collapsibleTreeNetwork(xn2)
+
+
+# fn_id <- not_done[1]; rels <- xn
+
+
+
+
+
+# extract points
+extract_points  <- x %>% filter(is_temp_file)
+
+
+### 
+
+xn <- x
+
+xn[1,1] <-NA
+
+
+
+
+
+rn <- dirname(xn[1,2][[1]]) %>% normalizePath(winslash = "/")
+rn2 <- xn$path[stringr::str_detect(tolower(xn$path), "temp")][1] %>% dirname() %>% dirname()
+
+xn <- xn %>% select(root, path)
+xn2 <- xn %>% 
+  mutate(root = root %>% 
+           normalizePath(winslash = "/") %>%  
+           stringr::str_remove_all(rn) %>% 
+           stringr::str_remove_all(rn2), 
+         path = path %>% 
+           normalizePath(winslash = "/") %>%  
+           stringr::str_remove_all(rn) %>% 
+           stringr::str_remove_all(rn2))
+
+collapsibleTreeNetwork(xn2)
+
+collapsibleTreeNetwork(org, attribute = "Title")
+collapsibleTreeNetwork(org)
 
 
 as.data.frame(Titanic)->d

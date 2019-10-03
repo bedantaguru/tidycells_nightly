@@ -30,34 +30,43 @@ this_file_kinds <- function(){
 tidycells_pkg_env$file_kinds <- this_file_kinds()
 
 
-file_kind_maker <- function(fn, fkind, ftype, compressed, archived){
-  fk <- list(name = fn, file_kind = fkind, file_type = ftype, is_compressed = compressed, is_archived = archived)
+file_kind_maker <- function(fn, fkind, ftype, compressed, archived, temp){
+  fk <- list(name = fn, 
+             file_kind = fkind, 
+             file_type = ftype, 
+             is_compressed = compressed, 
+             is_archived = archived, 
+             is_temporary_file = temp)
+  
   if(fk$file_kind == "TableField"){
     class(fk) <- c("TableField", "list")
   }
+  
   if(fk$file_kind == "TableField Container"){
     class(fk) <- c("TableFieldContainer", "list")
   }
-  if(fk$file_kind == "FileField" & (fk$is_compressed | fk$is_archived)){
-    class(fk) <- c("FileFieldCompressed", "list")
-  }
+  
   if(fk$file_kind == "FileField" & !fk$is_compressed){
     class(fk) <- c("FileField", "list")
+  }
+  
+  if(fk$file_kind == "FileField" & (fk$is_compressed | fk$is_archived)){
+    class(fk) <- c("FileFieldCompressed", "list")
   }
   fk
 }
 
-file_kind_identifier <- function(fn){
+file_kind_identifier <- function(fn, temporary_file = FALSE){
   fn <- as.character(fn)
   is_folder <- isTRUE(as.logical(file.info(fn)["isdir"]))
   if(is_folder){
-    return(file_kind_maker(fn, "FileField", "folder", FALSE, FALSE))
+    return(file_kind_maker(fn, "FileField", "folder", FALSE, FALSE, temporary_file))
   }
   
   file_type  <- detect_file_type(fn)
   
   if(file_type == "unknown"){
-    return(file_kind_maker(fn, "unknown", file_type, FALSE, FALSE))
+    return(file_kind_maker(fn, "unknown", file_type, FALSE, FALSE, temporary_file))
   }
   
   fkind_inf <- tidycells_pkg_env$file_kinds %>% filter(file_format == file_type)
@@ -65,9 +74,9 @@ file_kind_identifier <- function(fn){
   allowed_fkinds <- c("TableField Container", "TableField", "FileField", "unknown")
   
   if(fkind_inf$file_kind %in% allowed_fkinds){
-    return(file_kind_maker(fn, fkind_inf$file_kind[1], file_type[1], fkind_inf$compressed[1], fkind_inf$archived[1]))
+    return(file_kind_maker(fn, fkind_inf$file_kind[1], file_type[1], fkind_inf$compressed[1], fkind_inf$archived[1], temporary_file))
   }
   
-  return(file_kind_maker(fn, "unknown", file_type, FALSE, FALSE))
+  return(file_kind_maker(fn, "unknown", file_type, FALSE, FALSE, temporary_file))
   
 }
