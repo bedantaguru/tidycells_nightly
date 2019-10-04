@@ -124,6 +124,11 @@ this_domain_magic_numbers <- function() {
     0x9, 0xc7, 0x31, 0x8c, 0x18, 0x1f, 0x10, 0x11
   ))
 
+  # this is taken from
+  # https://www.garykessler.net/library/file_sigs.html
+  mns$xpt_magic <- as.raw(c(0x48, 0x45, 0x41, 0x44, 0x45, 0x52, 0x20, 0x52, 0x45, 
+                            0x43, 0x4f, 0x52, 0x44, 0x2a, 0x2a, 0x2a))
+  
   mns$sav_magic <- list(
     # this is taken from https://www.garykessler.net/library/file_sigs.html and https://tool.lu/ja_JP/magicbytes/
     as.raw(c(

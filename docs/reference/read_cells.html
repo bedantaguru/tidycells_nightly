@@ -15,11 +15,13 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -39,8 +41,8 @@
 
 
 
-<meta property="og:title" content="Read Cells from file — read_cells" />
 
+<meta property="og:title" content="Read Cells from file — read_cells" />
 <meta property="og:description" content="This function is designed to read cell level information
 (and the finally analyze, compose and collate_columns)
 from many file types like xls, pdf, doc etc.
@@ -63,9 +65,9 @@ It is recommend to try read_cells on the target file. If the outcome is expected
 If not try again with read_cells(file_name, at_level = &quot;compose&quot;). If after that also the output is not as expected
 then other functions are required to be used. At that time start again with read_cells(file_name, at_level = &quot;make_cells&quot;)
 and proceed to further functions." />
-
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -119,6 +121,9 @@ and proceed to further functions." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/FileTypes.html">Supported File Types</a>
+    </li>
+    <li>
       <a href="../articles/tidycells-intro.html">Tidycells Package</a>
     </li>
   </ul>
@@ -127,7 +132,6 @@ and proceed to further functions." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/r-rudra/tidycells">
@@ -154,7 +158,6 @@ and proceed to further functions." />
     </div>
 
     <div class="ref-description">
-    
     <p>This function is designed to read cell level information
 (and the finally <a href='analyze_cells.html'>analyze</a>, <a href='compose_cells.html'>compose</a> and <a href='collate_columns.html'>collate_columns</a>)
 from many file types like xls, pdf, doc etc.
@@ -177,13 +180,12 @@ It is recommend to try <code>read_cells</code> on the target file. If the outcom
 If not try again with <code>read_cells(file_name, at_level = "compose")</code>. If after that also the output is not as expected
 then other functions are required to be used. At that time start again with <code>read_cells(file_name, at_level = "make_cells")</code>
 and proceed to further functions.</em></p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>read_cells</span>(<span class='no'>x</span>, <span class='kw'>at_level</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"collate"</span>, <span class='st'>"detect_and_read"</span>, <span class='st'>"make_cells"</span>,
   <span class='st'>"va_classify"</span>, <span class='st'>"analyze"</span>, <span class='st'>"compose"</span>), <span class='kw'>omit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>compose_main_cols_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>from_level</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -223,7 +225,7 @@ will be returned.</p></td>
       <td><p>further arguments</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>If <code>simplify=TRUE</code> then different kind of object is returned in different levels (depends on <code>at_level</code>).
@@ -231,7 +233,6 @@ If <code>at_level="compose"</code> then only final tibble is returned otherwise 
 named <code>"read_cells_stage"</code>.</p>
 <p>If <code>simplify=FALSE</code> then it will return a <code><a href='read_cell_part-class.html'>read_cell_part</a></code> which you can process manually
 and continue again with <code>read_cells</code> (perhaps then <code>from_level</code> may be useful).</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>It performs following set of actions if called with default <code>at_level</code>.</p><ul>
@@ -244,7 +245,6 @@ and continue again with <code>read_cells</code> (perhaps then <code>from_level</
 </ul>
 
 <p>Here is the flowchart of the same:<img src='figures/read_cells.svg' width=400 /></p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># see supported files</span>
@@ -256,6 +256,7 @@ and continue again with <code>read_cells</code> (perhaps then <code>from_level</
 #&gt;   In case the doc is not working, try running docxtractr::read_docx('&lt;target doc file&gt;').
 #&gt;   Check whether the file is being read correctly.</span><span>
 #&gt; = </span><span style='color: #0000BB;'>Support is enabled for content type (means it will work even if the extension is wrong)</span><span>
+#&gt; = </span><span style='color: #0000BB;'>{csv} means flat-file (tsv, dat kind of file) i.e. all kinds of delimited files (comma and tab)</span><span>
 #&gt; 
 #&gt; Details: 
 #&gt; </span><span style='color: #00BBBB;'>+----------------------------------------------+</span><span>
@@ -290,11 +291,8 @@ and continue again with <code>read_cells</code> (perhaps then <code>from_level</
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

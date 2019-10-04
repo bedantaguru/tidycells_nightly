@@ -1,0 +1,45 @@
+---
+title: "Supported File Types"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tidycells)
+```
+
+# @Dev
+
+This is a Test for DT and collapsibleTree
+
+```{r, echo=FALSE}
+DT::datatable(head(iris), style = "bootstrap")
+```
+
+Here is a collapsibleTree
+
+```{r, echo=FALSE}
+# Create a simple org chart
+org <- data.frame(
+  Manager = c(
+    NA, "Ana", "Ana", "Bill", "Bill", "Bill", "Claudette", "Claudette", "Danny",
+    "Fred", "Fred", "Grace", "Larry", "Larry", "Nicholas", "Nicholas"
+  ),
+  Employee = c(
+    "Ana", "Bill", "Larry", "Claudette", "Danny", "Erika", "Fred", "Grace",
+    "Henri", "Ida", "Joaquin", "Kate", "Mindy", "Nicholas", "Odette", "Peter"
+  ),
+  Title = c(
+    "President", "VP Operations", "VP Finance", "Director", "Director", "Scientist",
+    "Manager", "Manager", "Jr Scientist", "Operator", "Operator", "Associate",
+     "Analyst", "Director", "Accountant", "Accountant"
+  )
+)
+collapsibleTree::collapsibleTreeNetwork(org, attribute = "Title")
+```
+

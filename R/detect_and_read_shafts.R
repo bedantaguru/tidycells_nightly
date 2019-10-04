@@ -1,4 +1,7 @@
 
+# this type of coding is not much maintainable
+# KFL : need to refactor
+
 finalize_lo <- function(lo) {
   if (length(lo$type) == 0) {
     lo$type <- "unknown"
@@ -32,7 +35,7 @@ shaft_html <- function(prior_shaft, lo, ignore_fty = FALSE) {
   omit <- lo$omit
 
   if (!("html" %in% omit)) {
-    if (("html" %in% lo$type) | ignore_fty) {
+    if (("html" %in% lo$type) | ("xml" %in% lo$type) | ignore_fty) {
       if (is_available("XML")) {
         read_try <- try(XML::readHTMLTable(fn, header = FALSE), silent = TRUE)
         if (inherits(read_try, "try-error")) read_try <- NULL
@@ -220,6 +223,59 @@ shaft_doc <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE) {
   make_shaft(lo, lo_done)
 }
 
+# the last resort
+shaft_doc_ppt_pptx_LibreOffice_tabulizer <- function(prior_shaft, lo, ignore_fty = FALSE) {
+  lo_done <- FALSE
+  
+  if (!missing(prior_shaft)) {
+    if (prior_shaft$shaft_done) {
+      # do nothing if already done
+      # return early
+      return(prior_shaft)
+    }
+    
+    # read info from prior_shaft
+    lo <- prior_shaft$shaft_info
+  }
+  
+  fn <- lo$file_name
+  omit <- lo$omit
+  
+  if (!("ppt" %in% omit) & !("pptx" %in% omit) & !("doc" %in% omit)) {
+    if (("pptx" %in% lo$type) | ("ppt" %in% lo$type) | ("doc" %in% lo$type) | ignore_fty) {
+      if (is_available("tabulizer") & is_available("docxtractr")) {
+        
+        
+        read_try <- suppressWarnings(suppressMessages(try(LibreOffice_convert_to_pdf_and_read(fn, pages = 1), silent = TRUE)))
+        if (inherits(read_try, "try-error")) read_try <- NULL
+        
+        if (!is.null(read_try)) {
+          lo$type <- lo$type %>% intersect(c("pptx","ppt", "doc"))
+          lo$used_function <- "#customized LibreOffice and tabulizer based function. >>> tidycells:::LibreOffice_convert_to_pdf_and_read"
+          
+          # read full data
+          suppressWarnings(
+            suppressMessages(
+              ctl <- LibreOffice_convert_to_pdf_and_read(fn)
+            )
+          )
+          
+          lo$content <- ctl
+          
+          # decision done
+          lo <- finalize_lo(lo)
+          lo_done <- TRUE
+        } else {
+          lo$type <- setdiff(lo$type, c("pptx","ppt", "doc"))
+        }
+        
+      }
+    }
+  }
+  
+  make_shaft(lo, lo_done)
+}
+
 shaft_docx <- function(prior_shaft, lo, ignore_fty = FALSE) {
   lo_done <- FALSE
 
@@ -288,6 +344,58 @@ shaft_docx <- function(prior_shaft, lo, ignore_fty = FALSE) {
   make_shaft(lo, lo_done)
 }
 
+shaft_docx_officer <- function(prior_shaft, lo, ignore_fty = FALSE) {
+  lo_done <- FALSE
+  
+  if (!missing(prior_shaft)) {
+    if (prior_shaft$shaft_done) {
+      # do nothing if already done
+      # return early
+      return(prior_shaft)
+    }
+    
+    # read info from prior_shaft
+    lo <- prior_shaft$shaft_info
+  }
+  
+  fn <- lo$file_name
+  omit <- lo$omit
+  
+  if (!("docx" %in% omit)) {
+    if (("docx" %in% lo$type) | ignore_fty) {
+      if (is_available("officer")) {
+        
+        
+        read_try <- suppressWarnings(suppressMessages(try(officer::read_docx(fn), silent = TRUE)))
+        if (inherits(read_try, "try-error")) read_try <- NULL
+        
+        if (inherits(read_try, "rdocx")) {
+          lo$type <- "docx"
+          lo$used_function <- "#customized officer based function. >>> tidycells:::read_docx_from_officer"
+          
+          # read full data
+          suppressWarnings(
+            suppressMessages(
+              ctl <- read_docx_from_officer(read_try, guess_header = FALSE)
+            )
+          )
+          
+          lo$content <- ctl
+          
+          # decision done
+          lo <- finalize_lo(lo)
+          lo_done <- TRUE
+        } else {
+          lo$type <- setdiff(lo$type, "docx")
+        }
+        
+      }
+    }
+  }
+  
+  make_shaft(lo, lo_done)
+}
+
 # this can be used for xlsx also (but with less reliability)
 shaft_xls <- function(prior_shaft, lo, ignore_fty = FALSE) {
   lo_done <- FALSE
@@ -307,14 +415,14 @@ shaft_xls <- function(prior_shaft, lo, ignore_fty = FALSE) {
   omit <- lo$omit
 
 
-  if (!("xls" %in% omit)) {
-    if (("xls" %in% lo$type) | ignore_fty) {
+  if (!("xls" %in% omit) & !("xlsx" %in% omit)) {
+    if (("xls" %in% lo$type) | ("xlsx" %in% lo$type) | ignore_fty) {
       if (is_available("xlsx")) {
         read_try <- suppressMessages(try(xlsx::loadWorkbook(fn), silent = TRUE))
 
         if (inherits(read_try, "try-error")) read_try <- NULL
         if (inherits(read_try, "jobjRef")) {
-          lo$type <- "xls"
+          lo$type <- lo$type %>% intersect(c("xlsx","xls"))
           lo$used_function <- "#customized xlsx based function. >>> tidycells:::read_xls_from_xlsx"
           # re read full data
           lo$content <- read_xls_from_xlsx(fn)
@@ -350,11 +458,11 @@ shaft_xls_readxl <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE
   omit <- lo$omit
 
 
-  if (!("xls{readxl}" %in% omit)) {
-    if (("xls" %in% lo$type) | ignore_fty) {
+  if (!("xls{readxl}" %in% omit) & !("xls" %in% omit) & !("xlsx" %in% omit) ) {
+    if (("xls" %in% lo$type) | ("xlsx" %in% lo$type) | ignore_fty) {
       if (is_available("readxl")) {
         if (!silent) {
-          message("Using readxl to read xls. Manually check date and numeric cells. (for better result install xlsx package)")
+          message("Using readxl to read xls/xlsx. Manually check date and numeric cells. (for better result install xlsx package)")
         }
 
         read_try <- suppressMessages(try(readxl::read_excel(fn, n_max = 1), silent = TRUE))
@@ -406,6 +514,7 @@ shaft_xlsx <- function(prior_shaft, lo, ignore_fty = FALSE) {
 
         if (!inherits(sheets_try, "try-error")) {
           lo$type <- "xlsx"
+          lo$used_function <- "tidyxl::xlsx_cells"
 
           # read it full
           lo$content <- tidyxl::xlsx_cells(fn) %>% split(.$sheet)
@@ -419,6 +528,59 @@ shaft_xlsx <- function(prior_shaft, lo, ignore_fty = FALSE) {
     }
   }
 
+  make_shaft(lo, lo_done)
+}
+
+shaft_pptx <- function(prior_shaft, lo, ignore_fty = FALSE) {
+  lo_done <- FALSE
+  
+  if (!missing(prior_shaft)) {
+    if (prior_shaft$shaft_done) {
+      # do nothing if already done
+      # return early
+      return(prior_shaft)
+    }
+    
+    # read info from prior_shaft
+    lo <- prior_shaft$shaft_info
+  }
+  
+  fn <- lo$file_name
+  omit <- lo$omit
+  
+  if (!("pptx" %in% omit)) {
+    if (("pptx" %in% lo$type) | ignore_fty) {
+      if (is_available("officer")) {
+        suppressWarnings(
+          suppressMessages(
+            read_meta_try <- try(officer::read_pptx(fn), silent = TRUE)
+          )
+        )
+        if (inherits(read_meta_try, "try-error")) read_meta_try <- NULL
+        
+        
+        if (inherits(read_meta_try, "rpptx")) {
+          lo$type <- "pptx"
+          lo$used_function <- "#customized officer based function. >>> tidycells:::read_pptx_from_officer"
+          
+          read_try <- suppressWarnings(
+            suppressMessages(
+              try(read_pptx_from_officer(fn), silent = TRUE)
+            )
+          )
+          
+          lo$content <- read_try
+          
+          # decision done
+          lo <- finalize_lo(lo)
+          lo_done <- TRUE
+        } else {
+          lo$type <- setdiff(lo$type, "pptx")
+        }
+      }
+    }
+  }
+  
   make_shaft(lo, lo_done)
 }
 
@@ -453,10 +615,12 @@ shaft_pdf <- function(prior_shaft, lo, ignore_fty = FALSE) {
 
         if (is.list(read_meta_try)) {
           lo$type <- "pdf"
+          lo$used_function <- "#customized tabulizer based function. >>> tidycells:::read_pdf_from_tabulizer"
+          
 
           read_try <- suppressWarnings(
             suppressMessages(
-              read_meta_try <- try(read_pdf_from_tabulizer(fn), silent = TRUE)
+              try(read_pdf_from_tabulizer(fn), silent = TRUE)
             )
           )
 
@@ -478,5 +642,59 @@ shaft_pdf <- function(prior_shaft, lo, ignore_fty = FALSE) {
     }
   }
 
+  make_shaft(lo, lo_done)
+}
+
+# combined shaft for all haven readable types
+shaft_haven <- function(prior_shaft, lo, ignore_fty = FALSE) {
+  lo_done <- FALSE
+  
+  if (!missing(prior_shaft)) {
+    if (prior_shaft$shaft_done) {
+      # do nothing if already done
+      # return early
+      return(prior_shaft)
+    }
+    
+    # read info from prior_shaft
+    lo <- prior_shaft$shaft_info
+  }
+  
+  fn <- lo$file_name
+  omit <- lo$omit
+  
+  haven_types <- c("sas", "sav", "zsav", "por", "dta", "xpt")
+  
+  if (length(intersect(omit, haven_types))==0) {
+    if ((length(intersect(lo$type, haven_types))>0) | ignore_fty) {
+      if (is_available("haven")) {
+        
+        this_type <- intersect(lo$type, haven_types)[1]
+        
+        haven_fns <- list(sas  = haven::read_sas,
+                          sav  = haven::read_sav,
+                          zsav = haven::read_sav,
+                          por = haven::read_por,
+                          dta = haven::read_dta,
+                          xpt = haven::read_xpt)
+        
+        rtry <- try(haven_fns[[this_type]](fn), silent = TRUE)
+        
+        if (!inherits(rtry, "try-error")) {
+          lo$type <- this_type
+          lo$used_function <- this_type %>% stringr::str_remove("z") %>% paste0("haven::read_",.)
+          
+          
+          lo$content <- rtry
+          # decision done
+          lo <- finalize_lo(lo)
+          lo_done <- TRUE
+        } else {
+          lo$type <- setdiff(lo$type, intersect(lo$type, haven_types))
+        }
+      }
+    }
+  }
+  
   make_shaft(lo, lo_done)
 }

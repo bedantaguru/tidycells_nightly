@@ -1,9 +1,15 @@
 
+usethis::use_article("FileTypes", title = "Supported File Types")
+
 # https://docs.travis-ci.com/user/customizing-the-build/#skipping-a-build
 
 # dlstats
 dlstats::cranApp()
 # https://cranlogs.r-pkg.org/badges/tidycells
+x <- cran_stats(c("unpivotr", "tidycells"))
+
+ggplot(x, aes(end, downloads, group=package, color=package)) +
+  geom_line() + geom_point(aes(shape=package))
 
 require(rvest)
 

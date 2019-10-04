@@ -73,6 +73,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="articles/FileTypes.html">Supported File Types</a>
+    </li>
+    <li>
       <a href="articles/tidycells-intro.html">Tidycells Package</a>
     </li>
   </ul>
@@ -299,22 +302,22 @@
 <p>If you want a well-aligned columns then you may like to do</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># bit tricky and tedious unless you do print_attribute_overview = TRUE in above line</span></a>
 <a class="sourceLine" id="cb10-2" title="2">dcfine &lt;-<span class="st"> </span>dc <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span>(<span class="dt">name =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">name =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
 <a class="sourceLine" id="cb10-4" title="4">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">2</span>_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb10-5" title="5">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">1</span>_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb10-6" title="6">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span></a>
 <a class="sourceLine" id="cb10-7" title="7">  ),</a>
-<a class="sourceLine" id="cb10-8" title="8">  <span class="dt">sex =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb10-8" title="8">  <span class="dt">sex =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
 <a class="sourceLine" id="cb10-9" title="9">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb10-10" title="10">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">2</span>_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb10-11" title="11">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_row_right_<span class="dv">1</span>_<span class="dv">1</span></a>
 <a class="sourceLine" id="cb10-12" title="12">  ),</a>
-<a class="sourceLine" id="cb10-13" title="13">  <span class="dt">school =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb10-13" title="13">  <span class="dt">school =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
 <a class="sourceLine" id="cb10-14" title="14">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb10-15" title="15">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>minor_corner_topLeft_<span class="dv">1</span>_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb10-16" title="16">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span></a>
 <a class="sourceLine" id="cb10-17" title="17">  )) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb10-18" title="18"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span>(school,sex, name, value)</a></code></pre></div>
+<a class="sourceLine" id="cb10-18" title="18"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(school,sex, name, value)</a></code></pre></div>
 <p><code><a href="https://rdrr.io/r/utils/head.html">head(dcfine)</a></code> looks like</p>
 <table class="table">
 <thead><tr class="header">

@@ -5,11 +5,15 @@
 #' @include detect_and_read_shafts.R
 
 # detect and read file type (and potentially read) based on content type
-detect_and_read <- function(fn, silent = FALSE, omit = NULL) {
+detect_and_read <- function(fn, silent = FALSE, omit = NULL, file_type) {
   common_file_error(fn, silent = silent)
 
   ext <- this_file_ext(fn)
-  file_type <- detect_file_type(fn)
+  
+  if(missing(file_type)){
+    file_type <- detect_file_type(fn)
+  }
+  
   lo <- list(file_name = fn, type = NULL, file_type = file_type, content = NULL, ext = ext, omit = omit)
 
   if (file_type == "text") {
@@ -40,10 +44,14 @@ detect_and_read <- function(fn, silent = FALSE, omit = NULL) {
     this_sft <- make_shaft(lo) %>%
       shaft_xlsx() %>%
       shaft_docx() %>%
+      shaft_docx_officer() %>% 
       shaft_xls() %>%
       shaft_xls_readxl() %>%
       shaft_doc() %>%
-      shaft_pdf()
+      shaft_pptx() %>% 
+      shaft_pdf() %>% 
+      shaft_haven() %>% 
+      shaft_doc_ppt_pptx_LibreOffice_tabulizer()
 
     if (!this_sft$shaft_done) {
       # reset to the case when fails to detect type
