@@ -49,7 +49,7 @@ if (getRversion() >= "2.15.1") {
     "is.reactive", "isolate", "nearPoints", "NS",
     "observe", "observeEvent", "plotOutput", "radioButtons",
     "reactive", "reactiveVal", "removeNotification", "renderPlot",
-    "runGadget", "selectizeInput", "shinyApp", "showNotification",
+    "runApp", "selectizeInput", "shinyApp", "showNotification",
     "sliderInput", "span", "stopApp", "tags",
     "updateSelectizeInput", "wellPanel", "withProgress",
 

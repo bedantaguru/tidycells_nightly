@@ -6,20 +6,23 @@ common_finish <- function(ui, server, title, viewer_pane, test_this) {
     return(es)
   }
 
+  
+  
   if (viewer_pane) {
-    runGadget(shinyApp(ui, server),
-      stopOnCancel = FALSE
-    )
+    vpane <- paneViewer()
   } else {
-    viewer <- dialogViewer(title,
+    vpane <- dialogViewer(title,
       width = 900,
       height = 700
     )
-    runGadget(shinyApp(ui, server),
-      viewer = viewer,
-      stopOnCancel = FALSE
-    )
   }
+  
+  
+  if(is.null(vpane)){
+    vpane <- utils::browseURL
+  }
+  
+  runApp(shinyApp(ui, server), launch.browser = vpane, quiet = TRUE)
 }
 
 shiny_app_va_classify <- function(d, viewer_pane = FALSE, test_this = FALSE) {
