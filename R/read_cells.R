@@ -33,7 +33,8 @@ read_cell_task_orders <- c("detect_and_read", "make_cells", "va_classify", "anal
 #'
 #' @param x either a valid file path or a [`read_cell_part`][read_cell_part-class]
 #' @param at_level till which level to process.
-#' Should be one of `detect_and_read`, `make_cells`, `va_classify`, `analyze`, `compose`, `collate`.
+#' Should be one of `detect_and_read`, `make_cells`, `va_classify`, `analyze`, `compose`, `collate`. 
+#' The alternate forms for `make_cells` are anything starting with `cell` (works only for filenames).
 #' Or simply a number (like 1 means `detect_and_read`, 5 means `compose`).
 #' @param omit (Optional) the file-types to omit. A character vector.
 #' @param simplify whether to simplify the output. (Default `TRUE`). If set to `FALSE` a [`read_cell_part`][read_cell_part-class]
@@ -61,12 +62,13 @@ read_cell_task_orders <- c("detect_and_read", "make_cells", "va_classify", "anal
 #' * **compose**: Compose the cell-analysis to a tidy form using [`compose_cells`][compose_cells()].
 #' * **collate**: Finally, collate columns based on content using [`collate_columns`][collate_columns()].
 #'
-#' \if{html}{
-#'
 #' Here is the flowchart of the same:
-#'
+#' 
+#' \if{html}{
 #' \figure{read_cells.svg}{options: width=400}
-#'
+#' }
+#' \if{latex}{
+#' \figure{readcells.pdf}{options: width=5in}
 #' }
 #'
 #' @rdname read_cells
@@ -285,6 +287,13 @@ read_cells.character <- function(x,
                                  ...) {
   file_name <- x
   common_file_error(file_name)
+  
+  # special case of at_level="cell*"
+  if(is.character(at_level)){
+    if(substr(at_level, 1,4)=="cell"){
+      at_level <- "make_cells"
+    }
+  }
 
   out_l <- list(file_name = file_name, stage = "init")
 
@@ -332,7 +341,13 @@ read_cells.default <- function(x,
 
 #' @rdname read_cells_internal
 #' @export
-read_cells.NULL <- function(x, ...) {
+read_cells.NULL <- function(x, 
+                            at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
+                            omit = NULL,
+                            simplify = TRUE,
+                            compose_main_cols_only = TRUE,
+                            from_level,
+                            ...) {
   cat(cli_b("Please provide a valid file path to process.\n"))
   possible_to_support(print_info = TRUE, return_print_info = FALSE)
 

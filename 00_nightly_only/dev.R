@@ -2,6 +2,133 @@
 
 
 
+tabular <- function(df, ...) {
+  stopifnot(is.data.frame(df))
+  
+  align <- function(x) if (is.numeric(x)) "c" else "l"
+  col_align <- vapply(df, align, character(1))
+  
+  dfm <- as.matrix(df)
+  blnk_row <- rep(" ", ncol(dfm))
+  # dfm <- rbind(
+  #   rbind(rbind(blnk_row, colnames(dfm)), blnk_row),
+  #   rbind(dfm, blnk_row))
+  # dfm <- rbind(
+  #   rbind(colnames(dfm), blnk_row),
+  #   dfm)
+  
+  fr <- colnames(dfm)
+  #fr <- colnames(dfm) %>% stringr::str_trim() %>% paste0("**",.,"**")
+  
+  # # 
+  # stick <- matrix(rep("|", nrow(dfm)), nrow = nrow(dfm))
+  # 
+  # dfm2 <- stick
+  # 
+  # for(i in 1:ncol(dfm)){
+  #   dfm2 <- cbind(dfm2, 
+  #                 cbind(dfm[,i], stick))
+  # }
+  # 
+  # df_final <- as.data.frame(dfm2)
+  # 
+  
+  for(i in 1:ncol(dfm)){
+    if(i%%2==0){
+      dfm[,i] <- paste0("_", dfm[,i], "_")
+    }
+  }
+  
+  dfm2 <- rbind(
+    blnk_row,
+    fr,
+    blnk_row,
+    dfm,
+    blnk_row)
+  
+  df_final <- as.data.frame(dfm2)
+  
+  cols <- lapply(df_final, format, ...)
+  # cols[[1]] <- paste0("| ", cols[[1]], " | ")
+  # if(length(cols)>1){
+  #   for(i in 2:length(cols)){
+  #     cols[[i]] <- paste0(cols[[i]], " | ")
+  #   }
+  # }
+  
+  cols <- lapply(cols, function(xn){
+    xn[1] <- stringr::str_replace_all(xn[1], " ", "_")
+    # xn[1] <- stringr::str_replace_all(xn[1], "\\|", " ")
+    xn[2] <- xn[2] %>% stringr::str_trim() %>% paste0("**",.,"**")
+    xn[3] <- stringr::str_replace_all(xn[3], " ", "_")
+    #xn[2] <- stringr::str_replace_all(xn[2], " ", "=")
+    xn[length(xn)] <- stringr::str_replace_all(xn[length(xn)], " ", "_")
+    #xn[length(xn)] <- stringr::str_replace_all(xn[length(xn)], "\\|", " ")
+    xn
+  })
+  
+  
+  #atag <- paste0("l",paste0(col_align, "l", collapse = ""))
+  atag <- paste0(col_align, collapse = "")
+  
+  contents <- do.call("paste",
+                      c(cols, list(sep = " \\tab ", collapse = "\\cr\n#'  ")))
+  
+  str <- ( paste("#' \\tabular{", atag, "}{\n#'  ",
+                 contents, "\n#' }\n", sep = "")
+  )
+  writeClipboard(str)
+  cat(str)
+}
+
+
+tabular <- function(df, ...) {
+  stopifnot(is.data.frame(df))
+  
+  align <- function(x) if (is.numeric(x)) "c" else "l"
+  col_align <- vapply(df, align, character(1))
+  
+  dfm <- as.matrix(df)
+  
+  fr <- colnames(dfm)
+  
+  for(i in 1:ncol(dfm)){
+    if(i%%2==0){
+      dfm[,i] <- paste0("_", dfm[,i], "_")
+    }
+  }
+  
+  
+  dfm2 <- rbind(
+    fr,
+    dfm
+    )
+  
+  df_final <- as.data.frame(dfm2)
+  
+  cols <- lapply(df_final, format, ...)
+  
+  cols <- lapply(cols, function(xn){
+    xn[1] <- xn[1] %>% stringr::str_trim() %>% paste0("**",.,"**")
+    
+    xn
+  })
+  
+  
+  #atag <- paste0("l",paste0(col_align, "l", collapse = ""))
+  atag <- paste0(col_align, collapse = "")
+  
+  contents <- do.call("paste",
+                      c(cols, list(sep = " \\tab ", collapse = "\\cr\n#'  ")))
+  
+  str <- ( paste("#' \\tabular{", atag, "}{\n#'  ",
+                 contents, "\n#' }\n", sep = "")
+  )
+  writeClipboard(str)
+  cat(str)
+}
+
+
 # https://github.com/fralonra/isbinary
 # # UTF-8 BOM
 # 0xef  0xbb  0xbf
@@ -607,11 +734,11 @@ x[[1]] %>%
   group_split() %>%
   map(~ try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back)))
 
- x[[1]] %>%
-   group_by(attr_gid, direction, attr_gid_split) %>%
-   group_split() %>%
-   map(~ stitch_direction(.x, ca$cell_df, trace_it = trace_it_back)) %>%
-   reduce(fj_this)
+x[[1]] %>%
+  group_by(attr_gid, direction, attr_gid_split) %>%
+  group_split() %>%
+  map(~ stitch_direction(.x, ca$cell_df, trace_it = trace_it_back)) %>%
+  reduce(fj_this)
 
 
 
@@ -623,12 +750,12 @@ d_att_map <- dat_boundary %>%
 
 admap1_major_minor$map %>%
   rename(md = dist) %>% 
-    group_by(data_gid, direction_group) %>%
-    mutate(m_dist = min(md)) %>%
-    ungroup() %>%
-    filter(md == m_dist) %>%
-    select(-md) %>%
-    rename(dist = m_dist)
+  group_by(data_gid, direction_group) %>%
+  mutate(m_dist = min(md)) %>%
+  ungroup() %>%
+  filter(md == m_dist) %>%
+  select(-md) %>%
+  rename(dist = m_dist)
 
 admap1_try <- admap0$all_map %>% 
   rename(attr_gid = gid, dist = md ) %>%

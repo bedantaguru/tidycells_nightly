@@ -6,7 +6,7 @@ decompress_file <- function(src_fkind){
   tdir <- this_temp_file(pattern = "decompress")
   unlink(tdir, recursive = TRUE, force = TRUE)
   dir.create(tdir, showWarnings = FALSE)
-  decompress(fn, tdir)
+  try(decompress(fn, tdir), silent = TRUE)
   fkout <- file_kind_identifier(tdir, temporary_file = TRUE)
   fkout
 }

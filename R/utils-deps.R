@@ -105,6 +105,9 @@ NULL
 #' @importFrom purrr imap_dfr
 NULL
 
+#' @importFrom purrr imap
+NULL
+
 #' @importFrom purrr reduce
 NULL
 

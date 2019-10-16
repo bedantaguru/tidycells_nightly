@@ -13,6 +13,7 @@ read_cells(x, at_level = c("collate", "detect_and_read", "make_cells",
 
 \item{at_level}{till which level to process.
 Should be one of \code{detect_and_read}, \code{make_cells}, \code{va_classify}, \code{analyze}, \code{compose}, \code{collate}.
+The alternate forms for \code{make_cells} are anything starting with \code{cell} (works only for filenames).
 Or simply a number (like 1 means \code{detect_and_read}, 5 means \code{compose}).}
 
 \item{omit}{(Optional) the file-types to omit. A character vector.}
@@ -74,12 +75,13 @@ It performs following set of actions if called with default \code{at_level}.
 \item \strong{collate}: Finally, collate columns based on content using \code{\link[=collate_columns]{collate_columns}}.
 }
 
-\if{html}{
-
 Here is the flowchart of the same:
 
+\if{html}{
 \figure{read_cells.svg}{options: width=400}
-
+}
+\if{latex}{
+\figure{readcells.pdf}{options: width=5in}
 }
 }
 \examples{

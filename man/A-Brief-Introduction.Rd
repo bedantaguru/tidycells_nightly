@@ -18,6 +18,9 @@ please start with \code{vignette("tidycells-intro")}.}
 \section{Introduction }{
 
 
+\if{latex}{
+\figure{logo.png}{options: width=1in}
+}
 \code{tidycells} hosts various functions for ...
 }
 

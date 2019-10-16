@@ -14,6 +14,9 @@
 #'
 #' @section Introduction :
 #'
+#' \if{latex}{
+#' \figure{logo.png}{options: width=1in}
+#' }
 #' `tidycells` hosts various functions for ...
 #'
 #' @name A Brief Introduction

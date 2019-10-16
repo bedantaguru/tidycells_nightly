@@ -65,7 +65,7 @@ VignetteBuilder:
 Encoding: UTF-8
 Language: en-US
 LazyData: true
-Roxygen: list(markdown = TRUE)
+Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 RoxygenNote: 6.1.1
 Collate: 
     'LibreOffice_convert_to_pdf_and_read.R'
@@ -83,6 +83,8 @@ Collate:
     'attach_trace_info.R'
     'cell_trace_plot.R'
     'class-cell_df.R'
+    'class-Table_Field.R'
+    'class-Table_Field_Container.R'
     'class-cell_df_analysis.R'
     'class-exploration_findings.R'
     'class-intermediate.R'
@@ -98,6 +100,7 @@ Collate:
     'detect_and_read_shafts.R'
     'file_etc.R'
     'detect_and_read.R'
+    'detect_table_block.R'
     'explore_it.R'
     'explore_it_etc.R'
     'extend_data_block.R'
@@ -146,6 +149,7 @@ Collate:
     'shiny_parts_server_components.R'
     'shiny_parts_ui.R'
     'similarity_score.R'
+    'stack_table_block.R'
     'stitch_direction.R'
     'utils-deps.R'
     'utils-etc.R'
