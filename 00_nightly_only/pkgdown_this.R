@@ -25,7 +25,7 @@ text-align: justify}
     writeLines(rd_now, "README.Rmd")
     
     unlink("docs", recursive = TRUE, force = TRUE)
-    unlink("pkgdown", recursive = TRUE, force = TRUE)
+    # unlink("pkgdown/favicon", recursive = TRUE, force = TRUE)
     # this is not required after 1.4.1 
     # pkgdown::build_favicons(overwrite = TRUE)
     pkgdown::build_site()

@@ -99,10 +99,12 @@ created in order to store cell level information." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/FileTypes.html">Supported File Types</a>
+      <a href="../articles/tidycells-intro.html">Tidycells Package Introduction</a>
     </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Other Guides / Development Stages</li>
     <li>
-      <a href="../articles/tidycells-intro.html">Tidycells Package</a>
+      <a href="../articles/FileTypes.html">Supported File Types</a>
     </li>
   </ul>
 </li>
@@ -138,7 +140,7 @@ created in order to store cell level information." />
 
     <div class="ref-description">
     
-    <p>The <code>cell_df</code> class is a subclass of <code><a href='https://rdrr.io/pkg/tibble/man/tibble.html'>tbl_df</a></code> and <code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code>,
+    <p>The <code>cell_df</code> class is a subclass of <code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tbl_df</a></code> and <code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code>,
 created in order to store cell level information.</p>
     
     </div>
@@ -168,7 +170,7 @@ However, (<code>row</code>, <code>col</code>) together should identify the row o
 <ul>
 <li><p><code>print</code>: Prints identifier of the class and the content of the underlying tibble.</p></li>
 <li><p><code>summary</code>: Calculates basic stats like number of rows and columns, number of characters and numeric fields, density etc.</p></li>
-<li><p><code>plot</code>: Plots (using <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2</a></code>) the cell information as ordinary table.</p></li>
+<li><p><code>plot</code>: Plots (using <code><a href='https://rdrr.io/pkg/ggplot2/man/ggplot.html'>ggplot2</a></code>) the cell information as ordinary table.</p></li>
 <li><p><code>as.matrix</code>: This will transform the data back into tabular form and create a character matrix.</p></li>
 <li><p><code>as.data.frame</code>: Similar to <code>as.matrix</code> this will also transform the data back into tabular form.</p></li>
 </ul>

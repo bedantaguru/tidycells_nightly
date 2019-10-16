@@ -289,9 +289,11 @@ read_cells.character <- function(x,
   common_file_error(file_name)
   
   # special case of at_level="cell*"
-  if(is.character(at_level)){
-    if(substr(at_level, 1,4)=="cell"){
-      at_level <- "make_cells"
+  if(length(at_level)>0){
+    if(is.character(at_level)){
+      if(substr(at_level[1], 1,4)=="cell"){
+        at_level <- "make_cells"
+      }
     }
   }
 

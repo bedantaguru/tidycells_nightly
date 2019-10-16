@@ -73,10 +73,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/FileTypes.html">Supported File Types</a>
+      <a href="articles/tidycells-intro.html">Tidycells Package Introduction</a>
     </li>
+    <li class="divider">
+    <li class="dropdown-header">Other Guides / Development Stages</li>
     <li>
-      <a href="articles/tidycells-intro.html">Tidycells Package</a>
+      <a href="articles/FileTypes.html">Supported File Types</a>
     </li>
   </ul>
 </li>
@@ -156,11 +158,13 @@
 <p>Let’s take a quick look at an example data as given in</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">filename &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>The data looks like (in excel)</p>
-<p><img src="articles/ext/marks.png" width="451px"></p>
+<p><img src="articles/ext/marks.svg" width="451px"></p>
 <p>Let’s try <code>tidycells</code> functions in this data</p>
 <p>Read at once</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># you should have tidyxl installed</span></a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="kw"><a href="reference/read_cells.html">read_cells</a></span>(filename)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co">#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="co">#&gt; length &gt; 1 and only the first element will be used</span></a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">collated_1</th>
@@ -285,39 +289,39 @@
 <p>The function <code>read_cells</code> is a set of ordered operations connected together. The flowchart of <code>read_cells</code>:</p>
 <p><img src="articles/ext/read_cells.svg" width="356px" style="display: block; margin: auto;"></p>
 <p>Let’s understand step by step procedures followed by <code>read_cells</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># if you have tidyxl installed</span></a>
-<a class="sourceLine" id="cb6-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="st">  </span><span class="kw"><a href="reference/read_cells.html">read_cells</a></span>(<span class="dt">at_level =</span> <span class="st">"make_cells"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-4" title="4"><span class="st">  </span>.[[<span class="dv">1</span>]]</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># if you have tidyxl installed</span></a>
+<a class="sourceLine" id="cb7-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="st">  </span><span class="kw"><a href="reference/read_cells.html">read_cells</a></span>(<span class="dt">at_level =</span> <span class="st">"make_cells"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="st">  </span>.[[<span class="dv">1</span>]]</a></code></pre></div>
 <p>Or</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># or you may do</span></a>
-<a class="sourceLine" id="cb7-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks_cells.rds"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-3" title="3"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># or you may do</span></a>
+<a class="sourceLine" id="cb8-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks_cells.rds"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>()</a></code></pre></div>
 <p>Then</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">d &lt;-<span class="st"> </span><span class="kw"><a href="reference/numeric_values_classifier.html">numeric_values_classifier</a></span>(d)</a>
-<a class="sourceLine" id="cb8-2" title="2">da &lt;-<span class="st"> </span><span class="kw"><a href="reference/analyze_cells.html">analyze_cells</a></span>(d)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">d &lt;-<span class="st"> </span><span class="kw"><a href="reference/numeric_values_classifier.html">numeric_values_classifier</a></span>(d)</a>
+<a class="sourceLine" id="cb9-2" title="2">da &lt;-<span class="st"> </span><span class="kw"><a href="reference/analyze_cells.html">analyze_cells</a></span>(d)</a></code></pre></div>
 <p>After this you need to run <code>compose_cells</code> (with argument <code>print_attribute_overview = TRUE</code>)</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">dc &lt;-<span class="st"> </span><span class="kw"><a href="reference/compose_cells.html">compose_cells</a></span>(da, <span class="dt">print_attribute_overview =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
-<p><img src="articles/ext/compose_cells_cli1.png" width="451px"></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">dc &lt;-<span class="st"> </span><span class="kw"><a href="reference/compose_cells.html">compose_cells</a></span>(da, <span class="dt">print_attribute_overview =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<p><img src="articles/ext/compose_cells_cli1.svg" width="451px"></p>
 <p>If you want a well-aligned columns then you may like to do</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># bit tricky and tedious unless you do print_attribute_overview = TRUE in above line</span></a>
-<a class="sourceLine" id="cb10-2" title="2">dcfine &lt;-<span class="st"> </span>dc <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">name =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
-<a class="sourceLine" id="cb10-4" title="4">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">2</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb10-5" title="5">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">1</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb10-6" title="6">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb10-7" title="7">  ),</a>
-<a class="sourceLine" id="cb10-8" title="8">  <span class="dt">sex =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
-<a class="sourceLine" id="cb10-9" title="9">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb10-10" title="10">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">2</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb10-11" title="11">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_row_right_<span class="dv">1</span>_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb10-12" title="12">  ),</a>
-<a class="sourceLine" id="cb10-13" title="13">  <span class="dt">school =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
-<a class="sourceLine" id="cb10-14" title="14">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb10-15" title="15">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>minor_corner_topLeft_<span class="dv">1</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb10-16" title="16">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb10-17" title="17">  )) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb10-18" title="18"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(school,sex, name, value)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># bit tricky and tedious unless you do print_attribute_overview = TRUE in above line</span></a>
+<a class="sourceLine" id="cb11-2" title="2">dcfine &lt;-<span class="st"> </span>dc <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">name =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb11-4" title="4">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">2</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb11-5" title="5">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">1</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb11-6" title="6">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span></a>
+<a class="sourceLine" id="cb11-7" title="7">  ),</a>
+<a class="sourceLine" id="cb11-8" title="8">  <span class="dt">sex =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb11-9" title="9">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb11-10" title="10">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">2</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb11-11" title="11">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_row_right_<span class="dv">1</span>_<span class="dv">1</span></a>
+<a class="sourceLine" id="cb11-12" title="12">  ),</a>
+<a class="sourceLine" id="cb11-13" title="13">  <span class="dt">school =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb11-14" title="14">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb11-15" title="15">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>minor_corner_topLeft_<span class="dv">1</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb11-16" title="16">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span></a>
+<a class="sourceLine" id="cb11-17" title="17">  )) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-18" title="18"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(school,sex, name, value)</a></code></pre></div>
 <p><code><a href="https://rdrr.io/r/utils/head.html">head(dcfine)</a></code> looks like</p>
 <table class="table">
 <thead><tr class="header">
@@ -367,10 +371,10 @@
 </table>
 <p>This is still not good right! You had to manually pick some weird column-names and spent some time and energy (when it was evident from data which columns should be aligned with whom).</p>
 <p>The <code>collate_columns</code> functions does exactly this for you. So instead of manually picking column-names after <em>compose cells</em> you can simply run</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># collate_columns(dc) should be same with </span></a>
-<a class="sourceLine" id="cb11-2" title="2"><span class="co"># direct read_cells() result except table_tag column</span></a>
-<a class="sourceLine" id="cb11-3" title="3"><span class="kw"><a href="reference/collate_columns.html">collate_columns</a></span>(dc) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-4" title="4"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># collate_columns(dc) should be same with </span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="co"># direct read_cells() result except table_tag column</span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="kw"><a href="reference/collate_columns.html">collate_columns</a></span>(dc) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">collated_1</th>

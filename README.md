@@ -120,7 +120,7 @@ filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork
 
 The data looks like (in excel)
 
-<img src="vignettes/ext/marks.png" width="451px" />
+<img src="vignettes/ext/marks.svg" width="451px" />
 
 Let’s try `tidycells` functions in this data
 
@@ -183,7 +183,7 @@ After this you need to run `compose_cells` (with argument
 dc <- compose_cells(da, print_attribute_overview = TRUE)
 ```
 
-<img src="vignettes/ext/compose_cells_cli1.png" width="451px" />
+<img src="vignettes/ext/compose_cells_cli1.svg" width="451px" />
 
 If you want a well-aligned columns then you may like to
 do

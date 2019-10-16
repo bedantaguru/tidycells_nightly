@@ -12,6 +12,22 @@ knitr::opts_chunk$set(
 
 # testing collapse
 
+
+<details>
+<summary>Some R code</summary>
+  
+```{r}
+1 + 2
+```
+</details>
+
+
+
+above is from pkgdown.
+
+below is done by me.
+
+
 <div class="container">
   <h2>Simple Collapsible</h2>
   <p>Click on the button to toggle between showing and hiding content.</p>

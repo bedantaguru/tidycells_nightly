@@ -98,10 +98,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/FileTypes.html">Supported File Types</a>
+      <a href="../articles/tidycells-intro.html">Tidycells Package Introduction</a>
     </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Other Guides / Development Stages</li>
     <li>
-      <a href="../articles/tidycells-intro.html">Tidycells Package</a>
+      <a href="../articles/FileTypes.html">Supported File Types</a>
     </li>
   </ul>
 </li>
@@ -169,9 +171,9 @@ If all the checks are passed then it returns <code>TRUE</code> else it returns <
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># returns TRUE</span>
-<span class='fu'>validate_cells</span>(<span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/tibble/man/tibble.html'>tibble</a></span>(<span class='kw'>row</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>data_type</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>, <span class='kw'>value</span> <span class='kw'>=</span> <span class='st'>"1"</span>))</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='fu'>validate_cells</span>(<span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span>(<span class='kw'>row</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>data_type</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>, <span class='kw'>value</span> <span class='kw'>=</span> <span class='st'>"1"</span>))</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='co'># this is FALSE</span>
-<span class='no'>chk</span> <span class='kw'>&lt;-</span> <span class='fu'>validate_cells</span>(<span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/tibble/man/tibble.html'>tibble</a></span>(<span class='kw'>row</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>data_type</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>))
+<span class='no'>chk</span> <span class='kw'>&lt;-</span> <span class='fu'>validate_cells</span>(<span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span>(<span class='kw'>row</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>data_type</span> <span class='kw'>=</span> <span class='st'>"numeric"</span>))
 
 <span class='co'># msg</span>
 <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>chk</span>, <span class='st'>"msg"</span>)</div><div class='output co'>#&gt; [1] "does not has required columns"</div></pre>

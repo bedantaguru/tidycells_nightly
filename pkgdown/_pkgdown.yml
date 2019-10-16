@@ -1,0 +1,19 @@
+destination: docs
+
+figures:
+  dev: grDevices::svg
+  fig.ext: svg
+
+navbar:
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: 'Tidycells Package Introduction'
+        href: articles/tidycells-intro.html
+      - text: '---'
+      - text: 'Other Guides / Development Stages'
+      - text: 'Supported File Types'
+        href: articles/FileTypes.html
+      
+

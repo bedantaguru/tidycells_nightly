@@ -129,7 +129,7 @@ filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork
 The data looks like (in excel)
 
 ```{r, out.width = "451px", echo=FALSE, eval=TRUE, dpi=300}
-knitr::include_graphics("vignettes/ext/marks.png")
+knitr::include_graphics("vignettes/ext/marks.svg")
 ```
 
 Let's try `tidycells` functions in this data
@@ -185,7 +185,7 @@ After this you need to run `compose_cells` (with argument `print_attribute_overv
 dc <- compose_cells(da, print_attribute_overview = TRUE)
 ```
 ```{r, out.width = "451px", echo=FALSE, eval=TRUE, dpi=300}
-knitr::include_graphics("vignettes/ext/compose_cells_cli1.png")
+knitr::include_graphics("vignettes/ext/compose_cells_cli1.svg")
 dc <- compose_cells(da)
 ```
 
