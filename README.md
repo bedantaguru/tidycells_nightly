@@ -121,7 +121,7 @@ filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork
 The data looks like (in
 excel)
 
-<img src="vignettes/ext/marks.sv" align="center" width="500px" style="border: 0;"/>
+<img src="vignettes/ext/marks.svg" align="center" width="500px" style="border: 0;"/>
 
 Let’s try `tidycells` functions in this data
 
