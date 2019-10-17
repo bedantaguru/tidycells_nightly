@@ -113,9 +113,8 @@ Here is a sample output:
 read_cells()
 ```
 
-```{r, out.width = "550px", echo=FALSE, dpi=300}
-knitr::include_graphics("ext/read_cells_out.svg")
-```
+<img src="ext/read_cells_out.svg" align="center" width="550px" style="border: 0;"/>
+
 
 Well, this is like _"I'm feeling lucky"_ kind of thing as told you earlier. If the final result is not what you are looking for, you may have to do some bit of extra work.
 
@@ -136,9 +135,7 @@ Now to make you understand what you can do with intermediate results, let's expl
 
 The flowchart of `read_cells` (_which will make more sense once you go through following section_)
 
-```{r, out.width = "356px", echo=FALSE, fig.align='center', dpi=300}
-knitr::include_graphics("ext/read_cells.svg")
-```
+<img src="ext/read_cells.svg" align="center" width="400px" style="border: 0;"/>
 
 
 ### 2. Making Data _tidy_
@@ -324,9 +321,7 @@ system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
 
 The data looks like (in excel)
 
-```{r, out.width = "451px", echo=FALSE, eval=TRUE, dpi=300}
-knitr::include_graphics("ext/marks.svg")
-```
+<img src="ext/marks.svg" align="center" width="500px" style="border: 0;"/>
 
 Let's try our luck in this data
 
@@ -364,10 +359,11 @@ Then you need to run `compose_cells` with additional new argument `print_attribu
 ```{r, echo=TRUE, eval=FALSE}
 dc <- compose_cells(da, print_attribute_overview = TRUE)
 ```
-```{r, out.width = "451px", echo=FALSE, eval=TRUE, dpi=300}
-knitr::include_graphics("ext/compose_cells_cli1.svg")
+```{r, echo=FALSE, eval=TRUE}
 dc <- compose_cells(da)
 ```
+<img src="ext/compose_cells_cli1.svg" align="center" width="500px" style="border: 0;"/>
+
 
 ```{r}
 # bit tricky and tedious unless you do print_attribute_overview = TRUE in above line

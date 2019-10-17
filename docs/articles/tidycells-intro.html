@@ -97,7 +97,7 @@
       <h1>Tidycells Package</h1>
                         <h4 class="author">Indranil Gayen</h4>
             
-            <h4 class="date">2019-10-16</h4>
+            <h4 class="date">2019-10-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/r-rudra/tidycells/blob/master/vignettes/tidycells-intro.Rmd"><code>vignettes/tidycells-intro.Rmd</code></a></small>
       <div class="hidden name"><code>tidycells-intro.Rmd</code></div>
@@ -178,8 +178,6 @@ text-align: justify}
 </table>
 <p>Now we can simply run</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(fcsv)</a></code></pre></div>
-<pre><code>#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has
-#&gt; length &gt; 1 and only the first element will be used</code></pre>
 <table class="table">
 <thead><tr class="header">
 <th align="left">collated_1</th>
@@ -220,7 +218,7 @@ text-align: justify}
 </tbody>
 </table>
 <p>Not a big deal for csv though. Also looks similar to</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(fcsv) <span class="op">%&gt;%</span><span class="st"> </span>tidyr<span class="op">::</span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(measure, val_of_measure, <span class="op">-</span>Kid.Name)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(fcsv) <span class="op">%&gt;%</span><span class="st"> </span>tidyr<span class="op">::</span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(measure, val_of_measure, <span class="op">-</span>Kid.Name)</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">Kid.Name</th>
@@ -254,21 +252,21 @@ text-align: justify}
 <p>Note that <code>read_cells</code> is neutral to file extension which means if somehow .xls file is saved as .csv file, then also it will detect the underlying file correctly as xls and use appreciate function to read tabular information contained in the file.</p>
 <p>However, support for each file types apart from csv is based on optional R packages. If you simply type <code><a href="../reference/read_cells.html">read_cells()</a></code> in the console, it will print which file types are supported and which package is potentially required for functionality, those are currently not available. If any package is potentially required, install the same and restart the R session to make that effective.</p>
 <p>Here is a sample output:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>()</a></code></pre></div>
-<p><img src="ext/read_cells_out.svg" width="550px"></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>()</a></code></pre></div>
+<p><img src="ext/read_cells_out.svg" align="center" width="550px" style="border: 0;"></p>
 <p>Well, this is like <em>“I’m feeling lucky”</em> kind of thing as told you earlier. If the final result is not what you are looking for, you may have to do some bit of extra work.</p>
 <p>The function <code>read_cells</code> has a few layers or stages of processing. You can choose the stage to stop processing and give intermediate results. Then you may manipulate the intermediate result, tune it and finally again resume processing (or do it outside <code>read_cells</code> completely!).</p>
 <p>Notice that <code>read_cells</code> can be broken into pieces like</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">d1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(fcsv, <span class="dt">at_level =</span> <span class="st">"va_classify"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>()</a>
-<a class="sourceLine" id="cb8-3" title="3">d2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(fcsv, <span class="dt">at_level =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(<span class="dt">at_level =</span> <span class="dv">4</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-5" title="5"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>()</a>
-<a class="sourceLine" id="cb8-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/identical.html">identical</a></span>(d1, d2)</a>
-<a class="sourceLine" id="cb8-7" title="7"><span class="co">#&gt; [1] TRUE</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">d1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(fcsv, <span class="dt">at_level =</span> <span class="st">"va_classify"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>()</a>
+<a class="sourceLine" id="cb7-3" title="3">d2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(fcsv, <span class="dt">at_level =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(<span class="dt">at_level =</span> <span class="dv">4</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>()</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/identical.html">identical</a></span>(d1, d2)</a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="co">#&gt; [1] TRUE</span></a></code></pre></div>
 <p>Now to make you understand what you can do with intermediate results, let’s explain to you other functionalities of the package and what are the steps followed by <code>read_cells</code>.</p>
 <p>The flowchart of <code>read_cells</code> (<em>which will make more sense once you go through following section</em>)</p>
-<p><img src="ext/read_cells.svg" width="356px" style="display: block; margin: auto;"></p>
+<p><img src="ext/read_cells.svg" align="center" width="400px" style="border: 0;"></p>
 </div>
 <div id="making-data-tidy" class="section level3">
 <h3 class="hasAnchor">
@@ -278,12 +276,12 @@ text-align: justify}
 <h4 class="hasAnchor">
 <a href="#as_cell_df" class="anchor"></a>2.1 as_cell_df</h4>
 <p>If you have any R object <code>x</code>, you can call <code>as_cell_df</code> convert it into a <code>cell-df</code> format (the format to store cell by cell information. See the documentation of <em>as_cell_df</em> or <em>cell_df-class</em> for more details).</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">x &lt;-<span class="st"> </span>iris <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>() </a>
-<a class="sourceLine" id="cb9-2" title="2">cd &lt;-<span class="st"> </span>x <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/as_cell_df.html">as_cell_df</a></span>(<span class="dt">take_col_names =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">x &lt;-<span class="st"> </span>iris <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>() </a>
+<a class="sourceLine" id="cb8-2" title="2">cd &lt;-<span class="st"> </span>x <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/as_cell_df.html">as_cell_df</a></span>(<span class="dt">take_col_names =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>Each stored cell has an address specified by row and column and a value (converted to a string) and a possible data type. Thus the <code>cell_df</code> structure is defined. This is the first level of operations performed by <code>read_cells</code>.</p>
 <p>You can even see how the data looks by issuing plot command.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(cd, <span class="dt">adaptive_txt_size =</span> <span class="ot">FALSE</span>, <span class="dt">txt_size =</span> <span class="fl">2.5</span>)</a></code></pre></div>
-<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-15-1.svg" width="356px"></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(cd, <span class="dt">adaptive_txt_size =</span> <span class="ot">FALSE</span>, <span class="dt">txt_size =</span> <span class="fl">2.5</span>)</a></code></pre></div>
+<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-13-1.svg" width="356px"></p>
 </div>
 <div id="value_attribute_classify" class="section level4">
 <h4 class="hasAnchor">
@@ -291,8 +289,8 @@ text-align: justify}
 <p>Next task is to assign each cell into <strong>value</strong>, <strong>attribute</strong> (of those values) and <strong>empty</strong> (irrelevant information). This is referred to in the package as value/attribute classification (VA classification). There are main 4 alternative ways to do this apart from manually editing by hand. These are documented in <code>value_attribute_classify</code> function.</p>
 <p>For now, we’ll use the most useful classifier, <code>numeric_values_classifier</code>. It assumes the cells which can be converted to a number, as values and rest as attributes. If the cell is storing a number as a string (<em>remember the famous warning you may have seen in Excel about “Number Stored as Text”</em>) it will treat that as values.</p>
 <p>Let’s take a sample example</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">dummy_dat &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(<span class="dt">name =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Mr. X"</span>, <span class="st">"Mr. Y"</span>), <span class="dt">sal =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"1,000"</span>,<span class="st">"12,000"</span>), <span class="dt">age =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">35</span>, <span class="dv">60</span>))</a>
-<a class="sourceLine" id="cb11-2" title="2">dummy_dat</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">dummy_dat &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(<span class="dt">name =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Mr. X"</span>, <span class="st">"Mr. Y"</span>), <span class="dt">sal =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"1,000"</span>,<span class="st">"12,000"</span>), <span class="dt">age =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">35</span>, <span class="dv">60</span>))</a>
+<a class="sourceLine" id="cb10-2" title="2">dummy_dat</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">name</th>
@@ -312,38 +310,38 @@ text-align: justify}
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">dummy_dat_cells &lt;-<span class="st"> </span>dummy_dat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/as_cell_df.html">as_cell_df</a></span>(<span class="dt">take_col_names =</span> <span class="ot">TRUE</span>) </a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">dummy_dat_cells &lt;-<span class="st"> </span>dummy_dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/as_cell_df.html">as_cell_df</a></span>(<span class="dt">take_col_names =</span> <span class="ot">TRUE</span>) </a></code></pre></div>
 <p>We can either do this</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">va_cells &lt;-<span class="st"> </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>(dummy_dat_cells)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">va_cells &lt;-<span class="st"> </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>(dummy_dat_cells)</a></code></pre></div>
 <p>Or this</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">va_cells &lt;-<span class="st"> </span><span class="kw"><a href="../reference/value_attribute_classify.html">value_attribute_classify</a></span>(dummy_dat_cells, </a>
-<a class="sourceLine" id="cb14-2" title="2">                                     <span class="dt">classifier =</span> <span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>())</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">va_cells &lt;-<span class="st"> </span><span class="kw"><a href="../reference/value_attribute_classify.html">value_attribute_classify</a></span>(dummy_dat_cells, </a>
+<a class="sourceLine" id="cb13-2" title="2">                                     <span class="dt">classifier =</span> <span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>())</a></code></pre></div>
 <p>Let’s plot it</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(va_cells, <span class="dt">adaptive_txt_size =</span> <span class="ot">FALSE</span>, <span class="dt">txt_size =</span> <span class="dv">3</span>)</a></code></pre></div>
-<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-21-1.svg" width="256px"></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(va_cells, <span class="dt">adaptive_txt_size =</span> <span class="ot">FALSE</span>, <span class="dt">txt_size =</span> <span class="dv">3</span>)</a></code></pre></div>
+<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-19-1.svg" width="256px"></p>
 <p>Once VA classification is done, if you plot the cells you’ll notice the color scheme is now pointed at VA classification (which is given by <code>Type</code>) rather than cell types.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># let's resume with iris example</span></a>
-<a class="sourceLine" id="cb16-2" title="2">cd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>(cd)</a>
-<a class="sourceLine" id="cb16-3" title="3"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(cd, <span class="dt">adaptive_txt_size =</span> <span class="ot">FALSE</span>, <span class="dt">txt_size =</span> <span class="fl">2.5</span>)</a></code></pre></div>
-<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-22-1.svg" width="356px"></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># let's resume with iris example</span></a>
+<a class="sourceLine" id="cb15-2" title="2">cd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>(cd)</a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(cd, <span class="dt">adaptive_txt_size =</span> <span class="ot">FALSE</span>, <span class="dt">txt_size =</span> <span class="fl">2.5</span>)</a></code></pre></div>
+<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-20-1.svg" width="356px"></p>
 </div>
 <div id="analyze_cells" class="section level4">
 <h4 class="hasAnchor">
 <a href="#analyze_cells" class="anchor"></a>2.3 analyze_cells</h4>
 <p>After this stage now the <code>cell-df</code> is ready for analysis (to understand data blocks, the orientation of attributes with respect to data or values). This is done via the following command.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">ca &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analyze_cells.html">analyze_cells</a></span>(cd)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">ca &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analyze_cells.html">analyze_cells</a></span>(cd)</a></code></pre></div>
 <p>This takes a while (the time taken is largely dependent on the complexity of the underlying tabular structure). Once it’s done you can plot the cell analysis and see how the heuristic detection has performed. Currently, only interactive way is developed for possible modifications in a cell analysis (covered in the subsequent section: <em>Interactive Modules</em>).</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(ca)</a></code></pre></div>
-<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-25-1.svg" width="356px"></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(ca)</a></code></pre></div>
+<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-23-1.svg" width="356px"></p>
 </div>
 <div id="compose_cells" class="section level4">
 <h4 class="hasAnchor">
 <a href="#compose_cells" class="anchor"></a>2.4 compose_cells</h4>
 <p>Having a cell analysis at hand, the next process to perform is to compose this cell analysis to form a composed columnar format data.frame. This is easily done as</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">dcomp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compose_cells.html">compose_cells</a></span>(ca)</a>
-<a class="sourceLine" id="cb19-2" title="2"><span class="co"># discarding other columns for printing (you can check them!)</span></a>
-<a class="sourceLine" id="cb19-3" title="3"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(dcomp[<span class="dv">1</span><span class="op">:</span><span class="dv">7</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">dcomp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compose_cells.html">compose_cells</a></span>(ca)</a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="co"># discarding other columns for printing (you can check them!)</span></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(dcomp[<span class="dv">1</span><span class="op">:</span><span class="dv">7</span>])</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="right">row</th>
@@ -411,10 +409,10 @@ text-align: justify}
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co"># let's check the same for va_cells (earlier dummy example)</span></a>
-<a class="sourceLine" id="cb20-2" title="2">va_cells <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/analyze_cells.html">analyze_cells</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/compose_cells.html">compose_cells</a></span>(<span class="dt">discard_raw_cols =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co"># let's check the same for va_cells (earlier dummy example)</span></a>
+<a class="sourceLine" id="cb19-2" title="2">va_cells <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/analyze_cells.html">analyze_cells</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/compose_cells.html">compose_cells</a></span>(<span class="dt">discard_raw_cols =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="right">row</th>
@@ -465,10 +463,10 @@ text-align: justify}
 </tbody>
 </table>
 <p>After this, you may like to see how the final data is connected or rendered from the actual table. To do this you may run</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="kw"><a href="../reference/cell_composition_traceback.html">cell_composition_traceback</a></span>(ca, <span class="dt">trace_row =</span> <span class="dv">1</span>)</a></code></pre></div>
-<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-30-1.svg" width="288"></p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="kw"><a href="../reference/cell_composition_traceback.html">cell_composition_traceback</a></span>(ca, <span class="dt">trace_row =</span> <span class="dv">10</span>)</a></code></pre></div>
-<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-30-2.svg" width="288"></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw"><a href="../reference/cell_composition_traceback.html">cell_composition_traceback</a></span>(ca, <span class="dt">trace_row =</span> <span class="dv">1</span>)</a></code></pre></div>
+<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-28-1.svg" width="288"></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="kw"><a href="../reference/cell_composition_traceback.html">cell_composition_traceback</a></span>(ca, <span class="dt">trace_row =</span> <span class="dv">10</span>)</a></code></pre></div>
+<p><img src="tidycells-intro_files/figure-html/unnamed-chunk-28-2.svg" width="288"></p>
 <p>There is an optional interactive version of it, which is explained in the subsequent section <em>Interactive Modules</em>.</p>
 </div>
 <div id="collate_columns" class="section level4">
@@ -476,8 +474,8 @@ text-align: justify}
 <a href="#collate_columns" class="anchor"></a>2.5 collate_columns</h4>
 <p>The data should be consumable after the composition stage, in most of the cases. However, in the presence of extreme variations in the underlying data structure, another step may be required which can be coined as “collation of columns”. If somehow the data is a bit cooperative in a sense that from the data itself it can be inferred that which column should be mapped with which column, then this stage is useful. It is a stage which does approximate string matching (which is enhanced if you have optional dependency <a href="https://CRAN.R-project.org/package=stringdist"><code>stringdist</code></a> package) to find out inter-column mapping among various data blocks (if the data has multiple small tables). In case there is only one table (a single data block) then this stage will do almost nothing except renaming the columns. In <code>iris</code> and <code>dummy_dat</code> example, this is kind of meaningless. This will be clear to you once you move forward to the next section (<em>where <strong>“A more complicated example”</strong> is discussed</em>).</p>
 <p>The function <code>collate_columns</code> is designed to carry out this operation. This can be easily done as</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">dcc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/collate_columns.html">collate_columns</a></span>(dcomp)</a>
-<a class="sourceLine" id="cb23-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(dcc)</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">dcc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/collate_columns.html">collate_columns</a></span>(dcomp)</a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(dcc)</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">collated_1</th>
@@ -526,17 +524,17 @@ text-align: justify}
 </table>
 <p>Note: You may omit this stage by choosing <code><a href="../reference/read_cells.html">read_cells(..., at_level = "compose")</a></code>.</p>
 <p>That’s all. These are the process flow followed by <code>read_cells</code>. Thus, summing it all</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co"># below should match with </span></a>
-<a class="sourceLine" id="cb24-2" title="2"><span class="co"># read_cells(fcsv) %&gt;% dplyr::select(-table_tag)</span></a>
-<a class="sourceLine" id="cb24-3" title="3"><span class="co"># * which (the column table_tag) is added to identify </span></a>
-<a class="sourceLine" id="cb24-4" title="4"><span class="co"># * potential multiple tables.</span></a>
-<a class="sourceLine" id="cb24-5" title="5">fcsv <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-6" title="6"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-7" title="7"><span class="st">  </span><span class="kw"><a href="../reference/as_cell_df.html">as_cell_df</a></span>(<span class="dt">take_col_names =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-8" title="8"><span class="st">  </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-9" title="9"><span class="st">  </span><span class="kw"><a href="../reference/analyze_cells.html">analyze_cells</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-10" title="10"><span class="st">  </span><span class="kw"><a href="../reference/compose_cells.html">compose_cells</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-11" title="11"><span class="st">  </span><span class="kw"><a href="../reference/collate_columns.html">collate_columns</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="co"># below should match with </span></a>
+<a class="sourceLine" id="cb23-2" title="2"><span class="co"># read_cells(fcsv) %&gt;% dplyr::select(-table_tag)</span></a>
+<a class="sourceLine" id="cb23-3" title="3"><span class="co"># * which (the column table_tag) is added to identify </span></a>
+<a class="sourceLine" id="cb23-4" title="4"><span class="co"># * potential multiple tables.</span></a>
+<a class="sourceLine" id="cb23-5" title="5">fcsv <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-6" title="6"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-7" title="7"><span class="st">  </span><span class="kw"><a href="../reference/as_cell_df.html">as_cell_df</a></span>(<span class="dt">take_col_names =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-8" title="8"><span class="st">  </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-9" title="9"><span class="st">  </span><span class="kw"><a href="../reference/analyze_cells.html">analyze_cells</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-10" title="10"><span class="st">  </span><span class="kw"><a href="../reference/compose_cells.html">compose_cells</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-11" title="11"><span class="st">  </span><span class="kw"><a href="../reference/collate_columns.html">collate_columns</a></span>()</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">collated_1</th>
@@ -572,44 +570,42 @@ text-align: justify}
 </tbody>
 </table>
 <p>A half-done item can be further manipulated and after the same, we can give it back to <code>read_cells</code> again to finish further processing (or simply can do it ourselves). Here is a sample manipulation example.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">rc_part &lt;-<span class="st"> </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(fcsv, <span class="dt">at_level =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb25-2" title="2"><span class="co"># it is a list with `read_cells_stage` attribute</span></a>
-<a class="sourceLine" id="cb25-3" title="3"><span class="co"># which indicate the last processed stage in read_cells</span></a>
-<a class="sourceLine" id="cb25-4" title="4"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(rc_part)</a>
-<a class="sourceLine" id="cb25-5" title="5"><span class="co">#&gt; List of 1</span></a>
-<a class="sourceLine" id="cb25-6" title="6"><span class="co">#&gt;  $ :Classes 'cell_df', 'cells', 'Table_Field', 'rc_df', 'tbl_df', 'tbl' and 'data.frame':    9 obs. of  4 variables:</span></a>
-<a class="sourceLine" id="cb25-7" title="7"><span class="co">#&gt;   ..$ row      : int [1:9] 1 1 1 2 2 2 3 3 3</span></a>
-<a class="sourceLine" id="cb25-8" title="8"><span class="co">#&gt;   ..$ col      : int [1:9] 1 2 3 1 2 3 1 2 3</span></a>
-<a class="sourceLine" id="cb25-9" title="9"><span class="co">#&gt;   ..$ data_type: chr [1:9] "character" "character" "character" "character" ...</span></a>
-<a class="sourceLine" id="cb25-10" title="10"><span class="co">#&gt;   ..$ value    : chr [1:9] "Kid Name" "Weight" "Age" "Nakshatra" ...</span></a>
-<a class="sourceLine" id="cb25-11" title="11"><span class="co">#&gt;  - attr(*, "read_cells_stage")= chr "make_cells"</span></a>
-<a class="sourceLine" id="cb25-12" title="12"><span class="co"># sample_based_classifier is another VA classifier</span></a>
-<a class="sourceLine" id="cb25-13" title="13"><span class="co"># for details see coresponding documentation</span></a>
-<a class="sourceLine" id="cb25-14" title="14">rc_part[[<span class="dv">1</span>]] &lt;-<span class="st"> </span>rc_part[[<span class="dv">1</span>]] <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-15" title="15"><span class="st">  </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-16" title="16"><span class="st">  </span><span class="kw"><a href="../reference/sample_based_classifier.html">sample_based_classifier</a></span>(<span class="dt">empty_sample =</span> <span class="st">"6"</span>)</a>
-<a class="sourceLine" id="cb25-17" title="17">  </a>
-<a class="sourceLine" id="cb25-18" title="18"></a>
-<a class="sourceLine" id="cb25-19" title="19"><span class="co"># below should be similar to </span></a>
-<a class="sourceLine" id="cb25-20" title="20"><span class="co"># rc_part[[1]] %&gt;% </span></a>
-<a class="sourceLine" id="cb25-21" title="21"><span class="co">#   analyze_cells() %&gt;% </span></a>
-<a class="sourceLine" id="cb25-22" title="22"><span class="co">#   compose_cells(discard_raw_cols = TRUE)</span></a>
-<a class="sourceLine" id="cb25-23" title="23">rc_part <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(<span class="dt">from_level =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb25-24" title="24"><span class="co">#&gt; # A tibble: 1 x 7</span></a>
-<a class="sourceLine" id="cb25-25" title="25"><span class="co">#&gt;   collated_1 collated_2 collated_3 collated_4 collated_5 table_tag value</span></a>
-<a class="sourceLine" id="cb25-26" title="26"><span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;</span></a>
-<a class="sourceLine" id="cb25-27" title="27"><span class="co">#&gt; 1 Weight     Nakshatra  Titas      Kid Name   Age        Table_1   12</span></a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">rc_part &lt;-<span class="st"> </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(fcsv, <span class="dt">at_level =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="co"># it is a list with `read_cells_stage` attribute</span></a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="co"># which indicate the last processed stage in read_cells</span></a>
+<a class="sourceLine" id="cb24-4" title="4"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(rc_part)</a>
+<a class="sourceLine" id="cb24-5" title="5"><span class="co">#&gt; List of 1</span></a>
+<a class="sourceLine" id="cb24-6" title="6"><span class="co">#&gt;  $ :Classes 'cell_df', 'cells', 'Table_Field', 'rc_df', 'tbl_df', 'tbl' and 'data.frame':    9 obs. of  4 variables:</span></a>
+<a class="sourceLine" id="cb24-7" title="7"><span class="co">#&gt;   ..$ row      : int [1:9] 1 1 1 2 2 2 3 3 3</span></a>
+<a class="sourceLine" id="cb24-8" title="8"><span class="co">#&gt;   ..$ col      : int [1:9] 1 2 3 1 2 3 1 2 3</span></a>
+<a class="sourceLine" id="cb24-9" title="9"><span class="co">#&gt;   ..$ data_type: chr [1:9] "character" "character" "character" "character" ...</span></a>
+<a class="sourceLine" id="cb24-10" title="10"><span class="co">#&gt;   ..$ value    : chr [1:9] "Kid Name" "Weight" "Age" "Nakshatra" ...</span></a>
+<a class="sourceLine" id="cb24-11" title="11"><span class="co">#&gt;  - attr(*, "read_cells_stage")= chr "make_cells"</span></a>
+<a class="sourceLine" id="cb24-12" title="12"><span class="co"># sample_based_classifier is another VA classifier</span></a>
+<a class="sourceLine" id="cb24-13" title="13"><span class="co"># for details see coresponding documentation</span></a>
+<a class="sourceLine" id="cb24-14" title="14">rc_part[[<span class="dv">1</span>]] &lt;-<span class="st"> </span>rc_part[[<span class="dv">1</span>]] <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb24-15" title="15"><span class="st">  </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb24-16" title="16"><span class="st">  </span><span class="kw"><a href="../reference/sample_based_classifier.html">sample_based_classifier</a></span>(<span class="dt">empty_sample =</span> <span class="st">"6"</span>)</a>
+<a class="sourceLine" id="cb24-17" title="17">  </a>
+<a class="sourceLine" id="cb24-18" title="18"></a>
+<a class="sourceLine" id="cb24-19" title="19"><span class="co"># below should be similar to </span></a>
+<a class="sourceLine" id="cb24-20" title="20"><span class="co"># rc_part[[1]] %&gt;% </span></a>
+<a class="sourceLine" id="cb24-21" title="21"><span class="co">#   analyze_cells() %&gt;% </span></a>
+<a class="sourceLine" id="cb24-22" title="22"><span class="co">#   compose_cells(discard_raw_cols = TRUE)</span></a>
+<a class="sourceLine" id="cb24-23" title="23">rc_part <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(<span class="dt">from_level =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb24-24" title="24"><span class="co">#&gt; # A tibble: 1 x 7</span></a>
+<a class="sourceLine" id="cb24-25" title="25"><span class="co">#&gt;   collated_1 collated_2 collated_3 collated_4 collated_5 table_tag value</span></a>
+<a class="sourceLine" id="cb24-26" title="26"><span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;</span></a>
+<a class="sourceLine" id="cb24-27" title="27"><span class="co">#&gt; 1 Weight     Nakshatra  Titas      Kid Name   Age        Table_1   12</span></a></code></pre></div>
 <p><strong>A more complicated example</strong></p>
 <p>Let’s take a quick look at another example data as given in</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>The data looks like (in excel)</p>
-<p><img src="ext/marks.svg" width="451px"></p>
+<p><img src="ext/marks.svg" align="center" width="500px" style="border: 0;"></p>
 <p>Let’s try our luck in this data</p>
 <p>Read at once</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb27-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>()</a></code></pre></div>
-<pre><code>#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has
-#&gt; length &gt; 1 and only the first element will be used</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>()</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">collated_1</th>
@@ -732,36 +728,36 @@ text-align: justify}
 </tbody>
 </table>
 <p>Let’s understand step by step procedures followed by <code>read_cells</code>.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="co"># if you have tidyxl installed</span></a>
-<a class="sourceLine" id="cb29-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb29-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(<span class="dt">at_level =</span> <span class="st">"make_cells"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb29-4" title="4"><span class="st">  </span>.[[<span class="dv">1</span>]]</a></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="co"># or you may do</span></a>
-<a class="sourceLine" id="cb30-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks_cells.rds"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb30-3" title="3"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>()</a>
-<a class="sourceLine" id="cb30-4" title="4">d &lt;-<span class="st"> </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>(d)</a>
-<a class="sourceLine" id="cb30-5" title="5">da &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analyze_cells.html">analyze_cells</a></span>(d)</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="co"># if you have tidyxl installed</span></a>
+<a class="sourceLine" id="cb27-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks.xlsx"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-3" title="3"><span class="st">  </span><span class="kw"><a href="../reference/read_cells.html">read_cells</a></span>(<span class="dt">at_level =</span> <span class="st">"make_cells"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-4" title="4"><span class="st">  </span>.[[<span class="dv">1</span>]]</a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="co"># or you may do</span></a>
+<a class="sourceLine" id="cb28-2" title="2">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"marks_cells.rds"</span>, <span class="dt">package =</span> <span class="st">"tidycells"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb28-3" title="3"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>()</a>
+<a class="sourceLine" id="cb28-4" title="4">d &lt;-<span class="st"> </span><span class="kw"><a href="../reference/numeric_values_classifier.html">numeric_values_classifier</a></span>(d)</a>
+<a class="sourceLine" id="cb28-5" title="5">da &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analyze_cells.html">analyze_cells</a></span>(d)</a></code></pre></div>
 <p>Then you need to run <code>compose_cells</code> with additional new argument <code>print_attribute_overview = TRUE</code></p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">dc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compose_cells.html">compose_cells</a></span>(da, <span class="dt">print_attribute_overview =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
-<p><img src="ext/compose_cells_cli1.svg" width="451px"></p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1"><span class="co"># bit tricky and tedious unless you do print_attribute_overview = TRUE in above line</span></a>
-<a class="sourceLine" id="cb32-2" title="2">dcfine &lt;-<span class="st"> </span>dc <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb32-3" title="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">name =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
-<a class="sourceLine" id="cb32-4" title="4">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">2</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb32-5" title="5">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">1</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb32-6" title="6">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb32-7" title="7">  ),</a>
-<a class="sourceLine" id="cb32-8" title="8">  <span class="dt">sex =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
-<a class="sourceLine" id="cb32-9" title="9">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb32-10" title="10">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">2</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb32-11" title="11">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_row_right_<span class="dv">1</span>_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb32-12" title="12">  ),</a>
-<a class="sourceLine" id="cb32-13" title="13">  <span class="dt">school =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
-<a class="sourceLine" id="cb32-14" title="14">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb32-15" title="15">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>minor_corner_topLeft_<span class="dv">1</span>_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb32-16" title="16">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb32-17" title="17">  )) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb32-18" title="18"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(school,sex, name, value)</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">dc &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compose_cells.html">compose_cells</a></span>(da, <span class="dt">print_attribute_overview =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<p><img src="ext/compose_cells_cli1.svg" align="center" width="500px" style="border: 0;"></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="co"># bit tricky and tedious unless you do print_attribute_overview = TRUE in above line</span></a>
+<a class="sourceLine" id="cb30-2" title="2">dcfine &lt;-<span class="st"> </span>dc <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-3" title="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">name =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb30-4" title="4">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">2</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb30-5" title="5">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">1</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb30-6" title="6">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span></a>
+<a class="sourceLine" id="cb30-7" title="7">  ),</a>
+<a class="sourceLine" id="cb30-8" title="8">  <span class="dt">sex =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb30-9" title="9">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>major_row_left_<span class="dv">1</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb30-10" title="10">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>major_col_bottom_<span class="dv">2</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb30-11" title="11">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_row_right_<span class="dv">1</span>_<span class="dv">1</span></a>
+<a class="sourceLine" id="cb30-12" title="12">  ),</a>
+<a class="sourceLine" id="cb30-13" title="13">  <span class="dt">school =</span> dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span>(</a>
+<a class="sourceLine" id="cb30-14" title="14">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb30-15" title="15">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> </span>minor_corner_topLeft_<span class="dv">1</span>_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb30-16" title="16">    data_block <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> </span>minor_col_top_<span class="dv">1</span>_<span class="dv">1</span></a>
+<a class="sourceLine" id="cb30-17" title="17">  )) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-18" title="18"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(school,sex, name, value)</a></code></pre></div>
 <p><code><a href="https://rdrr.io/r/utils/head.html">head(dcfine)</a></code> looks like</p>
 <table class="table">
 <thead><tr class="header">
@@ -811,8 +807,8 @@ text-align: justify}
 </table>
 <p>This is still not good right! You had to manually pick some weird column-names (when it was evident from data which columns should be aligned with whom).</p>
 <p>The <code>collate_columns</code> functions does exactly this for you. So instead of manually picking column-names after compose cells you can simply run</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1"><span class="kw"><a href="../reference/collate_columns.html">collate_columns</a></span>(dc) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-2" title="2"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1"><span class="kw"><a href="../reference/collate_columns.html">collate_columns</a></span>(dc) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb31-2" title="2"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">collated_1</th>
@@ -881,44 +877,27 @@ text-align: justify}
 <h3 class="hasAnchor">
 <a href="#support-for-multiple-formats" class="anchor"></a>3. Support for Multiple Formats</h3>
 <p>When coming to support for multiple formats (assuming you have all the required packages as specified by <code>read_cells</code>) you can run following set of command to test the multi-format support in <code>read_cells</code>.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1">dm &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(<span class="dt">fn =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span>(fold, <span class="dt">full.names =</span> T))</a>
-<a class="sourceLine" id="cb34-2" title="2">dm<span class="op">$</span>fn <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/basename.html">basename</a></span>()</a>
-<a class="sourceLine" id="cb34-3" title="3"><span class="co">#&gt; [1] "csv.docx"  "docx.html" "html.csv"  "pdf.docx"  "xls.pdf"   "xlsx.csv"</span></a></code></pre></div>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1">dcomps &lt;-<span class="st"> </span>dm<span class="op">$</span>fn <span class="op">%&gt;%</span><span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span>(read_cells)</a>
-<a class="sourceLine" id="cb35-2" title="2"><span class="co">#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has</span></a>
-<a class="sourceLine" id="cb35-3" title="3"><span class="co">#&gt; length &gt; 1 and only the first element will be used</span></a>
-<a class="sourceLine" id="cb35-4" title="4"></a>
-<a class="sourceLine" id="cb35-5" title="5"><span class="co">#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has</span></a>
-<a class="sourceLine" id="cb35-6" title="6"><span class="co">#&gt; length &gt; 1 and only the first element will be used</span></a>
-<a class="sourceLine" id="cb35-7" title="7"></a>
-<a class="sourceLine" id="cb35-8" title="8"><span class="co">#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has</span></a>
-<a class="sourceLine" id="cb35-9" title="9"><span class="co">#&gt; length &gt; 1 and only the first element will be used</span></a>
-<a class="sourceLine" id="cb35-10" title="10"></a>
-<a class="sourceLine" id="cb35-11" title="11"><span class="co">#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has</span></a>
-<a class="sourceLine" id="cb35-12" title="12"><span class="co">#&gt; length &gt; 1 and only the first element will be used</span></a>
-<a class="sourceLine" id="cb35-13" title="13"></a>
-<a class="sourceLine" id="cb35-14" title="14"><span class="co">#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has</span></a>
-<a class="sourceLine" id="cb35-15" title="15"><span class="co">#&gt; length &gt; 1 and only the first element will be used</span></a>
-<a class="sourceLine" id="cb35-16" title="16"></a>
-<a class="sourceLine" id="cb35-17" title="17"><span class="co">#&gt; Warning in if (substr(at_level, 1, 4) == "cell") {: the condition has</span></a>
-<a class="sourceLine" id="cb35-18" title="18"><span class="co">#&gt; length &gt; 1 and only the first element will be used</span></a>
-<a class="sourceLine" id="cb35-19" title="19">dcomps_sel &lt;-<span class="st"> </span>dcomps <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb35-20" title="20"><span class="st">    </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span>(<span class="op">~</span><span class="st"> </span>.x <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb35-21" title="21"><span class="st">      </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(value, collated_<span class="dv">1</span>, collated_<span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb35-22" title="22"><span class="co"># all of them are same [intentionaly made. but the file types are totally different]</span></a>
-<a class="sourceLine" id="cb35-23" title="23">dcomps_sel <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb35-24" title="24"><span class="st">  </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_lgl</a></span>(<span class="op">~</span><span class="kw"><a href="https://rdrr.io/r/base/identical.html">identical</a></span>(.x, dcomps_sel[[<span class="dv">1</span>]])) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb35-25" title="25"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/all.html">all</a></span>()</a>
-<a class="sourceLine" id="cb35-26" title="26"><span class="co">#&gt; [1] TRUE</span></a>
-<a class="sourceLine" id="cb35-27" title="27"><span class="co"># check one sample</span></a>
-<a class="sourceLine" id="cb35-28" title="28">dcomps_sel[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb35-29" title="29"><span class="co">#&gt; # A tibble: 4 x 3</span></a>
-<a class="sourceLine" id="cb35-30" title="30"><span class="co">#&gt;   value collated_1 collated_2</span></a>
-<a class="sourceLine" id="cb35-31" title="31"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;     </span></a>
-<a class="sourceLine" id="cb35-32" title="32"><span class="co">#&gt; 1 12    Weight     Nakshatra </span></a>
-<a class="sourceLine" id="cb35-33" title="33"><span class="co">#&gt; 2 16    Weight     Titas     </span></a>
-<a class="sourceLine" id="cb35-34" title="34"><span class="co">#&gt; 3 1.5   Age        Nakshatra </span></a>
-<a class="sourceLine" id="cb35-35" title="35"><span class="co">#&gt; 4 6     Age        Titas</span></a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">dm &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(<span class="dt">fn =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span>(fold, <span class="dt">full.names =</span> T))</a>
+<a class="sourceLine" id="cb32-2" title="2">dm<span class="op">$</span>fn <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/basename.html">basename</a></span>()</a>
+<a class="sourceLine" id="cb32-3" title="3"><span class="co">#&gt; [1] "csv.docx"  "docx.html" "html.csv"  "pdf.docx"  "xls.pdf"   "xlsx.csv"</span></a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">dcomps &lt;-<span class="st"> </span>dm<span class="op">$</span>fn <span class="op">%&gt;%</span><span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span>(read_cells)</a>
+<a class="sourceLine" id="cb33-2" title="2">dcomps_sel &lt;-<span class="st"> </span>dcomps <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb33-3" title="3"><span class="st">    </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span>(<span class="op">~</span><span class="st"> </span>.x <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb33-4" title="4"><span class="st">      </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(value, collated_<span class="dv">1</span>, collated_<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb33-5" title="5"><span class="co"># all of them are same [intentionaly made. but the file types are totally different]</span></a>
+<a class="sourceLine" id="cb33-6" title="6">dcomps_sel <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-7" title="7"><span class="st">  </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_lgl</a></span>(<span class="op">~</span><span class="kw"><a href="https://rdrr.io/r/base/identical.html">identical</a></span>(.x, dcomps_sel[[<span class="dv">1</span>]])) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-8" title="8"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/all.html">all</a></span>()</a>
+<a class="sourceLine" id="cb33-9" title="9"><span class="co">#&gt; [1] TRUE</span></a>
+<a class="sourceLine" id="cb33-10" title="10"><span class="co"># check one sample</span></a>
+<a class="sourceLine" id="cb33-11" title="11">dcomps_sel[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb33-12" title="12"><span class="co">#&gt; # A tibble: 4 x 3</span></a>
+<a class="sourceLine" id="cb33-13" title="13"><span class="co">#&gt;   value collated_1 collated_2</span></a>
+<a class="sourceLine" id="cb33-14" title="14"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;     </span></a>
+<a class="sourceLine" id="cb33-15" title="15"><span class="co">#&gt; 1 12    Weight     Nakshatra </span></a>
+<a class="sourceLine" id="cb33-16" title="16"><span class="co">#&gt; 2 16    Weight     Titas     </span></a>
+<a class="sourceLine" id="cb33-17" title="17"><span class="co">#&gt; 3 1.5   Age        Nakshatra </span></a>
+<a class="sourceLine" id="cb33-18" title="18"><span class="co">#&gt; 4 6     Age        Titas</span></a></code></pre></div>
 <p>Each file is with the wrong extension and the original extension should be the file name part before extension (intentionally created for testing this feature). Like for example, docx.csv is actually a docx. You can copy into some location where you have write access, then rename appropriately and open it to verify.</p>
 </div>
 <div id="interactive-modules" class="section level3">

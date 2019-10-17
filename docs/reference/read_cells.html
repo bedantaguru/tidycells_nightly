@@ -285,13 +285,13 @@ and continue again with <code>read_cells</code> (perhaps then <code>from_level</
 <span class='co'># while filename is the actual identifier of the file type</span>
 <span class='no'>fcsv</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span>(<span class='no'>fold</span>, <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"^csv."</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)[<span class='fl'>1</span>]
 <span class='co'># read the data</span>
-<span class='fu'>read_cells</span>(<span class='no'>fcsv</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 4 x 5</span><span>
+<span class='fu'>read_cells</span>(<span class='no'>fcsv</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 4 x 5</span><span>
 #&gt;   collated_1 collated_2 collated_3 table_tag value
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> Weight     Nakshatra  Kid Name   Table_1   12   
 #&gt; </span><span style='color: #555555;'>2</span><span> Weight     Titas      Kid Name   Table_1   16   
 #&gt; </span><span style='color: #555555;'>3</span><span> Age        Nakshatra  Kid Name   Table_1   1.5  
-#&gt; </span><span style='color: #555555;'>4</span><span> Age        Titas      Kid Name   Table_1   6    </div><div class='input'><span class='fu'>read_cells</span>(<span class='no'>fcsv</span>, <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; </span><span style='color: #0000BB;font-weight: bold;'>A partial read_cell</span><span>
+#&gt; </span><span style='color: #555555;'>4</span><span> Age        Titas      Kid Name   Table_1   6    </div><div class='input'><span class='fu'>read_cells</span>(<span class='no'>fcsv</span>, <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; </span><span style='color: #0000BB;font-weight: bold;'>A partial read_cell</span><span>
 #&gt; </span><span style='color: #0000BB;'>At stage </span><span>collate</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

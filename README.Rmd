@@ -128,9 +128,7 @@ filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork
 
 The data looks like (in excel)
 
-```{r, out.width = "451px", echo=FALSE, eval=TRUE, dpi=300}
-knitr::include_graphics("vignettes/ext/marks.svg")
-```
+<img src="vignettes/ext/marks.svg" align="center" width="500px" style="border: 0;"/>
 
 Let's try `tidycells` functions in this data
 
@@ -151,9 +149,7 @@ if(rlang::is_installed("tidyxl")){
 
 The function `read_cells` is a set of ordered operations connected together. The flowchart of `read_cells`:
 
-```{r, out.width = "356px", echo=FALSE, fig.align='center', dpi=300}
-knitr::include_graphics("vignettes/ext/read_cells.svg")
-```
+<img src="vignettes/ext/read_cells.svg" align="center" width="400px" style="border: 0;"/>
 
 Let's understand step by step procedures followed by `read_cells`. 
 
@@ -184,10 +180,11 @@ After this you need to run `compose_cells` (with argument `print_attribute_overv
 ```{r, echo=TRUE, eval=FALSE}
 dc <- compose_cells(da, print_attribute_overview = TRUE)
 ```
-```{r, out.width = "451px", echo=FALSE, eval=TRUE, dpi=300}
-knitr::include_graphics("vignettes/ext/compose_cells_cli1.svg")
+```{r, echo=FALSE, eval=TRUE}
 dc <- compose_cells(da)
 ```
+
+<img src="vignettes/ext/compose_cells_cli1.svg" align="center" width="500px" style="border: 0;"/>
 
 If you want a well-aligned columns then you may like to do
 

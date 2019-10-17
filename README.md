@@ -118,9 +118,10 @@ in
 filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
 ```
 
-The data looks like (in excel)
+The data looks like (in
+excel)
 
-<img src="vignettes/ext/marks.svg" width="451px" />
+<img src="vignettes/ext/marks.sv" align="center" width="500px" style="border: 0;"/>
 
 Let’s try `tidycells` functions in this data
 
@@ -150,7 +151,7 @@ The function `read_cells` is a set of ordered operations connected
 together. The flowchart of
 `read_cells`:
 
-<img src="vignettes/ext/read_cells.svg" width="356px" style="display: block; margin: auto;" />
+<img src="vignettes/ext/read_cells.svg" align="center" width="400px" style="border: 0;"/>
 
 Let’s understand step by step procedures followed by `read_cells`.
 
@@ -177,13 +178,14 @@ da <- analyze_cells(d)
 ```
 
 After this you need to run `compose_cells` (with argument
-`print_attribute_overview = TRUE`)
+`print_attribute_overview =
+TRUE`)
 
 ``` r
 dc <- compose_cells(da, print_attribute_overview = TRUE)
 ```
 
-<img src="vignettes/ext/compose_cells_cli1.svg" width="451px" />
+<img src="vignettes/ext/compose_cells_cli1.svg" align="center" width="500px" style="border: 0;"/>
 
 If you want a well-aligned columns then you may like to
 do

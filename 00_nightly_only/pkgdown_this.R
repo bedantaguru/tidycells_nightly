@@ -33,7 +33,8 @@ text-align: justify}
     ##############################
     #  after pkgdown manual tasks
     ##############################
-    file.copy("vignettes/ext/read_cells.svg", "docs/articles/ext/")
+    
+    file.copy(list.files("vignettes/ext/", pattern = ".svg$", full.names = T), "docs/articles/ext/", overwrite = T)
     unlink("README.Rmd")
     file.copy(rd_bk, "README.Rmd")
   }
