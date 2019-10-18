@@ -1,6 +1,4 @@
 
-#' @include tidycells-package.R
-
 # `file_type_from_magic_numbers` is designed for cases which
 # 1. **wand** fails to detect and still required by **tidycells**
 # 2. wand is not available etc.

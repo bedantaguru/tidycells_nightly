@@ -2,6 +2,14 @@
 
 
 
+getNamespaceExports(asNamespace("tidycells"))
+
+
+
+
+
+
+
 tabular <- function(df, ...) {
   stopifnot(is.data.frame(df))
   

@@ -1,6 +1,4 @@
 
-#' @include tidycells-package.R
-
 this_file_kinds <- function(){
   tibble(
     file_format = c("xls", "xlsx", "doc", "docx", 

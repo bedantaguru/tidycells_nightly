@@ -4,7 +4,6 @@ cell_df_class <- c("cell_df", "cells","Table_Field", "rc_df", "tbl_df", "tbl", "
 cell_df_class_internal <- c("cell_df", "cells","Table_Field", "rc_df", "tidyxl", "unpivotr", "readr", "unknown")
 
 #' @importFrom methods setOldClass
-#' @exportClass cell_df
 
 setOldClass(cell_df_class)
 

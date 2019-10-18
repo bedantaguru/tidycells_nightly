@@ -26,6 +26,5 @@
 NULL
 
 
-# @exportClass Table_Field_Container
 Table_Field_Container_class <- c("Table_Field_Container", "list")
 setOldClass(Table_Field_Container_class)

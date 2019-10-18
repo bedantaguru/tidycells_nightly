@@ -1,9 +1,4 @@
 
-
-# below is not required but kept for information
-# @include explore_it_etc.R
-
-
 # @Dev
 #' Explore recursively the content of the file or folder
 #'

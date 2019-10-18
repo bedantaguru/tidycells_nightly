@@ -21,6 +21,5 @@
 #' @keywords internal
 NULL
 
-#' @exportClass cell_analysis
 cell_df_analysis_class <- c("cell_analysis", "cell_df_analysis", "list")
 setOldClass(cell_df_analysis_class)

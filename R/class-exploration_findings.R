@@ -24,6 +24,5 @@
 NULL
 
 # @Dev
-# @exportClass exploration_findings
 exploration_findings_class <- c("exploration_findings", "tbl_df", "tbl", "data.frame")
 setOldClass(exploration_findings_class)

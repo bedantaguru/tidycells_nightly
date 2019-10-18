@@ -30,6 +30,5 @@
 #' @keywords internal
 NULL
 
-#' @exportClass read_cell_part
 read_cell_part_class <- c("read_cell_part", "list")
 setOldClass(read_cell_part_class)

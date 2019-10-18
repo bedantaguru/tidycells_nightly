@@ -1,6 +1,4 @@
 
-#' @include tidycells-package.R
-
 # this is designed to test and simulate
 # non availability of certain packages
 

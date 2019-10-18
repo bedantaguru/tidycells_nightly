@@ -2,8 +2,6 @@
 
 # @Dev
 
-#' @include class-cell_df.R
-
 #' `Table_Field` class
 #'
 #' @description
@@ -27,6 +25,5 @@
 NULL
 
 
-# @exportClass Table_Field
-Table_Field_class <- c("Table_Field", cell_df_class)
+Table_Field_class <- c("Table_Field", c("cell_df", "cells", "rc_df", "tbl_df", "tbl", "data.frame"))
 setOldClass(Table_Field_class)
