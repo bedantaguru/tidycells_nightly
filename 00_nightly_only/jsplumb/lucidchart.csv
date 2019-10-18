@@ -1,0 +1,31 @@
+Id,Name,Shape Library,Page ID,Contained By,Group,Line Source,Line Destination,Source Arrow,Destination Arrow,Text Area 1
+1,Page,,,,,,,,,Page 1
+2,Multiple Documents,Flowchart Shapes,1,,,,,,,Files
+3,Preparation,Flowchart Shapes,1,,,,,,,Explore It
+4,Process,Flowchart Shapes,1,,,,,,,Read it
+5,Preparation,Flowchart Shapes,1,,,,,,,Read Cells
+6,Process,Flowchart Shapes,1,,,,,,,Read Tables
+7,Process,Flowchart Shapes,1,,,,,,,Basic File Filtering
+8,Process,Flowchart Shapes,1,,,,,,,Read it
+9,Preparation,Flowchart Shapes,1,,,,,,,Content Filtering (File Filtering)
+10,Data (I/O),Flowchart Shapes,1,,,,,,,Table Field
+11,Document,Flowchart Shapes,1,,,,,,,Table Field Container
+12,Preparation,Flowchart Shapes,1,,,,,,,Table Field Filtering
+13,Line,,1,,,2,3,None,Arrow,
+14,Line,,1,,,2,4,None,Arrow,
+15,Line,,1,,,2,5,None,Arrow,
+16,Line,,1,,,2,6,None,Arrow,
+17,Line,,1,,,3,7,None,Arrow,
+18,Line,,1,,,7,8,None,Arrow,
+19,Line,,1,,,8,9,None,Arrow,
+20,Line,,1,,,9,10,None,Arrow,
+21,Line,,1,,,9,11,None,Arrow,
+22,Line,,1,,,11,12,None,Arrow,
+23,Line,,1,,,12,10,None,Arrow,
+24,Line,,1,,,8,4,None,Arrow,
+25,Line,,1,,,10,6,None,Arrow,
+26,Line,,1,,,4,6,None,Arrow,
+27,Line,,1,,,10,5,None,Arrow,
+28,Line,,1,,,4,5,None,Arrow,
+29,Line,,1,,,11,5,None,Arrow,
+30,Line,,1,,,11,6,None,Arrow,

@@ -37,6 +37,11 @@ text-align: justify}
     file.copy(list.files("vignettes/ext/", pattern = ".svg$", full.names = T), "docs/articles/ext/", overwrite = T)
     unlink("README.Rmd")
     file.copy(rd_bk, "README.Rmd")
+    
+    # jsplumb plug
+    
+    source("00_nightly_only/jsplumb/jsplumb_use.R")
+    
   }
   
 }
