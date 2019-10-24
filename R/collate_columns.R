@@ -8,6 +8,7 @@
 #'
 #' @param composed_data output of [`compose_cells`][compose_cells()] (preferably not processed)
 #' @param combine_threshold a numerical threshold (between 0-1) for content-based collation of columns. (Default 1)
+#' (High value indicate high chance of collation.)
 #' @param rest_cols number of rest columns (beyond `combine_threshold` joins these many numbers of columns to keep)
 #' @param retain_other_cols whether to keep other intermediate (and possibly not so important) columns. (Default `FALSE`)
 #' @param retain_cell_address whether to keep columns like (`row`, `col`, `data_block`).

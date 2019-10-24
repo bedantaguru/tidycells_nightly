@@ -9,3 +9,16 @@
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
 NULL
+
+
+#' @keywords internal
+#' @export
+#' @importFrom dplyr pull
+dplyr::pull
+
+
+
+#' @keywords internal
+#' @export
+#' @importFrom dplyr filter
+dplyr::filter

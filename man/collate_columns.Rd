@@ -10,7 +10,8 @@ collate_columns(composed_data, combine_threshold = 1, rest_cols = Inf,
 \arguments{
 \item{composed_data}{output of \code{\link[=compose_cells]{compose_cells}} (preferably not processed)}
 
-\item{combine_threshold}{a numerical threshold (between 0-1) for content-based collation of columns. (Default 1)}
+\item{combine_threshold}{a numerical threshold (between 0-1) for content-based collation of columns. (Default 1)
+(High value indicate high chance of collation.)}
 
 \item{rest_cols}{number of rest columns (beyond \code{combine_threshold} joins these many numbers of columns to keep)}
 

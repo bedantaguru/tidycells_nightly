@@ -9,3 +9,21 @@ rem_temp_file <- function(tf){
   tidycells_pkg_env$temp_files <- setdiff(tidycells_pkg_env$temp_files, tf) %>% unique()
   unlink(tf, recursive = TRUE, force = TRUE)
 }
+
+
+state <- function(x, ...){
+  UseMethod("state")
+}
+
+state.NULL <- function(x, ...){
+  ""
+}
+
+state.default <- function(x, ...){
+  sa <- attr(x, "state")
+  if(is.null(sa)){
+    ""
+  }else{
+    sa[1]
+  }
+}
