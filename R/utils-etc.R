@@ -27,3 +27,9 @@ state.default <- function(x, ...){
     sa[1]
   }
 }
+
+
+set_state <- function(x, state = ""){
+  attr(x, "state") <- state
+  x
+}
