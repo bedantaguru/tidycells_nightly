@@ -81,11 +81,12 @@ shaft_csv <- function(prior_shaft, lo, ignore_fty = FALSE) {
         # also possible need to rename the file
         # e.g. consider the case when file is like abc.gz but actually a csv
         # tested and working for gz
-        read_try <- try(readr::melt_csv(fn), silent = TRUE)
+        read_try <- try(readr_melt_auto(fn), silent = TRUE)
         if (inherits(read_try, "try-error")) read_try <- NULL
         if (is.data.frame(read_try)) {
           lo$type <- "csv"
-          lo$used_function <- "readr::melt_csv"
+          lo$used_function <- paste0("readr::", attr(read_try,"used_function"))
+          attr(read_try,"used_function") <- NULL
           lo$content <- read_try
           # decision done
           lo <- finalize_lo(lo)
@@ -174,14 +175,14 @@ shaft_doc <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE) {
 
         if (!silent) {
           if (detect_LibreOffice()) {
-            message(paste0(
+            msg_once(paste0(
               "LibreOffice is present ",
               "(please wait as it may take some time to read/detect tables from possible doc file).",
               "(If it is too slow try opening LibreOffice outside this R-Session and retry)",
               "\nNote: If you want you may disable doc detection by setting omit = \"doc\"."
             ))
           } else {
-            message("LibreOffice may be required for possible doc files. Check docxtractr::read_docx documentation")
+            msg_once("LibreOffice may be required for possible doc files. Check docxtractr::read_docx documentation")
           }
         }
 
@@ -243,24 +244,17 @@ shaft_doc_ppt_pptx_LibreOffice_tabulizer <- function(prior_shaft, lo, ignore_fty
   
   if (!("ppt" %in% omit) & !("pptx" %in% omit) & !("doc" %in% omit)) {
     if (("pptx" %in% lo$type) | ("ppt" %in% lo$type) | ("doc" %in% lo$type) | ignore_fty) {
-      if (is_available("tabulizer") & is_available("docxtractr")) {
+      if (is_available("tabulizer")) {
         
-        
-        read_try <- suppressWarnings(suppressMessages(try(LibreOffice_convert_to_pdf_and_read(fn, pages = 1), silent = TRUE)))
+        read_try <- suppressWarnings(suppressMessages(try(LibreOffice_convert_to_pdf_and_read(fn), silent = TRUE)))
         if (inherits(read_try, "try-error")) read_try <- NULL
         
         if (!is.null(read_try)) {
           lo$type <- lo$type %>% intersect(c("pptx","ppt", "doc"))
           lo$used_function <- "#customized LibreOffice and tabulizer based function. >>> tidycells:::LibreOffice_convert_to_pdf_and_read"
           
-          # read full data
-          suppressWarnings(
-            suppressMessages(
-              ctl <- LibreOffice_convert_to_pdf_and_read(fn)
-            )
-          )
-          
-          lo$content <- ctl
+          # read full data (already read)
+          lo$content <- read_try
           
           # decision done
           lo <- finalize_lo(lo)
@@ -462,7 +456,7 @@ shaft_xls_readxl <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE
     if (("xls" %in% lo$type) | ("xlsx" %in% lo$type) | ignore_fty) {
       if (is_available("readxl")) {
         if (!silent) {
-          message("Using readxl to read xls/xlsx. Manually check date and numeric cells. (for better result install xlsx package)")
+          msg_once("Using readxl to read xls/xlsx. Manually check date and numeric cells. (for better result install xlsx package)")
         }
 
         read_try <- suppressMessages(try(readxl::read_excel(fn, n_max = 1), silent = TRUE))
@@ -487,6 +481,52 @@ shaft_xls_readxl <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE
     }
   }
 
+  make_shaft(lo, lo_done)
+}
+
+shaft_xls_LibreOffice_tidyxl <- function(prior_shaft, lo, ignore_fty = FALSE, silent = FALSE) {
+  lo_done <- FALSE
+  
+  if (!missing(prior_shaft)) {
+    if (prior_shaft$shaft_done) {
+      # do nothing if already done
+      # return early
+      return(prior_shaft)
+    }
+    
+    # read info from prior_shaft
+    lo <- prior_shaft$shaft_info
+  }
+  
+  fn <- lo$file_name
+  omit <- lo$omit
+  
+  
+  if (!("xls" %in% omit)) {
+    if (("xls" %in% lo$type) | ignore_fty) {
+      if (is_available("tidyxl")) {
+        
+        read_try <- suppressWarnings(suppressMessages(try(LibreOffice_convert_to_xlsx_and_read(fn), silent = TRUE)))
+        if (inherits(read_try, "try-error")) read_try <- NULL
+        
+        if (!is.null(read_try)) {
+          lo$type <- "xls"
+          lo$used_function <- "#customized LibreOffice and tidyxl based function. >>> tidycells:::LibreOffice_convert_to_xlsx_and_read"
+          
+          # read full data (already read)
+          lo$content <- read_try
+          
+          # decision done
+          lo <- finalize_lo(lo)
+          lo_done <- TRUE
+        } else {
+          lo$type <- setdiff(lo$type, c("xls"))
+        }
+     
+      }
+    }
+  }
+  
   make_shaft(lo, lo_done)
 }
 
@@ -685,7 +725,7 @@ shaft_haven <- function(prior_shaft, lo, ignore_fty = FALSE) {
           lo$used_function <- this_type %>% stringr::str_remove("z") %>% paste0("haven::read_",.)
           
           
-          lo$content <- rtry
+          lo$content <- rtry %>% haven::as_factor()
           # decision done
           lo <- finalize_lo(lo)
           lo_done <- TRUE

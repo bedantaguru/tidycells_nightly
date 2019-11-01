@@ -82,7 +82,7 @@ get_well_name_maps <- function(x, only_well_names = FALSE){
   
   
   if(only_well_names){
-    xn2 <- xn %>% select(root, path, well_name)
+    xn2 <- xn %>% select(root, path, well_name) %>% as_tibble
     
     xn2 <- xn2 %>% left_join(xn2 %>% select(-root), by = c("root"="path"), suffix = c("_child", "_parent")) %>% 
       distinct(well_name_parent, well_name_child) %>% filter(well_name_parent!=well_name_child | is.na(well_name_parent))

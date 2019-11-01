@@ -13,7 +13,7 @@
 
 # may not be in CRAN https://github.com/jimhester/archive/issues/28
 
-devtools::install_github("jimhester/archive")
+remotes::install_github("jimhester/archive")
 
 decompress.file_7z <- function(src, dest){
   archive::archive_extract(src, dest)

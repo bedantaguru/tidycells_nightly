@@ -28,3 +28,7 @@ NULL
 
 Table_Field_Container_class <- c("Table_Field_Container", "list")
 setOldClass(Table_Field_Container_class)
+
+is_tfc <- function(d) {
+  inherits(d, "Table_Field_Container")
+}

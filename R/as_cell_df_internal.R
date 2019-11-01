@@ -8,7 +8,7 @@ as_cell_df_internal <- function(d, ...) {
 
 as_cell_df_internal.default <- function(d,
                                         take_row_names = FALSE,
-                                        take_col_names = FALSE) {
+                                        take_col_names = FALSE, ...) {
   if (!is.data.frame(d)) {
     abort("Data frame is expected")
   }
@@ -116,11 +116,11 @@ as_cell_df_internal.default <- function(d,
   }
 }
 
-as_cell_df_internal.cell_df <- function(d) {
+as_cell_df_internal.cell_df <- function(d, ...) {
   new_cell_df(d)
 }
 
-as_cell_df_internal.tidyxl <- function(d) {
+as_cell_df_internal.tidyxl <- function(d, ...) {
   if (!is.data.frame(d)) {
     abort("Data frame is expected")
   }
@@ -158,7 +158,7 @@ as_cell_df_internal.tidyxl <- function(d) {
   new_cell_df(d_out)
 }
 
-as_cell_df_internal.unpivotr <- function(d) {
+as_cell_df_internal.unpivotr <- function(d, ...) {
   if (!is.data.frame(d)) {
     abort("Data frame is expected")
   }
@@ -207,7 +207,7 @@ as_cell_df_internal.unpivotr <- function(d) {
   new_cell_df(d_out)
 }
 
-as_cell_df_internal.readr <- function(d) {
+as_cell_df_internal.readr <- function(d, ...) {
   if (!is.data.frame(d)) {
     abort("Data frame is expected")
   }

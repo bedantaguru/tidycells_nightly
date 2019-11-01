@@ -1,6 +1,34 @@
 
 
 
+# extra functionalities
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+this <- function(x){
+  if(is.null(attr(x, "this"))){
+    UseMethod("this")
+  }else{
+    x
+  }
+}
+this.default <- function(x){
+  attr(x, "this") <- "test"
+  x
+}
+
+
 
 getNamespaceExports(asNamespace("tidycells"))
 
@@ -110,7 +138,7 @@ tabular <- function(df, ...) {
   dfm2 <- rbind(
     fr,
     dfm
-    )
+  )
   
   df_final <- as.data.frame(dfm2)
   

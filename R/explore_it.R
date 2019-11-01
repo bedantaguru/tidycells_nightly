@@ -42,11 +42,11 @@ explore_it_internal <- function(fkind, root = "<root>", depth = 0, max_depth = I
 }
 
 explore_it_internal.TableField <- function(fkind, root = "<root>", depth = 0,   ...){
-  explore_it_output_maker(fkind, root, depth, readable = TRUE)
+  explore_it_output_maker(fkind, root, depth, readable = fkind$is_implemented[1])
 }
 
 explore_it_internal.TableFieldContainer <- function(fkind, root = "<root>", depth = 0,  ...){
-  explore_it_output_maker(fkind, root, depth, readable = TRUE)
+  explore_it_output_maker(fkind, root, depth, readable = fkind$is_implemented[1])
 }
 
 explore_it_internal.FileField <- function(fkind, root = "<root>", depth = 0, max_depth = Inf, ...){

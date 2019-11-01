@@ -6,7 +6,7 @@ this_file_kinds <- function(){
                     "sav", "zsav", "por", "dta", "xpt", "zip", "rar", "7z", "tar", "gz", 
                     "xz", "bz2"), 
     implemented = c(TRUE, TRUE, TRUE, TRUE, TRUE, 
-                    TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 
+                    TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, 
                     TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 
                     TRUE), 
     file_kind = c("TableField Container", "TableField Container", 
@@ -28,13 +28,14 @@ this_file_kinds <- function(){
 tidycells_pkg_env$file_kinds <- this_file_kinds()
 
 
-file_kind_maker <- function(fn, fkind, ftype, compressed, archived, temp){
+file_kind_maker <- function(fn, fkind, ftype, compressed, archived, temp, implemented){
   fk <- list(name = fn, 
              file_kind = fkind, 
              file_type = ftype, 
              is_compressed = compressed, 
              is_archived = archived, 
-             is_temporary_file = temp)
+             is_temporary_file = temp,
+             is_implemented = implemented)
   
   if(fk$file_kind == "TableField"){
     class(fk) <- c("TableField", "list")
@@ -58,13 +59,13 @@ file_kind_identifier <- function(fn, temporary_file = FALSE){
   fn <- as.character(fn)
   is_folder <- isTRUE(as.logical(file.info(fn)["isdir"]))
   if(is_folder){
-    return(file_kind_maker(fn, "FileField", "folder", FALSE, FALSE, temporary_file))
+    return(file_kind_maker(fn, "FileField", "folder", FALSE, FALSE, temporary_file, TRUE))
   }
   
   file_type  <- detect_file_type(fn)
   
   if(file_type == "unknown"){
-    return(file_kind_maker(fn, "unknown", file_type, FALSE, FALSE, temporary_file))
+    return(file_kind_maker(fn, "unknown", file_type, FALSE, FALSE, temporary_file, FALSE))
   }
   
   fkind_inf <- tidycells_pkg_env$file_kinds %>% filter(file_format == file_type)
@@ -72,9 +73,9 @@ file_kind_identifier <- function(fn, temporary_file = FALSE){
   allowed_fkinds <- c("TableField Container", "TableField", "FileField", "unknown")
   
   if(fkind_inf$file_kind %in% allowed_fkinds){
-    return(file_kind_maker(fn, fkind_inf$file_kind[1], file_type[1], fkind_inf$compressed[1], fkind_inf$archived[1], temporary_file))
+    return(file_kind_maker(fn, fkind_inf$file_kind[1], file_type[1], fkind_inf$compressed[1], fkind_inf$archived[1], temporary_file, fkind_inf$implemented[1]))
   }
   
-  return(file_kind_maker(fn, "unknown", file_type, FALSE, FALSE, temporary_file))
+  return(file_kind_maker(fn, "unknown", file_type, FALSE, FALSE, temporary_file, FALSE))
   
 }

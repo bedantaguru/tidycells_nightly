@@ -15,7 +15,7 @@ get_col_representative <- function(x, cut_th = 500L, lower_it = TRUE, silent = T
   x <- dxt$x
   if (length(x) > cut_th) {
     if (!silent) {
-      message(paste0(
+      msg_once(paste0(
         "Representatives for column is selected based on a sample.",
         "\nYou may need to set.seed() to have a reproducible outcome"
       ))

@@ -43,6 +43,7 @@ detect_and_read <- function(fn, silent = FALSE, omit = NULL, file_type) {
       shaft_docx_officer() %>% 
       shaft_xls() %>%
       shaft_xls_readxl() %>%
+      shaft_xls_LibreOffice_tidyxl() %>% 
       shaft_doc() %>%
       shaft_pptx() %>% 
       shaft_pdf() %>% 

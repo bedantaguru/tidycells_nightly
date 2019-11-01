@@ -14,3 +14,6 @@ assign("magic_numbers", NULL, envir = tidycells_pkg_env)
 
 # used in --> zzz.R  +  utils-etc.R
 assign("temp_files", NULL, envir = tidycells_pkg_env)
+
+# used in --> utils-etc.R
+assign("notifications", NULL, envir = tidycells_pkg_env)
