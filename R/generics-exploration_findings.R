@@ -59,7 +59,7 @@ print.exploration_findings <- function(x, ...) {
       init_str,
       cnt_str,
       "\n", cli_bs(), paste0(cli_b("Total files: "), st$total_files),
-      ifelse(!info$all_readable_success, 
+      ifelse(!st$all_readable_success, 
              paste0(cli_r(paste0("\n", cli_bs(), "At least one readable file ",cli_br("did not")," read successfully."))), 
              "")
     )

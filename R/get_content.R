@@ -15,6 +15,8 @@ get_content.cell_df <- function(x, ...){
 }
 
 get_content.Table_Field_Container <- function(x, ...){
-  x %>% map_chr(get_content) %>% strsplit(" ") %>% unlist %>% stringr::str_trim() %>% unique() %>% paste0(collapse = " ")
+  name_str <- names(x) %>% basename() %>% stringr::str_split("/") %>% unlist() %>% tolower() %>% unique() %>% paste0(collapse = " ")
+  x %>% map_chr(get_content) %>% stringr::str_split(" ") %>% unlist %>% stringr::str_trim() %>% unique() %>% paste0(collapse = " ") %>% 
+    paste0(" ", name_str)
 }
 

@@ -50,3 +50,9 @@ read_it.exploration_findings <- function(x, omit = NULL, ...){
   
 }
 
+
+read_it.Table_Field_Container <- function(x, refresh = FALSE, ...){
+  xt <- filter(x, TRUE)
+  attr(xt, "content_variation_over_TFs") <- calc_content_variation_over_TFs(xt)
+  formalize_tfc(xt)
+}
