@@ -26,7 +26,7 @@
 NULL
 
 
-Table_Field_Container_class <- c("Table_Field_Container", "list")
+Table_Field_Container_class <- c("Table_Field_Container", "tfc", "list")
 setOldClass(Table_Field_Container_class)
 
 is_tfc <- function(d) {

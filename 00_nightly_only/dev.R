@@ -5,10 +5,20 @@
 
 
 
+mm <- matrix(c("tl","tr","bl","br"), nrow = 2, byrow = T)
 
 
 
+rtab_parts_transforms$top(mm)
+rtab_parts_transforms$left(mm)
+rtab_parts_transforms$right(mm)
+rtab_parts_transforms$bottom(mm)
 
+
+rtab_parts_transforms$top(mm, cn = T)
+rtab_parts_transforms$left(mm, cn = T)
+rtab_parts_transforms$right(mm, cn = T)
+rtab_parts_transforms$bottom(mm, cn = T)
 
 
 

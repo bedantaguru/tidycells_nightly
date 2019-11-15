@@ -38,36 +38,55 @@ state.NULL <- function(x, ...){
 }
 
 state.default <- function(x, ...){
-  sa <- attr(x, "state")
+  formalize_state(attr(x, "state"))
+}
+
+formalize_state <- function(sa){
   if(is.null(sa)){
     ""
   }else{
-    sa[1]
-  }
-}
-
-attach_state <- function(x){
-  if(is.null(attr(x, "state"))){
-    UseMethod("attach_state")
-  }else{
-    x
-  }
-}
-
-attach_state.default <- function(x){
-  sa <- attr(x, "state")
-  if(is.null(sa)){
-    attr(x, "state") <- ""
-  }else{
+    sa <- as.character(sa) %>% unique()
     sa <- sa[!is.na(sa)]
-    attr(x, "state") <- sa[1]
+    sa <- sa[nchar(sa)>0]
+    if(length(sa)==0) sa <- ""
+    sa
   }
-  x
-}
-
-set_state <- function(x, state = ""){
-  attr(x, "state") <- state
-  x
 }
 
 
+name_fix_for_list <- function(xl, name_tag = "Node", sep="_"){
+  
+  if(is.null(names(xl))){
+    names(xl) <- paste0(name_tag, sep, seq_along(xl))
+  }else{
+    nms <- names(xl)
+    nms <- nms[!is.na(nms)]
+    nms <- nms[nchar(nms)>0]
+    nms <- unique(nms)
+    if(length(nms)!=length(xl)){
+      nmap <- tibble(nms = names(xl), seq = seq_along(nms))
+      nmap <- nmap %>% mutate(is_blank = nchar(nms)==0)
+      nmap_blnk <- nmap %>% filter(is_blank)
+      nmap <- nmap %>% mutate(nn = nms)
+      if(nrow(nmap_blnk)>0){
+        nmap_blnk <- nmap_blnk %>% mutate(nn = paste0(name_tag, sep, seq_along(nms)))
+        nmap <- nmap %>% filter(!is_blank) %>% bind_rows(nmap_blnk)
+      }
+      
+      if(any(duplicated(nmap$nn))){
+        nmapl <- nmap %>% group_by(nn) %>% group_split()
+        nmap <- nmapl %>% map_df(~{
+          if(nrow(.x)>1){
+            .x <- .x %>% mutate(nn = paste0(nn, sep, seq_along(nn)))
+          }
+          .x
+        })
+      }
+      nmap <- nmap %>% arrange(seq)
+      names(xl) <- nmap$nn
+    }
+  }
+  
+  xl
+  
+}

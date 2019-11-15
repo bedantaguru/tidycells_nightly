@@ -11,7 +11,11 @@ setOldClass(cell_df_class)
 #'
 #' @description
 #' The `cell_df` class is a subclass of [`tbl_df`][tibble::tibble()] and [`data.frame`][base::data.frame()],
-#' created in order to store cell level information.
+#' created in order to store cell level information. A `cell_df` is also termed as a `Table_Field`. 
+#' These two terms are used interchangeably to mean same thing. However, there is a minor philosophical 
+#' difference between them. Usually `Table_Field` associates a concept of holding one or several tables 
+#' in semi-structured manner, while `cell_df` is basically a restricted data.frame capable of holding any 
+#' cell level information. 
 #'
 #' @section Properties of `cell_df`:
 #'
@@ -45,21 +49,25 @@ setOldClass(cell_df_class)
 NULL
 
 
-new_cell_df <- function(dat) {
-  val <- validate_cells(dat)
-
-  if (!val) {
-    abort(paste0(attr(val, "msg"), collapse = "\n"))
+new_cell_df <- function(dat, minimal = FALSE) {
+  
+  if(!minimal){
+    val <- validate_cells(dat)
+    
+    if (!val) {
+      abort(paste0(attr(val, "msg"), collapse = "\n"))
+    }
+    
+    if (!is.integer(dat$row)) {
+      dat <- dat %>% mutate(row = as.integer(row))
+    }
+    
+    if (!is.integer(dat$col)) {
+      dat <- dat %>% mutate(col = as.integer(col))
+    }
+    
   }
-
-  if (!is.integer(dat$row)) {
-    dat <- dat %>% mutate(row = as.integer(row))
-  }
-
-  if (!is.integer(dat$col)) {
-    dat <- dat %>% mutate(col = as.integer(col))
-  }
-
+  
   # if all above passes
 
   # unclass cell_df induces class
@@ -69,8 +77,6 @@ new_cell_df <- function(dat) {
   class(dat) <- class(dat) %>%
     c(cell_df_class, .) %>%
     unique()
-
-
 
   dat
 }

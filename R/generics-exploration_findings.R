@@ -82,13 +82,13 @@ print.exploration_findings <- function(x, ...) {
 }
 
 
-attach_state.exploration_findings <- function(x){
+state.exploration_findings <- function(x, ...){
+  st <- NULL
   if(hasName(x, "tfc") & hasName(x, "content") & hasName(x, "read_success")){
-    x <- set_state(x, "with_content")
-  }else{
-    x <- set_state(x, "")
+    st <- c(st, "with_content")
   }
-  x
+  
+  formalize_state(st)
 }
 
 #' @export
@@ -100,7 +100,8 @@ filter.exploration_findings <- function(.data, ...){
     attr(.datat,"filtered") <- TRUE
   }
   if(nrow(.data)>0 & nrow(.datat) == 0){
-    dts <- rlang::enquos(...) %>% unlist() %>% as.character()
+    dts <- rlang::enquos(...)
+    dts <- dts %>% unlist() %>% as.character() %>% c(names(dts))
     dts <- dts %>% stringr::str_detect("content") %>% dts[.]
     dts <- dts %>% stringr::str_detect("[A-Z]") %>% dts[.]
     chk <- length(dts) > 0 

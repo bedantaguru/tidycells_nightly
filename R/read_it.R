@@ -9,7 +9,7 @@ read_it <- function(x, ...){
 
 read_it.exploration_findings <- function(x, omit = NULL, ...){
   
-  if(state(x)=="with_content") return(x) # retun early
+  if("with_content" %in% state(x)) return(x) # retun early
   
   sl <- x %>% split(seq(nrow(x)))
   
@@ -43,8 +43,6 @@ read_it.exploration_findings <- function(x, omit = NULL, ...){
   x$content <- x$tfc %>% map_chr(get_content)
   
   x$read_success  <- !nt_read
-  
-  x <- set_state(x, "with_content")
   
   x
   

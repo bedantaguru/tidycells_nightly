@@ -29,3 +29,33 @@ NULL
 
 Table_List_class <- c("Table_List", "list")
 setOldClass(Table_List_class)
+
+
+as_table_list <- function(x){
+  if(!is.list(x)){
+    abort("Not a list")
+  }
+  xo <- x
+  if(length(xo)>0){
+    all_same <- FALSE
+    mode <- ""
+    if(is.matrix(xo[[1]])){
+      if(xo %>% map_lgl(is.matrix) %>% all) mode <- "matrix"
+    }
+    if(is.data.frame(xo[[1]])){
+      if(xo %>% map_lgl(is.data.frame) %>% all) mode <- "data.frame"
+    }
+    if(!(mode %in% c("matrix","data.frame"))){
+      abort("all nodes must be either matrix or data.frame")
+    }
+    attr(xo, "mode") <- mode
+  }
+  
+  xo <- name_fix_for_list(xo, name_tag = "Table")
+  if(!is.null(attr(xo, "meta"))){
+    attr(xo, "meta") <- attr(xo, "meta") %>% mutate(name = names(xo))
+  }
+  class(xo) <- Table_List_class
+  xo
+  
+}

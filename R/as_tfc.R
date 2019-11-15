@@ -1,7 +1,5 @@
 
 
-# states
-
 as_tfc <- function(x, ...){
   UseMethod("as_tfc")
 }
@@ -14,48 +12,13 @@ validate_tfc <- function(x, strong = FALSE){
   }
 }
 
-name_fix_for_tfc <- function(xl){
-  
-  if(is.null(names(xl))){
-    names(xl) <- paste0("Table_Field_", seq_along(xl))
-  }else{
-    nms <- names(xl)
-    nms <- nms[!is.na(nms)]
-    nms <- nms[nchar(nms)>0]
-    nms <- unique(nms)
-    if(length(nms)!=length(xl)){
-      nmap <- tibble(nms = names(xl), seq = seq_along(nms))
-      nmap <- nmap %>% mutate(is_blank = nchar(nms)==0)
-      nmap_blnk <- nmap %>% filter(is_blank)
-      nmap <- nmap %>% mutate(nn = nms)
-      if(nrow(nmap_blnk)>0){
-        nmap_blnk <- nmap_blnk %>% mutate(nn = paste0("Table_Field_", seq_along(nms)))
-        nmap <- nmap %>% filter(!is_blank) %>% bind_rows(nmap_blnk)
-      }
-      
-      if(any(duplicated(nmap$nn))){
-        nmapl <- nmap %>% group_by(nn) %>% group_split()
-        nmap <- nmapl %>% map_df(~{
-          if(nrow(.x)>1){
-            .x <- .x %>% mutate(nn = paste0(nn, seq_along(nn)))
-          }
-          .x
-        })
-      }
-      nmap <- nmap %>% arrange(seq)
-      names(xl) <- nmap$nn
-    }
-  }
-  
-  xl
-  
-}
+
 
 formalize_tfc <- function(x){
   if(!validate_tfc(x)){
     abort("Something went wrong...")
   }
-  x <- name_fix_for_tfc(x)
+  x <- name_fix_for_list(x, name_tag = "Table_Field")
   if(!is.null(attr(x, "meta"))){
     attr(x, "meta") <- attr(x, "meta") %>% mutate(name = names(x))
   }
@@ -84,7 +47,7 @@ as_tfc.data.frame <- as_tfc.tbl
 as_tfc.matrix <- as_tfc.tbl
 
 as_tfc.exploration_findings <- function(x, ...){
-  if(state(x)!="with_content"){
+  if(!("with_content" %in% state(x))){
     abort(paste0("Does not have <content>. Have you missed <read_it>?"))
   }
   

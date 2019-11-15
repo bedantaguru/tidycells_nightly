@@ -1,38 +1,19 @@
 
-calc_content_variation_over_TFs <- function(x){
-  lmt <- calc_meta_for_tfc(x)
-  wds <- lmt$content %>% map(~stringr::str_split(.x, " ") %>% unlist)
-  dr <- wds %>% unlist() %>% unique() %>% length()
-  nr <- wds %>% reduce(intersect) %>% length()
-  1-nr/dr
-}
 
-print.Table_Field_Container <- function(x, ...){
-  if(is.null(attr(x, "content_variation_over_TFs"))){
-    cv_msg <- ""
-    msg_once("<content-information> is not generated. You may do the same by <read_it>.")
-  }else{
-    cv_this <- attr(x, "content_variation_over_TFs")
-    cv_msg <- paste0(cli_b("Content Variation across TF(s): "), 
-                     ifelse(cv_this>0.7, 
-                            cli_r("High"), 
-                            ifelse(cv_this<=0.3, 
-                                   cli_g("Low"), 
-                                   cli_b("Not Very Low"))), 
-                     " (", round(cv_this, 2), ")")
-  }
-  
+print.Table_List <- function(x, ...){
+
   msg <- paste0(
-    cli_bb("Table_Field_Container"), cli_b(" with :"),"\n",
-    cli_bs(), cli_b("Number of "), cli_bb("Table_Fields"), cli_b(": "), length(x),
-    ifelse(nchar(cv_msg)>0, paste0("\n", cli_bs(), cv_msg), "")
+    cli_bb("Table_List"), cli_b(" with :"),"\n",
+    cli_bs(), cli_b("Number of "), cli_bb("Tables"), 
+    cli_b(paste0(" (",attr(x, "mode"),")",": ")), length(x)
   )
   
   cat(msg)
 }
 
 
-calc_meta_for_tfc <- function(x, fresh = FALSE){
+# @Dev
+calc_meta_for_tl <- function(x, fresh = FALSE){
   
   last_meta <- attr(x, "meta")
   
@@ -117,18 +98,4 @@ plot.Table_Field_Container <- function(x, ..., no_plot = FALSE){
   return(invisible(g))
 }
 
-state.Table_Field_Container <- function(x, ...){
-  st <- NULL
-  if(!is.null(attr(x, "meta"))){
-    st <- c(st, "with_meta")
-  }
-  
-  if(!is.null(attr(x, "content_variation_over_TFs"))){
-    st <- c(st, "with_content_variation")
-  }
-  
-  # add child state
-  st <- x %>% map(state) %>% reduce(intersect) %>% c(st)
-  
-  formalize_state(st)
-}
+

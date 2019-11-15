@@ -2,6 +2,50 @@
 # @Dev
 
 
+stack_table_block <- function(x, ...){
+  UseMethod("stack_table_block")
+}
+
+# tfc for table field collection
+stack_table_block.Table_Field_Container <- function(x, raw = FALSE, ...){
+  
+  if(!("with_table_block" %in% state(x))){
+    tfc_blocks <- detect_table_block(x)
+  }else{
+    tfc_blocks <- x
+  }
+  
+  tfc_blocks <- tfc_blocks %>% imap(~.x %>% mutate(gid = paste0(.y, "_",gid)) %>% split(.$gid)) %>% 
+    reduce(c)
+  rtab_parts <- tfc_blocks %>% map(stack_table_block_parts)
+  rtab_parts_joins <- rtab_parts %>% reduce(table_block_stacker)
+  
+  if(raw){
+    out <- rtab_parts_joins %>% map("data")
+  }else{
+    out <- rtab_parts_joins %>% map("data") %>% map(re_read_table)
+  }
+  as_table_list(out)
+}
+
+
+re_read_table <- function(xstr){
+  if(is_available("readr") & nrow(xstr)>1){
+    suppressWarnings({
+      xstr %>% 
+        apply(1, paste0, collapse = "|") %>% 
+        readr::read_delim(delim = "|")
+    })
+  }else{
+    xstr %>% 
+      apply(1, paste0, collapse = "|") %>% 
+      utils::read.table(text = ., sep = "|", header = T, stringsAsFactors = F) %>% 
+      as_tibble()
+  }
+}
+
+
+
 clean_colnames_for_stack_table_block_parts <- function(x){
   x %>% stringr::str_trim() %>% tolower
 }
@@ -25,16 +69,6 @@ stack_table_block_parts <- function(dat){
   class(out) <- c(class(out), "stack_table_block_parts") %>% unique()
   out
 }
-
-# tfc for table field collection
-stack_table_block <- function(tfc){
-  tfc_blocks <- tfc %>% map(detect_table_block)
-  tfc_blocks <- tfc_blocks %>% imap(~.x %>% mutate(gid = paste0(.y, "_",gid)) %>% split(.$gid)) %>% 
-    reduce(c)
-  rtab_parts <- tfc_blocks %>% map(stack_table_block_parts)
-  rtab_parts_joins <- rtab_parts %>% reduce(table_block_stacker)
-}
-
 
 
 table_block_stacker <- function(rtab_prt1, rtab_prt2){
@@ -115,38 +149,38 @@ merge_rtab_parts <- function(rtab_prt1, rtab_prt2, mrg_inf){
 rtab_parts_transforms <- list(
   top = function(x, cn = FALSE){
     if(cn){
-      d <- x[1,] %>% t() %>% as_tibble
+      d <- x[ 1, , drop = F] %>% as_tibble
     }else{
-      d <- x[-1,] %>% as_tibble
+      d <- x[-1, , drop = F] %>% as_tibble
     }
-    colnames(d) <- x[1,] %>% clean_colnames_for_stack_table_block_parts()
+    colnames(d) <- x[ 1, ] %>% clean_colnames_for_stack_table_block_parts()
     d
   },
   left = function(x, cn = FALSE){
     if(cn){
-      d <- x[,1] %>% t() %>% as_tibble()
+      d <- x[ ,  1, drop = F] %>% t() %>% as_tibble()
     }else{
-      d <- x[,-1] %>% t() %>% as_tibble()
+      d <- x[ , -1, drop = F] %>% t() %>% as_tibble()
     }
-    colnames(d) <- x[,1] %>% clean_colnames_for_stack_table_block_parts()
+    colnames(d) <- x[ , 1] %>% clean_colnames_for_stack_table_block_parts()
     d
   },
   bottom = function(x, cn = FALSE){
     if(cn){
-      d <- x[nrow(x),] %>% t() %>% as_tibble
+      d <- x[  nrow(x), , drop = F] %>% as_tibble
     }else{
-      d <- x[-nrow(x),] %>% as_tibble
+      d <- x[ -nrow(x), , drop = F] %>% as_tibble
     }
-    colnames(d) <- x[nrow(x),] %>% clean_colnames_for_stack_table_block_parts()
+    colnames(d) <- x[nrow(x), ] %>% clean_colnames_for_stack_table_block_parts()
     d
   },
   right = function(x, cn = FALSE){
     if(cn){
-      d <- x[,ncol(x)] %>% t() %>% as_tibble()
+      d <- x[ ,  ncol(x), drop = F] %>% t() %>% as_tibble()
     }else{
-      d <- x[,-ncol(x)] %>% t() %>% as_tibble()
+      d <- x[ , -ncol(x), drop = F] %>% t() %>% as_tibble()
     }
-    colnames(d) <- x[,ncol(x)] %>% clean_colnames_for_stack_table_block_parts()
+    colnames(d) <- x[ , ncol(x)] %>% clean_colnames_for_stack_table_block_parts()
     d
   }
 )
