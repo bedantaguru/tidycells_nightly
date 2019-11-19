@@ -1,5 +1,156 @@
 
 
+d <-tibble(x= c(1,2), y= c("a", "b"))
+
+
+attr(d$x[1], "id") <- 1
+attr(d$x[2], "id") <- 1
+
+names(d$x) <-c("1","2")
+
+
+
+# extrenal cell modification traceback
+# not very easy
+
+
+library(unpivotr)
+library(tidyxl)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(stringr)
+
+library(unpivotr)
+library(tidyxl)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(stringr)
+
+cells <-
+  xlsx_cells(system.file("extdata/enron.xlsx", package = "unpivotr")) %>%
+  dplyr::filter(!is_blank, between(row, 14L, 56L), col <= 20) %>%
+  select(row, col, data_type, numeric, character, date)
+
+
+cells <- as_cell_df(cells)
+cells_orig <- cells
+
+
+
+
+f1 <- function(x){
+  "hi"
+}
+
+f2 <- function(x){
+  "hii"
+}
+
+
+f3 <- function(x, y){
+  "hi"
+}
+
+f4<- function(x, y){
+  "hello"
+}
+
+identical(args(f1), args(f3))
+
+identical(args(f4), args(f3))
+
+
+tidy_this <- function(cells, cells_orig){
+  
+  if(missing(cells_orig)){
+    cells_orig <- cells
+  }
+  
+  row_headers <-
+    dplyr::filter(cells, between(row, 17, 56), between(col, 2, 4)) %>%
+    # mutate(character = ifelse(!is.na(character),
+    #                           character,
+    #                           format(date, origin="1899-12-30", "%b-%y"))) %>%
+    select(row, col, value) %>%
+    nest(-row) %>%
+    mutate(row_header = map(data,
+                            ~ str_trim(paste(.x$value, collapse = " ")))) %>%
+    unnest(row_header) %>%
+    mutate(col = 2L) %>%
+    select(row, row_header)
+  
+  titles <-
+    # dplyr::filter(cells, character == "Fixed Price") %>%
+    inner_join(cells, dplyr::filter(cells_orig, value == "Fixed Price") %>% select(row, col), by = c("row", "col")) %>%
+    select(row, col) %>%
+    mutate(row = row - 1L) %>%
+    inner_join(cells, by = c("row", "col"))
+  
+  cells %>% 
+    mutate(character = value) %>% 
+    partition(titles) %>%
+    pull(cells) %>% 
+    purrr::map_dfr(~ .x %>%
+                     behead("NNW", "title") %>%
+                     behead("NNW", "price") %>%
+                     behead("N", "bid_offer")) %>%
+    # select(-data_type, -character, -date) %>%
+    select(-data_type, -character) %>%
+    left_join(row_headers, by = "row")
+}
+
+
+# simple case
+
+
+################################################
+
+d1 <- tidy_this(cells)
+
+dcells <- cells %>% mutate(value = paste0(row, "_", col)) 
+d2 <- tidy_this(dcells, cells)
+
+d2 <- d2 %>% mutate(chk_col = paste0(row, "_", col))
+
+vcol <- d2 %>% select(-chk_col) %>% .[1:min(100, nrow(d2)),] %>% map_int(~.x %>% intersect(d2$chk_col) %>% length) %>% which.max() %>% names()
+
+d1.1 <- d1 
+colnames(d1.1)[which(colnames(d1.1)==vcol)] <- "value"
+
+d1.1.1 <- d1.1 %>% select(row, col, value)
+d1.1.2 <- d1.1 %>% select(-row, -col, -value)
+orig_colnames <- colnames(d1.1.2)
+
+cname_map <- tibble(orig = orig_colnames, cname = paste0("major_", seq_along(orig_colnames)), cname_l2 = paste0("major_col_top_", seq_along(orig_colnames), "_1"))
+
+colnames(d1.1.2) <- cname_map$cname
+
+d1.1.2.b <- d1.1.2
+colnames(d1.1.2.b) <- cname_map$cname_l2
+
+d1_final <- dplyr::bind_cols(d1.1.1, d1.1.2, d1.1.2.b)
+
+
+d2.1 <- colnames(d2) %>% setdiff(c(vcol, "chk_col")) %>% d2[.]
+
+d2.2  <- d2.1 %>% select(-row, -col) %>% map(~.x %>% stringr::str_replace_all("[^0-9_]+"," :: ")) %>% as_tibble()
+
+colnames(d2.2) <- paste0("cellAddress_",cname_map$cname_l2)
+
+d2_final <- dplyr::bind_cols(d2.1 %>% select(row, col), d2.2)
+
+
+dc_this <-  d1_final %>% inner_join(d2_final, by = c("row", "col"))
+
+attr(dc_this, "tidycells.cname_map") <- cname_map
+
+################################################
+
+
+
+
 
 # extra functionalities
 

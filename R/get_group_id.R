@@ -11,20 +11,8 @@
 #'
 get_group_id <- function(dat, no_group_boundary = FALSE, allow_corner = FALSE) {
   
-  if(allow_corner){
-    if(!hasName(dat, "gid")){
-      abort("'gid' is required")
-    }
-  }
-  
-  if(allow_corner){
-    dat_a <- as_tibble(dat) %>%
-      select(row, col, gid)
-    dat_a <- boundary_cells(dat_a)
-  }else{
-    dat_a <- as_tibble(dat) %>%
-      select(row, col)
-  }
+  dat_a <- as_tibble(dat) %>%
+    select(row, col)
   
   digi_sep <- dat_a %>%
     summarise(rm = max(row), cm = max(col)) %>%
@@ -73,7 +61,14 @@ get_group_id <- function(dat, no_group_boundary = FALSE, allow_corner = FALSE) {
   drc_id <- drc_id %>% mutate(gid = as.character(gid))
   
   if(allow_corner){
-    drc_id <- drc_id %>% inner_join(dat %>% select(row, col), by = c("row", "col"))
+    repeat({
+      drc_id_new <- drc_id %>% boundary_cells()
+      l1 <- drc_id_new %>% pull(gid) %>% unique() %>% length()
+      l2 <- drc_id %>% pull(gid) %>% unique() %>% length()
+      if(l1==l2) break()
+      drc_id <- drc_id_new
+    })
+    
   }
   
   if(no_group_boundary){
@@ -94,22 +89,30 @@ get_group_id_boundary <- function(drc_id) {
 
 
 boundary_cells <- function(dat){
-  bdr <- dat %>% split(.$gid) %>% map_df(boundary_cells_part)
-  bdr <- bdr %>% filter(row>0, col>0, row <= max(dat$row), col <=max(dat$col)) %>% unique()
-  bdr
+  bdr <- dat %>% split(.$gid) %>% map_df(~{
+    dpart <- .x %>% boundary_cells_part() %>% mutate(gid = .x$gid[1]) %>% 
+      inner_join(dat, by = c("row", "col"), suffix = c("_1","_2"))
+    dat %>% filter(gid %in% c(dpart$gid_1, dpart$gid_2)) %>% mutate(gid = min(gid))
+  })
+  bdr <- bdr %>% filter(row>0, col>0, row <= max(dat$row), col <=max(dat$col)) %>% unique() 
+  bdr <- bdr %>% inner_join(dat %>% select(row, col), by = c("row", "col"))
+  bdr %>% group_by(row, col) %>% summarise(gid = min(gid)) %>% ungroup
 }
 
+# corner cells
 boundary_cells_part <- function(dg){
-  mr <- min(dg$row)
-  Mr <- max(dg$row)
-  mc <- min(dg$col)
-  Mc <- max(dg$col)
-  bind_rows(
-    tibble(row = mr-1, col = (mc-1):(Mc+1)),
-    tibble(row = Mr+1, col = (mc-1):(Mc+1)),
-    tibble(row = mr:Mr, col = mc-1),
-    tibble(row = mr:Mr, col = Mc+1)
-  ) %>% bind_rows(dg) %>% select(row, col)
+  d <- dg %>% distinct(row, col)
+  list(
+    d, 
+    d %>% mutate(row=row-1, col = col-1),
+    d %>% mutate(row=row-1, col = col+1),
+    d %>% mutate(row=row+1, col = col-1),
+    d %>% mutate(row=row+1, col = col+1)
+  ) %>% 
+    bind_rows() %>% 
+    filter(row >0, col >0) %>% 
+    distinct(row, col)
+  
 }
 
 
@@ -118,7 +121,10 @@ get_group_id_join_gids <- function(old_group_id_info, gid_map, no_group_boundary
     left_join(gid_map, by = "gid") %>%
     mutate(new_gid = ifelse(is.na(new_gid), gid, new_gid)) %>%
     select(-gid) %>%
-    rename(gid = new_gid)
+    rename(gid = new_gid) %>% 
+    group_by(row, col) %>% 
+    dplyr::summarise_all(min) %>% 
+    ungroup()
   
   if(no_group_boundary){
     return(old_group_id_info)

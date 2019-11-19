@@ -8,7 +8,7 @@ as_cell_df_internal <- function(d, ...) {
 
 as_cell_df_internal.default <- function(d,
                                         take_row_names = FALSE,
-                                        take_col_names = FALSE, ...) {
+                                        take_col_names = TRUE, ...) {
   if (!is.data.frame(d)) {
     abort("Data frame is expected")
   }
@@ -114,6 +114,30 @@ as_cell_df_internal.default <- function(d,
   } else {
     abort("unknown error occurred")
   }
+}
+
+as_cell_df_internal.generic_type <- function(d, ...){
+  dtype <- attr(d, "tidycells.generic_type_dtype")
+  attr(d, "tidycells.generic_type_dtype") <- NULL
+  colnames(d)[which(colnames(d)==dtype)] <- "data_type"
+  rest_cols <- colnames(d) %>% setdiff(c("row","col", "data_type"))
+  char_try <- d %>% select(-row, -col, -data_type) %>% map(~{
+    ct <- try(as.character(.x), silent = T)
+    if(inherits(ct, "try-error")){
+      ct <- rep(NA, length(.x))
+      msg_once("<generic_type> cell_df conversion may be incomplete.")
+      cls <- class(.x) %>% paste0(collapse = ", ")
+      warn(paste0("failed to convert into <character> for: <", cls, "> class"))
+    }
+    ct
+  }) %>% 
+    as_tibble() %>% 
+    apply(1, function(x){x[!is.na(x)][1]})
+  d0 <- d %>% select(row, col, data_type) %>% mutate(value = char_try)
+  d0 <- d0 %>% mutate(data_type=ifelse(data_type=="numeric", "numeric", "character"))
+  
+  new_cell_df(d0)
+  
 }
 
 as_cell_df_internal.cell_df <- function(d, ...) {

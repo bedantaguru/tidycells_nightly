@@ -37,7 +37,9 @@ calc_meta_for_tfc <- function(x, fresh = FALSE){
   last_meta <- attr(x, "meta")
   
   refresh <- FALSE
-  if(is.null(last_meta) | !is.data.frame(last_meta) | fresh | !hasName(last_meta, "name")){
+  if(is.null(last_meta) | !is.data.frame(last_meta) | fresh | !hasName(last_meta, "name") |
+     !hasName(last_meta, "content") | !hasName(last_meta, "nrow") | !hasName(last_meta, "ncol") | 
+     !hasName(last_meta, "size")){
     refresh <- TRUE
   }
   
@@ -51,25 +53,19 @@ calc_meta_for_tfc <- function(x, fresh = FALSE){
   
   if(refresh){
     last_meta <- tibble(id = seq_along(x), name = names(x))
+  }else{
+    return(last_meta)
   }
   
   xt <- x[last_meta$name]
   
-  if(!hasName(last_meta, "content") | fresh){
-    last_meta <- last_meta %>% mutate(content = xt %>% map_chr(get_content))
-  }
+  last_meta <- last_meta %>% mutate(content = xt %>% map_chr(get_content))
   
-  if(!hasName(last_meta, "nrow") | fresh){
-    last_meta <- last_meta %>% mutate(nrow = xt %>% map_dbl(~max(.x$row)-min(.x$row)+1))
-  }
+  last_meta <- last_meta %>% mutate(nrow = xt %>% map_dbl(~max(.x$row)-min(.x$row)+1))
   
-  if(!hasName(last_meta, "ncol") | fresh){
-    last_meta <- last_meta %>% mutate(ncol = xt %>% map_dbl(~max(.x$col)-min(.x$col)+1))
-  }
+  last_meta <- last_meta %>% mutate(ncol = xt %>% map_dbl(~max(.x$col)-min(.x$col)+1))
   
-  if(!hasName(last_meta, "size") | fresh){
-    last_meta <- last_meta %>% mutate(size = ncol*nrow)
-  }
+  last_meta <- last_meta %>% mutate(size = ncol*nrow)
   
   last_meta
   

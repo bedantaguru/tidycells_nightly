@@ -132,7 +132,8 @@ summary.cell_df <- function(object, ..., no_print = FALSE) {
 plot.cell_df <- function(x, ...,
                          fill,
                          no_fill = FALSE,
-                         adaptive_txt_size = TRUE, txt_size = 4, txt_alpha = 1, no_txt = FALSE, no_plot = FALSE) {
+                         adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, no_plot = FALSE, 
+                         background) {
   d <- x
   
   if (missing(fill)) {
@@ -160,7 +161,7 @@ plot.cell_df <- function(x, ...,
   
   if (adaptive_txt_size) {
     d <- d %>%
-      mutate(nc = nchar(value), txt_size_ = (min(nc) + 10^-10) / (nc + 10^-10) * txt_size) %>%
+      mutate(nc = nchar(value), txt_size_ = (min(nc) + 10^-10) / (nc + 10^-10) * txt_size/2 + txt_size/2) %>%
       select(-nc) %>%
       rename(txt_size = txt_size_)
   }
@@ -185,6 +186,17 @@ plot.cell_df <- function(x, ...,
       
     }
     
+    if(!missing(background)){
+      if(is_cell_df(background)){
+        g <- g +
+          ggplot2::geom_tile(data = background, mapping = ggplot2::aes(col, -row),
+                             color = "#00000036", na.rm = TRUE, width = 1, height = 1, inherit.aes = F, 
+                             fill = "black", alpha = 0.1)
+      }else{
+        abort("background must be a cell_df")
+      }
+    }
+  
     g <- g +
       ggplot2::geom_tile(color = "#00000046", na.rm = TRUE, width = 1, height = 1) 
     
@@ -270,11 +282,15 @@ state.cell_df <- function(x, ...){
     st <- c(st, "with_table_block")
   }
   
+  if(!is.null(attr(x, "meta"))){
+    st <- c(st, "with_meta_for_table_blocks")
+  }
+  
+  
   formalize_state(st)
 }
 
 
-# @Dev
 mutate.cell_df <- function(.data, ..., direct = FALSE){
   dthis <- .data
   dthis <- as_tibble(dthis)
@@ -308,10 +324,10 @@ mutate.cell_df <- function(.data, ..., direct = FALSE){
           tibble(gid = gto, new_gid = names(dts)[.x])
         })
       
-      new_gid_map <- new_gid_map %>% mutate_all(~stringr::str_replace(.x, "gid_",""))
+      new_gid_map <- new_gid_map %>% mutate_all(~stringr::str_replace(.x, "gid_","")) %>% unique()
       
       dthis <- get_group_id_join_gids(old_group_id_info = list(group_id_map = dthis), 
-                             gid_map = new_gid_map, no_group_boundary = TRUE)$group_id_map
+                                      gid_map = new_gid_map, no_group_boundary = TRUE)$group_id_map
       
       
     }else{
@@ -322,4 +338,96 @@ mutate.cell_df <- function(.data, ..., direct = FALSE){
     dthis <- mutate(dthis, ...)
   }
   new_cell_df(dthis, minimal = TRUE)
+}
+
+
+calc_meta_for_tf <- function(x, fresh = FALSE){
+  
+  if(!("with_table_block" %in% state(x))){
+    x <- detect_table_block(x)
+  }
+  
+  last_meta <- attr(x, "meta")
+  
+  refresh <- FALSE
+  if(is.null(last_meta) | !is.data.frame(last_meta) | fresh | 
+     !hasName(last_meta, "gid") | !hasName(last_meta, "content") | !hasName(last_meta, "nrow") | !hasName(last_meta, "ncol") | 
+     !hasName(last_meta, "size")
+  ){
+    refresh <- TRUE
+  }
+  
+  if(is.data.frame(last_meta)){
+    if(hasName(last_meta, "gid")){
+      if(length(unique(intersect(x$gid, last_meta$gid))) < length(unique(x$gid))){
+        refresh <- TRUE
+      }
+    }
+  }
+  
+  if(refresh){
+    xl <- x %>% as_tibble() %>% split(.$gid)
+    last_meta <- tibble(id = seq_along(xl), gid = xl %>% map("gid") %>% map(1) %>% unlist())
+  }else{
+    return(last_meta)
+  }
+  
+  
+  xl <- xl[last_meta$gid]
+  
+  xl <- xl %>% map(~new_cell_df(.x, minimal = TRUE))
+  
+  last_meta <- last_meta %>% mutate(content = xl %>% map_chr(get_content))
+  
+  last_meta <- last_meta %>% mutate(nrow = xl %>% map_dbl(~max(.x$row)-min(.x$row)+1))
+  
+  last_meta <- last_meta %>% mutate(ncol = xl %>% map_dbl(~max(.x$col)-min(.x$col)+1))
+  
+  last_meta <- last_meta %>% mutate(size = ncol*nrow)
+  
+  last_meta
+  
+}
+
+
+filter.cell_df <- function(.data, ..., refresh = FALSE){
+  
+  x <- .data %>% as_tibble()
+  
+  dts_this <- rlang::enquos(...)
+  dts_this <- dts_this %>% unlist() %>% as.character() %>% c(names(dts_this))
+  
+  if(dts_this %>% stringr::str_detect("content") %>% any()){
+    
+    this_meta <- calc_meta_for_tf(.data, fresh = refresh)
+    
+    x_fused <- x %>% left_join(this_meta, by = "gid")
+    
+    x_fused_flt <- filter(x_fused, ...)
+    
+    x_fused_flt_m <- x_fused_flt[colnames(this_meta)] %>% unique()
+    x_fused_flt_x <- x_fused_flt[colnames(x)] %>% unique()
+    
+    xo <- x_fused_flt_x
+    attr(xo, "meta") <- x_fused_flt_m
+    
+    if(nrow(x)>0 & nrow(x_fused_flt_x) == 0){
+      
+      dts <- dts_this %>% stringr::str_detect("content") %>% dts[.]
+      dts <- dts %>% stringr::str_detect("[A-Z]") %>% dts[.]
+      chk <- length(dts) > 0 
+      if(chk){
+        msg_once("Seems like you are filtering 'Table_Field' based on content.",
+                 "\nKindly note that content is in lower case.",
+                 "\nThe string with which you are comparing should be also in lower case.",
+                 "\nCheck once whether that is the case.")
+      }
+    }
+    
+  }else{
+    xo <- filter(x, ...)
+  }
+  
+  xo %>% new_cell_df(minimal = TRUE)
+  
 }

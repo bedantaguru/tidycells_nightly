@@ -5,10 +5,7 @@ detect_table_block <- function(dat, allow_corner = FALSE, ...){
 }
 
 detect_table_block.cell_df <- function(dat, allow_corner = FALSE, ...){
-  dat_gids <- get_group_id(dat, no_group_boundary = TRUE)
-  if(allow_corner){
-    dat_gids <- get_group_id(dat_gids$group_id_map, no_group_boundary = TRUE, allow_corner = TRUE)
-  }
+  dat_gids <- get_group_id(dat, no_group_boundary = TRUE, allow_corner = allow_corner)
   dat_with_gid <- dat
   dat_with_gid$gid <- NULL
   dat_gids_map <- dat_gids$group_id_map %>% mutate(gid = gid %>% as.factor() %>% as.integer() %>% as.character())

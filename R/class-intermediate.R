@@ -2,6 +2,24 @@
 #' @importFrom utils hasName
 
 
+detect_cell_df_pattern_generic <- function(dat){
+  ans <- F
+  chk1 <- hasName(dat, "row") & hasName(dat, "col")
+  
+  if(chk1 & ncol(dat)>= 4 & nrow(dat)>0 & is_conforms_to_rcdf(dat)){
+    # has at least two other columns
+    small_d <- dat[1:min(nrow(dat), 50),] %>% select(-row, -col) 
+    chk1.1 <- small_d %>% map_lgl(is.character) %>% any()
+    dchk_arr1.2 <- small_d %>% map_int(~setdiff(.x, colnames(small_d)) %>% length)
+    chk1.2 <- any(dchk_arr1.2==0)
+    if(chk1.1 & chk1.2){
+      ans <- T
+      attr(ans, "dtype") <- names(which(dchk_arr1.2==0))
+    }
+  }
+  ans
+}
+
 detect_cell_df_pattern <- function(dat) {
 
   # this is built as per the description of the return values from supported packages
@@ -9,6 +27,8 @@ detect_cell_df_pattern <- function(dat) {
   # 1) tidyxl::xlsx_cells
   # 2) unpivotr::as_cells
   # 3) readr::melt_csv (and family)
+  # (following is not detected here)
+  # 4) generic_type (row , col, <some_name>, <some_column>)
 
   chk <- tibble(
     type = c(
@@ -47,7 +67,7 @@ detect_cell_df_pattern <- function(dat) {
       cdt = data_types %>% map_int(~ (.x %in% dat$data_type) %>% sum()),
       coc = optional_cols %>% map_int(~ hasName(dat, .x) %>% sum())
     ) %>%
-    filter(ccn) %>%
+    filter(ccn, cdt>0) %>%
     filter(cdt == max(cdt), coc == max(coc)) %>%
     pull(type)
 
@@ -64,7 +84,16 @@ detect_cell_df_pattern <- function(dat) {
 
 
 attach_intermediate_class <- function(dat) {
-  class(dat) <- c(class(dat), detect_cell_df_pattern(dat)) %>% unique()
+  p1 <- detect_cell_df_pattern(dat)
+  if(p1=="unknown"){
+    # see if generic type pattern is present
+    chk2 <- detect_cell_df_pattern_generic(dat)
+    if(chk2){
+      p1 <- "generic_type"
+      attr(dat,"tidycells.generic_type_dtype") <-attr(chk2, "dtype") 
+    }
+  }
+  class(dat) <- c(class(dat), p1) %>% unique()
 
   dat
 }
