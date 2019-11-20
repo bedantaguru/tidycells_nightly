@@ -128,20 +128,38 @@ shiny_app_traceback <- function(x, dcomp, viewer_pane = FALSE, test_this = FALSE
   }
 
 
-  ########## UI ##########
-  ui <- miniPage(
-    gadgetTitleBar("Composition Traceback"),
-    miniTabstripPanel(
-      ui_part_traceback(),
-      ui_part_data_block(zoom_this = TRUE, direction_text_this = FALSE, plot_issues_option = FALSE),
-      ui_part_plot_tune(txt_alpha_max = 0.9, selected_fill = "type"),
-      ui_part_visualize(),
-      id = "now_tab_main"
+  if(inherits(x, "cell_analysis")){
+    ########## UI ##########
+    ui <- miniPage(
+      gadgetTitleBar("Composition Traceback"),
+      miniTabstripPanel(
+        ui_part_traceback(),
+        ui_part_data_block(zoom_this = TRUE, direction_text_this = FALSE, plot_issues_option = FALSE),
+        ui_part_plot_tune(txt_alpha_max = 0.9, selected_fill = "type"),
+        ui_part_visualize(),
+        id = "now_tab_main"
+      )
     )
-  )
-
-  ########## Server ##########
-  server <- server_traceback(x, dcomp)
+    
+    ########## Server ##########
+    server <- server_traceback(x, dcomp)
+  }else{
+    
+    ########## UI ##########
+    ui <- miniPage(
+      gadgetTitleBar("Composition Traceback"),
+      miniTabstripPanel(
+        ui_part_traceback(),
+        ui_part_plot_tune(txt_alpha_max = 0.9, selected_fill = "type"),
+        ui_part_visualize(),
+        id = "now_tab_main"
+      )
+    )
+    
+    ########## Server ##########
+    server <- server_traceback_external(x)
+  }
+  
 
   common_finish(ui, server,
     title = "TidyCells: Composition Traceback (Composition Viewer)",

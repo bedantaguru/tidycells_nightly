@@ -132,7 +132,9 @@ summary.cell_df <- function(object, ..., no_print = FALSE) {
 plot.cell_df <- function(x, ...,
                          fill,
                          no_fill = FALSE,
-                         adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, no_plot = FALSE, 
+                         adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, 
+                         no_plot = FALSE,
+                         fill_alpha = 1,
                          background) {
   d <- x
   
@@ -198,7 +200,7 @@ plot.cell_df <- function(x, ...,
     }
   
     g <- g +
-      ggplot2::geom_tile(color = "#00000046", na.rm = TRUE, width = 1, height = 1) 
+      ggplot2::geom_tile(color = "#00000046", na.rm = TRUE, width = 1, height = 1, alpha = fill_alpha) 
     
     if(fill!="gid"){
       g <- g +

@@ -20,7 +20,8 @@ sps_part_plot_now <- function(input, output, session, d_now) {
         fill = input$fill, adaptive_txt_size = input$adaptive_txt_size,
         txt_size = input$txt_size, txt_alpha = input$txt_alpha,
         no_txt = input$no_txt,
-        no_plot = TRUE
+        no_plot = TRUE,
+        fill_alpha = input$fill_alpha
       )
     }
   })
@@ -761,7 +762,7 @@ sps_part_orientation_modification <- function(input, output, session, plot_now, 
 # helper function
 
 # optional server logic
-sps_part_traceback_raw <- function(input, output, session, dcomp, ca, prior_ca_plot) {
+sps_part_traceback_raw <- function(input, output, session, dcomp, ca, prior_ca_plot, is_external = FALSE) {
   if (!is.reactive(dcomp)) {
     .dcomp <- dcomp
     dcomp <- function() {
@@ -769,13 +770,16 @@ sps_part_traceback_raw <- function(input, output, session, dcomp, ca, prior_ca_p
     }
   }
 
-  # ca : cell analysis
-  if (!is.reactive(ca)) {
-    .ca <- ca
-    ca <- function() {
-      .ca
+  if (!is_external) {
+    # ca : cell analysis
+    if (!is.reactive(ca)) {
+      .ca <- ca
+      ca <- function() {
+        .ca
+      }
     }
   }
+
 
   if (!is.reactive(prior_ca_plot)) {
     .prior_ca_plot <- prior_ca_plot
@@ -794,6 +798,8 @@ sps_part_traceback_raw <- function(input, output, session, dcomp, ca, prior_ca_p
 
   output$dt_trace <- DT::renderDT({
     dc0 <- dcomp()
+    
+    cnmap <- attr(dc0, "tidycells.cname_map")
 
     showcols <- colnames(dc0) %>%
       stringr::str_detect("[major|minor|collated]_[0-9]+$") %>%
@@ -860,9 +866,19 @@ sps_part_traceback_raw <- function(input, output, session, dcomp, ca, prior_ca_p
     }
 
     this_dc(dc0_disp)
+    
+    dc0_disp_final <- dc0_disp %>% select(-data_block)
+    
+    if(is_external & !is.null(cnmap)){
+      for(i in 1:nrow(cnmap)){
+        cn <- cnmap$cname[i]
+        if(cn %in% colnames(dc0_disp_final)){
+          colnames(dc0_disp_final)[which(colnames(dc0_disp_final)==cn)] <- cnmap$orig[i]
+        }
+      }
+    }
 
-
-    DT::datatable(dc0_disp %>% select(-data_block),
+    DT::datatable(dc0_disp_final,
       selection = "single",
       escape = FALSE,
       rownames = FALSE,
@@ -883,7 +899,11 @@ sps_part_traceback_raw <- function(input, output, session, dcomp, ca, prior_ca_p
 
 
   output$plot_traceback <- renderPlot({
-    cell_trace_plot(dcomp(), trace_row = selected_row(), ca = ca(), prior_ca_plot = prior_ca_plot())
+    if (!is_external) {
+      cell_trace_plot(dcomp(), trace_row = selected_row(), ca = ca(), prior_ca_plot = prior_ca_plot())
+    } else {
+      cell_trace_plot(dcomp(), trace_row = selected_row(), prior_ca_plot = prior_ca_plot(), external = list())
+    }
   })
 
 
@@ -954,8 +974,10 @@ sps_part_traceback_raw <- function(input, output, session, dcomp, ca, prior_ca_p
 
 # attach like
 # gid_sel <- callModule(sps_part_traceback, "ui_traceback", dcomp = dcomp, ca = x, prior_ca_plot = info_dblock$plot)
-sps_part_traceback <- function(input, output, session, dcomp, ca, prior_ca_plot) {
+# or 
+# callModule(sps_part_traceback, "ui_traceback", dcomp = dcomp, prior_ca_plot = info_dblock$plot, is_external = TRUE)
+sps_part_traceback <- function(input, output, session, dcomp, ca, prior_ca_plot, is_external = FALSE) {
   if (DT_present()) {
-    sps_part_traceback_raw(input, output, session, dcomp, ca, prior_ca_plot)
+    sps_part_traceback_raw(input, output, session, dcomp, ca, prior_ca_plot, is_external)
   }
 }

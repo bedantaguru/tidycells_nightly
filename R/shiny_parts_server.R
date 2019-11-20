@@ -183,3 +183,37 @@ server_traceback <- function(x, dcomp) {
     })
   }
 }
+
+server_traceback_external <- function(x) {
+  d <- x$cells %>% basic_classifier() 
+  
+  dcomp <- attach_trace_info_external(x)
+  
+  cnmap <- attr(dcomp, "tidycells.cname_map")
+  
+  # mutate is discarding attr !
+  # @Dev may need to create dplyr issue
+  dcomp <- dcomp %>%
+    mutate(RN = seq(value))
+  
+  attr(dcomp, "tidycells.cname_map") <- cnmap
+  
+  function(input, output, session) {
+    d_now <- reactiveVal()
+    d_now(d)
+    
+    plot_now <- callModule(sps_part_plot_now, "ui_plot_tune", d_now = d_now)
+    
+    callModule(sps_part_plotly, "ui_visualize", plot_now = plot_now)
+    
+    callModule(sps_part_traceback, "ui_traceback", dcomp = dcomp, prior_ca_plot = plot_now, is_external = TRUE)
+    
+    observeEvent(input$cancel, {
+      stopApp(abort("Traceback Canceled"))
+    })
+    
+    observeEvent(input$done, {
+      stopApp(invisible(dcomp))
+    })
+  }
+}

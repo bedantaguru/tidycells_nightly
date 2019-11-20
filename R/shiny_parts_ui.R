@@ -45,7 +45,8 @@ ui_part_plot_tune <- function(id = "ui_plot_tune",
           label = "Fill type:",
           choices = c("data_type", "type"),
           selected = selected_fill
-        )
+        ),
+        sliderInput(ns("fill_alpha"), label = "Fill transparency", min = 0, max = 1, value = 1, step = 0.05)
       ),
       checkboxInput(ns("no_txt"), label = "Disable Text in Cells", value = FALSE),
       conditionalPanel(

@@ -98,7 +98,8 @@ tidy_this <- function(cells, cells_orig){
                      behead("N", "bid_offer")) %>%
     # select(-data_type, -character, -date) %>%
     select(-data_type, -character) %>%
-    left_join(row_headers, by = "row")
+    left_join(row_headers, by = "row") %>% 
+    rename(cv = value)
 }
 
 

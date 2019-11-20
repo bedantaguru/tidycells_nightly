@@ -1,25 +1,51 @@
 
+# @Dev doc update
 
 #' Display static composition traceback plot
 #'
 #' @param ca A cell analysis
 #' @param dc (optional) a composed tidy data.frame
+#' @param external (optional) A list containing `cells` node and `operation` node. 
+#' `Cells` node should host a `cell_df` while `operation` node will host a two argument function which returns
+#' a data.frame having at least two columns named :  `row` and `col`.
 #' @param trace_row the row number to trace. (Default 1)
+#'
 #' @keywords internal
 #' @export
-cell_composition_traceback <- function(ca, dc, trace_row = 1L) {
-  cell_trace_plot(dc, trace_row, ca)
+cell_composition_traceback <- function(ca, dc, trace_row = 1L, external) {
+  if(!missing(external)){
+    cell_trace_plot(dc, trace_row, ca, external = external)
+  }else{
+    cell_trace_plot(dc, trace_row, ca)
+  }
+  
 }
 
 
-cell_trace_plot <- function(dc, trace_row, ca, prior_plot, prior_ca_plot) {
-  dc <- attach_trace_info(ca, dc)
+cell_trace_plot <- function(dc, trace_row, ca, prior_plot, prior_ca_plot, external) {
+  
+  external_mode <- FALSE
+  
+  if(!missing(external) & missing(ca)){
+    external_mode <- TRUE
+  }
+  
+  if(!external_mode){
+    dc <- attach_trace_info(ca, dc)
+  }else{
+    dc <- attach_trace_info_external(external, dc)
+  }
+  
 
   if (!missing(trace_row)) {
     if (length(trace_row) > 0) {
       if (missing(prior_plot)) {
         if (missing(prior_ca_plot)) {
-          prior_plot <- graphics::plot(ca$cell_df, no_plot = TRUE)
+          if(!external_mode){
+            prior_plot <- graphics::plot(ca$cell_df, no_plot = TRUE)
+          }else{
+            prior_plot <- graphics::plot(external$cells, no_plot = TRUE, txt_alpha = 0.5, fill_alpha = 0.5)
+          }
         }
       }
 
@@ -59,14 +85,19 @@ cell_trace_plot <- function(dc, trace_row, ca, prior_plot, prior_ca_plot) {
 
 
       if (missing(prior_ca_plot)) {
-        prior_ca_plot <- graphics::plot(ca,
-          prior_plot = prior_plot,
-          gids = d0$data_block,
-          zoom_selected_gids = TRUE,
-          block_boundary = FALSE,
-          direction_text = FALSE,
-          no_plot = TRUE
-        )
+        if(!external_mode){
+          prior_ca_plot <- graphics::plot(ca,
+                                          prior_plot = prior_plot,
+                                          gids = d0$data_block,
+                                          zoom_selected_gids = TRUE,
+                                          block_boundary = FALSE,
+                                          direction_text = FALSE,
+                                          no_plot = TRUE
+          )
+        }else{
+          prior_ca_plot <- prior_plot
+        }
+        
       }
       this_plot <- prior_ca_plot
       this_plot <- this_plot + ggplot2::guides(fill = FALSE)
