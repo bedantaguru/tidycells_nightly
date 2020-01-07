@@ -25,10 +25,10 @@
 ### AppVeyor
 
 * Windows Server 2012 R2 x64 (build 9600) [x86_64-w64-mingw32 (64-bit)]
-  * (R_VERSION=release, R_ARCH=x64) R version 3.6.2 (2019-12-12)
-  * (R_VERSION=devel) R Under development (unstable) (2020-01-03 r77629)
-  * (R_VERSION=patched) R version 3.6.2 Patched (2020-01-03 r77629)
-  * (R_VERSION=oldrel, RTOOLS_VERSION=33, CRAN=http://cran.rstudio.com) R version 3.5.3 (2019-03-11)
+  * (release) R version 3.6.2 (2019-12-12)
+  * (devel) R Under development (unstable) (2020-01-03 r77629)
+  * (patched) R version 3.6.2 Patched (2020-01-03 r77629)
+  * (oldrel) R version 3.5.3 (2019-03-11)
 
 ### RHub
 
