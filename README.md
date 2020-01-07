@@ -1,4 +1,4 @@
-# **tidycells** <img src="vignettes/ext/logo.svg" align="right" width="200"/>
+# **tidycells** <img src="vignettes/ext/logo.png" align="right" width="200"/>
 
 #### *Read Tabular Data from Diverse Sources and Easily Make Them Tidy*
 
@@ -13,7 +13,7 @@ status](https://travis-ci.org/r-rudra/tidycells.svg?branch=master)](https://trav
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/r-rudra/tidycells?branch=master&svg=true)](https://ci.appveyor.com/project/bedantaguru/tidycells)
 [![R-hub
-checks](https://img.shields.io/badge/R_Hub-11/20_OK-green?style=flat-square&logo=R)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md#all-r-hub-build-summary)
+checks](https://img.shields.io/badge/R_Hub-10/20_OK-green?style=flat-square&logo=R)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md#all-r-hub-build-summary)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
@@ -111,17 +111,15 @@ version comes with prebuilt-vignette*).
 
 ## Quick Overview
 
-Let’s take a quick look at an example data as given
-in
+Let’s take a quick look at an example data as given in
 
 ``` r
-filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
+system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
 ```
 
-The data looks like (in
-excel)
+The data looks like (in excel)
 
-<img src="vignettes/ext/marks.svg" align="center" width="500px" style="border: 0;"/>
+<img src="vignettes/ext/marks.png" width="451px" />
 
 Let’s try `tidycells` functions in this data
 
@@ -129,7 +127,8 @@ Read at once
 
 ``` r
 # you should have tidyxl installed
-read_cells(filename)
+system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
+  read_cells()
 ```
 
 | collated\_1 | collated\_2 | collated\_3 | collated\_4  | collated\_5        | table\_tag | value |
@@ -148,10 +147,9 @@ read_cells(filename)
 | Score       | Female      | School C    | Name         | U Gupta            | Sheet1     | 38    |
 
 The function `read_cells` is a set of ordered operations connected
-together. The flowchart of
-`read_cells`:
+together. The flowchart of `read_cells`:
 
-<img src="vignettes/ext/read_cells.svg" align="center" width="400px" style="border: 0;"/>
+<img src="vignettes/ext/read_cells.svg" width="356px" style="display: block; margin: auto;" />
 
 Let’s understand step by step procedures followed by `read_cells`.
 
@@ -178,17 +176,15 @@ da <- analyze_cells(d)
 ```
 
 After this you need to run `compose_cells` (with argument
-`print_attribute_overview =
-TRUE`)
+`print_attribute_overview = TRUE`)
 
 ``` r
 dc <- compose_cells(da, print_attribute_overview = TRUE)
 ```
 
-<img src="vignettes/ext/compose_cells_cli1.svg" align="center" width="500px" style="border: 0;"/>
+<img src="vignettes/ext/compose_cells_cli1.png" width="451px" />
 
-If you want a well-aligned columns then you may like to
-do
+If you want a well-aligned columns then you may like to do
 
 ``` r
 # bit tricky and tedious unless you do print_attribute_overview = TRUE in above line

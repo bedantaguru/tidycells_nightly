@@ -22,55 +22,6 @@ You are most welcome to contribute to this project in any means.
 
 Apart from opening an issue in Github (preferably with [reprex](https://reprex.tidyverse.org/)), you can also contribute mainly to the "Heuristic Maturation" process for `tidycells::analyze_cells` and `tidycells::collate_columns`. If any issue is specific to a data which you would like to share with me, there is a friendly function to mask your data using `tidycells:::mask_data` (_this function is not exported to avoid possible name conflicts_).
 
-### The Badges
-
-I have added many badges already (which I thought will be helpful to the user for code quality and further assurance). You may notice that few badges are round cornered and few are sharp cornered. This is to justify the API based dynamic badges vs. static badges. 
-
-_Dynamic Badges (round corners)_ 
-
-[![CRAN
-status](https://www.r-pkg.org/badges/version/tidycells)](https://cran.r-project.org/package=tidycells)
-[![CRAN
-checks](https://cranchecks.info/badges/summary/tidycells)](https://cran.r-project.org/web/checks/check_results_tidycells.html)
-[![Travis build
-status](https://travis-ci.org/r-rudra/tidycells.svg?branch=master)](https://travis-ci.org/r-rudra/tidycells)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/r-rudra/tidycells?branch=master&svg=true)](https://ci.appveyor.com/project/bedantaguru/tidycells)
-[![Codecov Coverage
-Status](https://codecov.io/gh/r-rudra/tidycells/branch/master/graph/badge.svg)](https://codecov.io/gh/r-rudra/tidycells?branch=master)
-[![Coveralls Coverage
-Status](https://coveralls.io/repos/github/r-rudra/tidycells/badge.svg?branch=master&service=github)](https://coveralls.io/github/r-rudra/tidycells?branch=master)
-
-_Static Badges (sharp corners)_
-
-[![R-hub
-checks](https://img.shields.io/badge/R_Hub-11/20_OK-green?style=flat-square&logo=R)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md#all-r-hub-build-summary)
-[![Lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg?style=flat-square)](https://www.tidyverse.org/lifecycle/#maturing)
-[![Dependency
-status](https://img.shields.io/badge/Depends-9/28-orange.svg?style=flat-square)](https://CRAN.R-project.org/package=tidycells)
-[![See
-DevNotes](https://img.shields.io/badge/See-DevNotes-blue.svg?style=flat-square)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md)
-
-_Seems Static Badges (the shape of which I can't control)_
-
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/r-rudra/tidycells/master/LICENSE.md)
-[![Project Status: Active – The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-
-Note the usual dependency badge (given below) is not used in main README. It is because the usual badge from [https://tinyverse.netlify.com/](https://tinyverse.netlify.com/) is raster based (png file) and does not look quite good in mobile like devices (and when the page is zoomed).
-
-Apart from these badges few other badges (some of them may make no sense yet):
-
-[![](http://cranlogs.r-pkg.org/badges/last-month/tidycells?color=blue)](https://cran.r-project.org/package=tidycells)
-[![](http://cranlogs.r-pkg.org/badges/last-week/tidycells?color=blue)](https://cran.r-project.org/package=tidycells)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/tidycells?color=blue)](https://cran.r-project.org/package=tidycells)
-[![status](https://tinyverse.netlify.com/badge/tidycells)](https://CRAN.R-project.org/package=tidycells)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d3a474fbfb04935829c38e7b61c4a17)](https://www.codacy.com/manual/bedantaguru/tidycells?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=r-rudra/tidycells&amp;utm_campaign=Badge_Grade)
-
-Development Status badges
-[![Travis dev build
-status](https://travis-ci.org/bedantaguru/tidycells_nightly.svg?branch=master)](https://travis-ci.org/bedantaguru/tidycells_nightly)
 
 ### FAQs
 
@@ -91,7 +42,7 @@ The shiny tests are only carried out in selected testing environments because of
 * The input [`plot brush`](https://shiny.rstudio.com/articles/plot-interaction.html) is changing in fractional values under different OS. Most of the functionalities are recorded with brush input which slightly differs. Since the `JSON` to `JSON` comparison is strict now, these are resulting in test failures. 
 * Sometimes GitHub push and pull is changing JSON slightly [getting `LF will be replaced by CRLF` warning.] (Full message: _The file will have its original line endings in your working directory. warning: LF will be replaced by CRLF_). It is solved using tar files (which untar on the fly). This is the reason the all recorded tests (includes JSON) are compress to tar in [tidycells/tests/testthat/testshiny/](https://github.com/r-rudra/tidycells/tree/master/tests/testthat/testshiny). 
 
-Given these difficulties, the shiny tests are tested in the following environments only.
+Given these difficulties, the shiny tests are tested in the following environments (and in all *Windows* environment listed below).
 
 | Test Environment | OS                                      | R Version                                   | Screenshot Tested |
 |------------------|-----------------------------------------|---------------------------------------------|-------------------|
@@ -131,70 +82,49 @@ Check trackable version [here](https://github.com/r-rudra/tidycells/issues/2).
 
 See other successful builds in [CRAN Comments](https://github.com/r-rudra/tidycells/blob/master/cran-comments.md)
 
-#### Minor Issues
-
-* Fedora Linux, 
-  * R-devel, clang, gfortran
-
-**Result** : NOTE
-
-**Reason** : Packages suggested but not available for checking: 'tabulizer', 'xlsx'
-
-* CentOS 6
-  * stock R from EPEL
-
-**Result** : NOTE
-
-**Reason** : Packages suggested but not available for checking: ‘tidyxl’ ‘plotly’
-
-####  Errors
-
-* Debian Linux, 
-  * R-devel, clang, ISO-8859-15 locale
-  * R-devel, GCC
-  * R-devel, GCC, no long double
-  * R-patched, GCC
-  * R-release, GCC
-  * R-devel, GCC ASAN/UBSAN
-* Ubuntu Linux 16.04 LTS
-  * R-devel, GCC
-  * R-release, GCC
-  * R-devel with rchk
-
-**Result** : PREPERROR
-
-**Reason** : xml2 and httr failed to installed due to system dependency (libxml2, libssl/openssl)
-
+See whole build matrix below
 
 **Note** : Neither of these errors (or notes) are attributable to the package as they failed because of induced system dependency or optional package dependency.
 
 
-### All R-hub build summary
+### All build summary
 
-| OS                                     | R Version                                                                                                | Result    |
-|----------------------------------------|----------------------------------------------------------------------------------------------------------|-----------|
-| macOS 10.11 El Capitan                 | (R-release) R version 3.6.0 (2019-04-26)                                                                 | SUCCESS   |
-| Oracle Solaris 10, x86, 32 bit         | (R-patched) R version 3.6.0 (2019-04-26)                                                                 | SUCCESS   |
-| Windows Server 2008 R2 SP1             | (R-devel) R Under development (unstable) (2019-07-04 r76780)                                             | SUCCESS   |
-| Windows Server 2008 R2 SP2             | (R-oldrel) R version 3.5.3 (2019-03-11)                                                                  | SUCCESS   |
-| Windows Server 2008 R2 SP3             | (R-patched) R version 3.6.0 Patched (2019-06-21 r76731)                                                  | SUCCESS   |
-| Windows Server 2008 R2 SP4             | (R-release) R version 3.6.1 (2019-07-05)                                                                 | SUCCESS   |
-| Windows Server 2012                    | (R-devel, Rtools4.0, 32/64 bit) R version 3.6.0 Under development   (Testing Rtools) (2019-02-27 r76167) | SUCCESS   |
-| Fedora Linux                           | (R-devel, GCC) R Under development (unstable) (2019-08-18 r77026)                                        | SUCCESS   |
-| CentOS 6 with Redhat Developer Toolset | (R from EPEL) R version 3.5.2 (2018-12-20)                                                               | SUCCESS   |
-| **NOTE**                               | **Reason : _optional package dependency_**                                                               |           |
-| Fedora Linux                           | R-devel, clang, gfortran                                                                                 | NOTE      |
-| CentOS 6                               | stock R from EPEL                                                                                        | NOTE      |
-| **PREPERROR**                          | **Reason : _induced system dependency_**                                                                 |           |
-| Debian Linux                           | R-devel, clang, ISO-8859-15 locale                                                                       | PREPERROR |
-| Debian Linux                           | R-devel, GCC                                                                                             | PREPERROR |
-| Debian Linux                           | R-devel, GCC, no long double                                                                             | PREPERROR |
-| Debian Linux                           | R-patched, GCC                                                                                           | PREPERROR |
-| Debian Linux                           | R-release, GCC                                                                                           | PREPERROR |
-| Debian Linux                           | R-devel, GCC ASAN/UBSAN                                                                                  | PREPERROR |
-| Ubuntu Linux 16.04 LTS                 | R-devel, GCC                                                                                             | PREPERROR |
-| Ubuntu Linux 16.04 LTS                 | R-release, GCC                                                                                           | PREPERROR |
-| Ubuntu Linux 16.04 LTS                 | R-devel with rchk                                                                                        | PREPERROR |
+| Package   | Version | Submit Date | Where      | OS Type | OS Description                          | R Version                                                              | R Version Tag                                                     | Platform                           | State |
+|-----------|---------|-------------|------------|---------|-----------------------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------|------------------------------------|-------|
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Windows | Windows Server 2008 R2 SP1              | R version 3.6.2 (2019-12-12)                                           | R-release 32/64 bit                                               | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Windows | Windows Server 2008 R2 SP1              | R version 3.6.2 Patched (2019-12-12 r77564)                            | R-patched 32/64 bit                                               | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Windows | Windows Server 2008 R2 SP1              | R version 3.5.3 (2019-03-11)                                           | R-oldrel 32/64 bit                                                | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Windows | Windows Server 2012                     | R version 4.0.0 Under development (Testing Rtools) (2019-09-30 r77236) | R-devel Rtools4.0 32/64 bit                                       | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Windows | Windows Server 2008 R2 SP1              | R Under development (unstable) (2019-11-08 r77393)                     | R-devel 32/64 bit                                                 | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Ubuntu Linux 16.04 LTS                  | R Under development (unstable) (2020-01-03 r77629)                     | R-devel with rchk                                                 | PREPERROR                          |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Ubuntu Linux 16.04 LTS                  | R-release GCC                                                          | PREPERROR                                                         |                                    |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Ubuntu Linux 16.04 LTS                  | R Under development (unstable) (2020-01-03 r77629)                     | R-devel GCC                                                       | PREPERROR                          |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Solaris | Oracle Solaris 10 x86 32 bit            | R version 3.6.0 (2019-04-26)                                           | R-patched                                                         | i386-pc-solaris2.10 (32-bit)       | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | macOS   | macOS 10.11 El Capitan                  | R version 3.6.2 (2019-12-12)                                           | R-release                                                         | x86_64-apple-darwin15.6.0 (64-bit) | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Debian Linux                            | R Under development (unstable) (2018-06-20 r74924)                     | R-devel GCC ASAN/UBSAN                                            | PREPERROR                          |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | CentOS 6 with Redhat Developer Toolset  | R version 3.5.2 (2018-12-20)                                           | R from EPEL                                                       | x86_64-redhat-linux-gnu (64-bit)   | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | CentOS 6                                |                                                                        | stock R from EPEL                                                 | PREPERROR                          |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Fedora Linux                            | R Under development (unstable) (2020-01-03 r77629)                     | R-devel GCC                                                       | x86_64-pc-linux-gnu (64-bit)       | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Fedora Linux                            | R Under development (unstable) (2020-01-03 r77629)                     | R-devel clang gfortran                                            | x86_64-pc-linux-gnu (64-bit)       | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Debian Linux                            | R-release GCC                                                          | PREPERROR                                                         |                                    |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Debian Linux                            | R-patched GCC                                                          | PREPERROR                                                         |                                    |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Debian Linux                            | R Under development (unstable) (2020-01-03 r77629)                     | R-devel GCC no long double                                        | PREPERROR                          |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Debian Linux                            | R Under development (unstable) (2020-01-03 r77629)                     | R-devel GCC                                                       | PREPERROR                          |       |
+| tidycells | 0.2.2   | 2020-01-06  | RHub       | Linux   | Debian Linux                            | R Under development (unstable) (2019-08-18 r77026)                     | R-devel clang ISO-8859-15 locale                                  | PREPERROR                          |       |
+| tidycells | 0.2.2   | 2020-01-06  | AppVeyor   | Windows | Windows Server 2012 R2 x64 (build 9600) | R version 3.6.2 (2019-12-12)                                           | R_VERSION=release, R_ARCH=x64                                     | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | AppVeyor   | Windows | Windows Server 2012 R2 x64 (build 9600) | R Under development (unstable) (2020-01-03 r77629)                     | R_VERSION=devel                                                   | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | AppVeyor   | Windows | Windows Server 2012 R2 x64 (build 9600) | R version 3.6.2 Patched (2020-01-03 r77629)                            | R_VERSION=patched                                                 | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | AppVeyor   | Windows | Windows Server 2012 R2 x64 (build 9600) | R version 3.5.3 (2019-03-11)                                           | R_VERSION=oldrel, RTOOLS_VERSION=33, CRAN=http://cran.rstudio.com | x86_64-w64-mingw32 (64-bit)        | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | Travis     | linux   | Ubuntu 16.04.6 LTS                      | R version 3.5.3 (2017-01-27)                                           | R: oldrel                                                         | x86_64-pc-linux-gnu (64-bit)       | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | Travis     | linux   | Ubuntu 16.04.6 LTS                      | R version 3.6.1 (2017-01-27)                                           | R: release                                                        | x86_64-pc-linux-gnu (64-bit)       | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | Travis     | osx     | macOS High Sierra 10.13.6               | R version 3.6.2 (2019-12-12)                                           | R: release                                                        | x86_64-apple-darwin15.6.0 (64-bit) | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | Travis     | linux   | Ubuntu 16.04.6 LTS                      | R Under development (unstable) (2020-01-03 r77628)                     | R: devel                                                          | x86_64-pc-linux-gnu (64-bit)       | OK    |
+| tidycells | 0.2.2   | 2020-01-06  | WinBuilder | Windows |                                         | R version 3.5.3 (2019-03-11)                                           | x86_64-w64-mingw32 (64-bit)                                       | OK                                 |       |
+| tidycells | 0.2.2   | 2020-01-06  | WinBuilder | Windows |                                         | R version 3.6.2 (2019-12-12)                                           | x86_64-w64-mingw32 (64-bit)                                       | OK                                 |       |
+| tidycells | 0.2.2   | 2020-01-06  | WinBuilder | Windows |                                         | R Under development (unstable)   (2020-01-03 r77629)                   | x86_64-w64-mingw32 (64-bit)                                       | OK                                 |       |
+| tidycells | 0.2.2   | 2020-01-06  | Local      | Windows | Windows 10 x64 (build 17134)            | R version 3.6.1 (2019-07-05)                                           | x86_64-w64-mingw32/x64 (64-bit)                                   | OK                                 |       |
+| tidycells | 0.2.2   | 2020-01-06  | Local      | Windows | Windows 10 x64 (build 17134)            | R version 3.6.2 (2019-12-12)                                           | x86_64-w64-mingw32/x64 (64-bit)                                   | OK                                 |       |
+
 
 ### Dependency Explained
 

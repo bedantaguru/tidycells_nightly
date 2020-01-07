@@ -4,7 +4,7 @@
 \alias{cell_composition_traceback}
 \title{Display static composition traceback plot}
 \usage{
-cell_composition_traceback(ca, dc, trace_row = 1L)
+cell_composition_traceback(ca, dc, trace_row = 1L, external)
 }
 \arguments{
 \item{ca}{A cell analysis}
@@ -12,6 +12,10 @@ cell_composition_traceback(ca, dc, trace_row = 1L)
 \item{dc}{(optional) a composed tidy data.frame}
 
 \item{trace_row}{the row number to trace. (Default 1)}
+
+\item{external}{(optional) A list containing \code{cells} node and \code{operation} node.
+\code{Cells} node should host a \code{cell_df} while \code{operation} node will host a two argument function which returns
+a data.frame having at least two columns named :  \code{row} and \code{col}.}
 }
 \description{
 Display static composition traceback plot

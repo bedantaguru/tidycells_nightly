@@ -5,7 +5,11 @@
 \title{\code{cell_df} class}
 \description{
 The \code{cell_df} class is a subclass of \code{\link[tibble:tibble]{tbl_df}} and \code{\link[base:data.frame]{data.frame}},
-created in order to store cell level information.
+created in order to store cell level information. A \code{cell_df} is also termed as a \code{Table_Field}.
+These two terms are used interchangeably to mean same thing. However, there is a minor philosophical
+difference between them. Usually \code{Table_Field} associates a concept of holding one or several tables
+in semi-structured manner, while \code{cell_df} is basically a restricted data.frame capable of holding any
+cell level information.
 }
 \section{Properties of \code{cell_df}}{
 

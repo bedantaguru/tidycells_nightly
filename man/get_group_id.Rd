@@ -4,7 +4,7 @@
 \alias{get_group_id}
 \title{Get Group ID for joined cells}
 \usage{
-get_group_id(dat)
+get_group_id(dat, no_group_boundary = FALSE, allow_corner = FALSE)
 }
 \arguments{
 \item{dat}{the (data or attribute) cells (in at least row-col format)}

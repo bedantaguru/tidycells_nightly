@@ -145,6 +145,15 @@ require(purrr)
 # validate_email(email = "nil.gayen@gmail.com", token = "ed728b8460a7460081331fa6ca2e10b7")
 rh <- x$name %>% map(~check(platform = .x, check_args = "--as-cran", show_status = FALSE))
 
+y <- x$description %>% str_replace(", x86, 32 bit"," x86 32 bit") %>% str_remove_all("\\(experimental\\)") %>% str_split(",") %>% map(~c(.x[1], str_trim(paste0(.x[-1], collapse = ""))))
+
+cr <- rh %>% map(~try(.x$cran_summary(), silent = T))
+rhub_res <- rhub::list_my_checks()
+# after run 
+
+
+x$name %>% walk(~check(platform = .x, check_args = "--as-cran", show_status = FALSE))
+
 # after done
 u <- rh %>% map(~try(.x$cran_summary(), silent = TRUE))
 

@@ -122,19 +122,28 @@ test_that("read_cells: external packages works (except pdf)", {
   skip_if_not_installed("xlsx")
   skip_if_not_installed("tidyxl")
   skip_if_not_installed("docxtractr")
-  skip_if_not_installed("tabulizer")
   skip_if_not_installed("XML")
 
 
   fold <- system.file("extdata", "messy", package = "tidycells", mustWork = TRUE)
   dm <- tibble::tibble(fn = list.files(fold, full.names = TRUE))
-
+  
   dm <- dm %>%
     dplyr::mutate(original = dm$fn %>%
       purrr::map_chr(~ basename(.x) %>%
         stringr::str_split("\\.") %>%
         purrr::map_chr(1)))
 
+  chk_types <- possible_to_support(perform_real_file_read_check = TRUE)
+  
+  chk_types <- chk_types %>% filter(is_read_checked)
+  
+  dm <- dm %>% filter(original %in% chk_types$file_type_raw)
+  
+  if(nrow(dm %>% filter(original!="csv"))==0){
+    skip("No file format supported (apart from csv)!!")
+  }
+  
   # remove pdf
   # for known issue https://github.com/ropensci/tabulizer/issues/106
   dm <- dm %>% dplyr::filter(original != "pdf")
@@ -186,10 +195,20 @@ test_that("read_cells: external packages works (for pdf)", {
         stringr::str_split("\\.") %>%
         purrr::map_chr(1)))
 
+  chk_types <- possible_to_support(perform_real_file_read_check = TRUE)
+  
+  chk_types <- chk_types %>% filter(is_read_checked)
+  
+  dm <- dm %>% filter(original %in% chk_types$file_type_raw)
+  
   # this tested on only windows and linux (Travis)
   # for known issue https://github.com/ropensci/tabulizer/issues/106
   dm <- dm %>% dplyr::filter(original %in% c("pdf", "csv"))
-
+  
+  if(nrow(dm %>% filter(original!="csv"))==0){
+    skip("pdf file format not supported!!")
+  }
+  
   dm <- dm %>%
     dplyr::group_by(original) %>%
     dplyr::sample_n(1) %>%
