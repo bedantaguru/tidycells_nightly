@@ -22,8 +22,9 @@ Naive \code{data_type} Based Value/Attribute Classifier
 \seealso{
 \link[=value_attribute_classify]{value_attribute_classify}
 
-Other Value/Attribute Classifier: \code{\link{numeric_values_classifier}},
-  \code{\link{sample_based_classifier}}
+Other Value/Attribute Classifier: 
+\code{\link{numeric_values_classifier}()},
+\code{\link{sample_based_classifier}()}
 }
 \concept{Value/Attribute Classifier}
 \keyword{internal}

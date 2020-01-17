@@ -7,7 +7,7 @@
 \title{tidycells: Read Tabular Data from Diverse Sources and Easily Make
     Them Tidy}
 \description{
-\if{html}{\figure{logo.png}{options: align='right'}}
+\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
 Provides utilities to read, cells from complex
     tabular data and heuristic detection based 'structural assignment' of
@@ -59,7 +59,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Indranil Gayen \email{nil.gayen@gmail.com} (0000-0003-0197-1944)
+\strong{Maintainer}: Indranil Gayen \email{nil.gayen@gmail.com} (\href{https://orcid.org/0000-0003-0197-1944}{ORCID})
 
 }
 \keyword{internal}

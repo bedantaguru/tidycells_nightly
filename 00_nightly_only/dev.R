@@ -1,5 +1,543 @@
 
+############### DT plots #####################
 
+# attribute = "#F8766D", value = "#00BFC4", empty = "#A3A3A3A3",
+# character = "#F8766D", numeric = "#00BFC4",
+# major_attr = "#F8766D", data = "#00BFC4", minor_attr = "#FACE6EE9"
+
+# 1 : F8766D : attribute / character / major_attr
+# 2 : 00BFC4 : value / numeric / data
+# 3 : FACE6EE9 : minor_attr
+# 4 : A3A3A3A3 : empty
+# 
+
+na_replace_this_df <- function(.data){
+  .data %>% 
+    mutate_all(~ifelse(is.na(.x), "", .x))
+  
+}
+
+style_num_this_df <- function(.data){
+  .data %>% 
+    mutate_all(~ifelse(is.na(.x), 4, .x) %>% 
+                 recode(attribute = 1,
+                        character = 1,
+                        major_attr = 1,
+                        value = 2,
+                        numeric = 2, 
+                        data = 2,
+                        minor_attr = 3,
+                        empty = 4, 
+                        .default = 4))
+  
+}
+
+
+require(tidycells)
+require(DT)
+require(dplyr)
+require(purrr)
+
+xl <- tidyxl::xlsx_cells("inst/extdata/marks.xlsx")
+fmt <-tidyxl::xlsx_formats("inst/extdata/marks.xlsx")
+
+cd <- as_cell_df(xl)
+
+cd <- numeric_values_classifier(cd)
+
+cdd <- as.data.frame(cd)
+
+
+cdt <- cd %>% mutate(value = type) %>% as.data.frame()
+
+
+
+# can be implemented in C++
+seq_of_AA <- function(n){
+  
+  digis <- ceiling(log(n)/log(26))
+  
+  m <- matrix(0, nrow = n, ncol = digis)
+  
+  rem <- 0
+  
+  if(ncol(m) > 0){
+    for(i in 0:(ncol(m)-1)){
+      div_n <- (seq(n)-rem)/(26^i) 
+      rem_n <- (div_n - 1) %% 26 +1
+      rem_n <- rem_n * ifelse(seq(n) >= sum(26^seq(0, i)), 1, 0)
+      rem <- rem + (26^i)*rem_n
+      m[,ncol(m)-i] <- rem_n
+    }
+  }
+  
+  apply(m, 1, function(x) paste0(LETTERS[x], collapse = ""))
+  
+}
+
+colnames(cdd) <- seq_of_AA(ncol(cdd))
+
+colnames(cdt) <- paste0("style_", colnames(cdd))
+require(shiny)
+
+# 
+# 
+# std_opts <- list(
+#   pageLength = 10,
+#   keys = TRUE,
+#   sDom = '<"top">lrt<"bottom">pB',
+#   deferRender = TRUE,
+#   #scrollX = TRUE,
+#   scrollX= 400,
+#   scrollY = 500,
+#   scroller = TRUE,
+#   scrollCollapse = TRUE,
+#   select = list(style = 'os', items = 'cell'),
+#   ordering = FALSE,
+#   fixedColumns = TRUE,
+#   fixedHeader = TRUE
+# )
+
+# this_dt_table_container <- nsht$tags$table(
+#   nsht$tags$style(type = "text/css", "th {
+#   background-color: #cde6fa63; 
+#   border-right-width: 1px; 
+#   border-right-style: solid; 
+#   border-right-color: black; 
+#   border-bottom-width: 1px; 
+#   border-bottom-style: solid; 
+#   border-bottom-color: black}"),
+#   tableHeader(c("",colnames(cdd))))
+
+
+# nsht$tags$thead(
+#   nsht$tags$tr(
+#     c(list(nsht$tags$th(class = "dt_info_on_whole_table"), 
+#            colnames(cdd) %>% map(nsht$tags$th)))))
+
+
+#nsht$tags$th()
+
+#colnames(cdd) %>% map(nsht$tags$th)
+
+get_element_separated_list <- function(x, sep){
+  if(inherits(x, "shiny.tag")){
+    n <- 1
+  }else{
+    n <- length(x)
+  }
+  
+  if(n>1){
+    nsep <- n-1
+    out <- seq(nsep+n) %>% map(~{
+      if(.x%%2==0){
+        sep
+      }else{
+        x[(.x+1)/2]
+      }
+    })
+  }else{
+    out <- list(x)
+  }
+  
+  out
+  
+}
+
+make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_length = 20, info = "info"){
+  cdd <- na_replace_this_df(cdd)
+  cdt <- style_num_this_df(cdt)
+  
+  fd <- bind_cols(cdd, cdt)
+  
+  nsht <- asNamespace("htmltools")
+  
+  this_dt_table_container <- nsht$tags$table(
+    nsht$tags$style(type = "text/css", "th.dt_cols_of_whole_table {
+  background-color: #cde6fa63; 
+  border-left-width: 1px; 
+  border-left-style: solid; 
+  border-left-color: #ddd; 
+  border-right-width: 1px; 
+  border-right-style: solid; 
+  border-right-color: #ddd; 
+  border-bottom-width: 1px; 
+  border-bottom-style: solid; 
+  border-bottom-color: #ddd;
+  border-top-width: 1px; 
+  border-top-style: solid; 
+  border-top-color: #ddd;
+  }
+  
+  th.dt_rownum_of_whole_table{
+  width: 25px;
+  }
+  
+  td.selected{
+  background-color: #08C; !important;
+  }
+  
+  td.active {
+  background-color: green !important;
+  }
+  
+  .dt_info_on_whole_table{
+  font-size: 60%;
+  width: 25px;
+  text-align: center;
+  transform: rotate(-45deg);
+  }"),
+    
+    nsht$tags$thead(
+      nsht$tags$tr(
+        c(list(
+          nsht$tags$th(
+            nsht$tags$div(
+              get_element_separated_list(info, nsht$tags$br()),
+              #nsht$tags$div("hi", style = "color:red"),
+              class = "dt_info_on_whole_table"),
+            class = "dt_rownum_of_whole_table"), 
+          colnames(cdd) %>% map(~nsht$tags$th(.x, class = "dt_cols_of_whole_table")))))))
+  
+  
+  if(shrink){
+    cdfs <- list(list(targets = seq(ncol(cdd)+1, ncol(fd)), visible = FALSE),
+                 list(
+                   targets = seq(1, ncol(cdd)),
+                   render = JS(
+                     "function(data, type, row, meta) {",
+                     paste0("return type === 'display' && data.length > ",shrink_length," ?"),
+                     paste0("'<span title=\"' + data + '\">' + data.substr(0, ",shrink_length,") + '...</span>' : data;"),
+                     "}")
+                 ))
+  }else{
+    cdfs <- list(list(targets = seq(ncol(cdd)+1, ncol(fd)), visible = FALSE))
+  }
+  
+  dt <- datatable(fd,
+                  escape = FALSE,
+                  rownames = TRUE,
+                  #style = "bootstrap4",
+                  style = ifelse(in_shiny, "bootstrap", "default"),
+                  container = this_dt_table_container,
+                  fillContainer = FALSE,
+                  class = "cell-border stripe",
+                  extensions = c("KeyTable", "Scroller","FixedHeader"),
+                  selection = list(target = 'cell'),
+                  #editable = TRUE,
+                  options = list(
+                    columnDefs = cdfs,
+                    pageLength = 10,
+                    keys = TRUE,
+                    sDom = '<"top">lrt<"bottom">pB',
+                    deferRender = TRUE,
+                    #scrollX = TRUE,
+                    scrollX= 400,
+                    scrollY = 500,
+                    scroller = TRUE,
+                    scrollCollapse = TRUE,
+                    # select = list(style = 'os', items = 'cell'),
+                    ordering = FALSE,
+                    fixedColumns = TRUE,
+                    fixedHeader = TRUE
+                  ))
+  # look for styles 
+  # here https://rstudio.github.io/DT/010-style.html
+  dt %>%
+    formatStyle(
+      columns = colnames(cdd),
+      valueColumns = colnames(cdt),
+      target = "cell",
+      backgroundColor = styleEqual(
+        levels = c(1,2,3,4),
+        values = c("#F8766D","#00BFC4","#FACE6EE9","#A3A3A31F")))
+  
+}
+
+
+make_DT_this_df(cdd, cdt, info = list(nsht$tags$a("attribute", style = "color:#F8766D"), 
+                                      nsht$tags$a("value", style = "color:#00BFC4")))
+
+
+# 1 : F8766D : attribute / character / major_attr
+# 2 : 00BFC4 : value / numeric / data
+# 3 : FACE6EE9 : minor_attr
+# 4 : A3A3A3A3 : empty
+# 
+
+# # for row
+# cs <- tags$style(HTML("
+# table.dataTable tr.selected td,
+# table.dataTable td.selected .active {
+# background-color: green !important;
+# }
+# "))
+# 
+# 
+# 
+# cs <- tags$style(HTML("
+# table.dataTable tr.selected td,
+# table.dataTable td.active {
+# background-color: green !important;
+# }
+# "))
+
+
+cs <- tags$style(HTML("
+td.active {
+background-color: green !important;
+}
+"))
+
+# 
+# cs <- tags$style(HTML("
+# td.active {
+# background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgd2lkdGg9IjEwIgogICBoZWlnaHQ9IjEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIGlkPSJzdmc4NDciCiAgIHNvZGlwb2RpOmRvY25hbWU9ImRvd25sb2FkLnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMC45Mi4zICgyNDA1NTQ2LCAyMDE4LTAzLTExKSI+CiAgPG1ldGFkYXRhCiAgICAgaWQ9Im1ldGFkYXRhODUzIj4KICAgIDxyZGY6UkRGPgogICAgICA8Y2M6V29yawogICAgICAgICByZGY6YWJvdXQ9IiI+CiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+CiAgICAgICAgPGRjOnR5cGUKICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPgogICAgICA8L2NjOldvcms+CiAgICA8L3JkZjpSREY+CiAgPC9tZXRhZGF0YT4KICA8ZGVmcwogICAgIGlkPSJkZWZzODUxIiAvPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMSIKICAgICBvYmplY3R0b2xlcmFuY2U9IjEwIgogICAgIGdyaWR0b2xlcmFuY2U9IjEwIgogICAgIGd1aWRldG9sZXJhbmNlPSIxMCIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMCIKICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMDI3IgogICAgIGlkPSJuYW1lZHZpZXc4NDkiCiAgICAgc2hvd2dyaWQ9ImZhbHNlIgogICAgIGlua3NjYXBlOnpvb209IjQ3LjIiCiAgICAgaW5rc2NhcGU6Y3g9IjYuNzgxNjY3MiIKICAgICBpbmtzY2FwZTpjeT0iNC4xMzI4MjQ5IgogICAgIGlua3NjYXBlOndpbmRvdy14PSItOCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTgiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJzdmc4NDciIC8+CiAgPHJlY3QKICAgICB3aWR0aD0iMTAiCiAgICAgaGVpZ2h0PSIxMCIKICAgICBmaWxsPSJ3aGl0ZSIKICAgICBpZD0icmVjdDg0MyIKICAgICBzdHlsZT0iZmlsbDojMDA4MDAwIiAvPgogIDxwYXRoCiAgICAgZD0iTS0xLDEgbDIsLTIgICAgICAgICAgICBNMCwxMCBsMTAsLTEwICAgICAgICAgICAgTTksMTEgbDIsLTIiCiAgICAgc3Ryb2tlPSJibGFjayIKICAgICBzdHJva2Utd2lkdGg9IjEiCiAgICAgaWQ9InBhdGg4NDUiIC8+Cjwvc3ZnPgo=')
+# background-repeat: repeat;
+# background-color: green !important;
+# text-color: black; !important;
+# }
+# "))
+
+
+
+runGadget(shinyApp(
+  ui = fluidPage(
+    DTOutput("dt"),
+    verbatimTextOutput('txt1')),
+  server = function(input, output, session){
+    output$dt <- renderDT({
+      make_DT_this_df(cdd, cdt, in_shiny = T, info = c("value","attribute"))
+    })
+    
+    output$txt1 <- renderPrint({
+      s <- input$dt_cells_selected
+      if (length(s)) {
+        print(s)
+      }
+    })
+    
+  }
+))
+
+#DataTables_Table_0 > tbody > tr:nth-child(3) > td.active
+
+runGadget(shinyApp(
+  ui = fluidPage(DTOutput("dt"),
+                 verbatimTextOutput('txt1')),
+  server = function(input, output, session){
+    output$dt <- renderDT({
+      datatable(cdd,
+                escape = FALSE,
+                rownames = TRUE,
+                style = "bootstrap",
+                fillContainer = FALSE,
+                class = "cell-border stripe",
+                extensions = c("KeyTable", "Scroller","FixedHeader","Select"),
+                selection = list(target = 'cell'),
+                #editable = TRUE,
+                options = std_opts)
+    }, server = F)
+    
+    output$txt1 <- renderPrint({
+      s <- input$dt_cells_selected
+      if (length(s)) {
+        print(s)
+      }
+    })
+    
+  }
+))
+
+
+
+# cellranger::num_to_letter()
+
+
+# 
+# 
+# cos <- tags$script(HTML(
+#   "$(document).ready(function() {
+#   $('#DataTables_Table_0').DataTable( {
+#     select: {
+#       style: 'os',
+#       items: 'cell'
+#     }
+#   } );
+# } );"
+# ))
+
+
+
+
+shinyApp(
+  ui = fluidPage(
+    
+    DT::dataTableOutput('dt1'),
+    verbatimTextOutput('txt1')
+    
+  ),
+  server = function(input, output, session) {
+    
+    output$dt1 = DT::renderDataTable({
+      datatable(head(iris), extensions = 'KeyTable', options = list(keys = TRUE),
+                selection = list(target = 'cell'))
+      
+    }, server = T)
+    
+    # print the selected indices
+    output$txt1 = renderPrint({
+      s = input$dt1_cells_selected
+      if (length(s)) {
+        print(s)
+      }
+    })
+    
+  }
+)
+
+
+
+
+
+datatable(cdd,
+          escape = FALSE,
+          rownames = TRUE,
+          fillContainer = FALSE,
+          class = "cell-border stripe",
+          extensions = c("KeyTable", "Scroller","FixedHeader","Select"),
+          selection = "none",
+          #editable = TRUE,
+          options = list(
+            pageLength = 10,
+            keys = TRUE,
+            sDom = '<"top">lrt<"bottom">pB',
+            deferRender = TRUE,
+            #scrollX = TRUE,
+            scrollX= 400,
+            scrollY = 500,
+            scroller = TRUE,
+            scrollCollapse = TRUE,
+            ordering = FALSE,
+            fixedColumns = TRUE,
+            fixedHeader = TRUE,
+            select = list(style = 'os', items = 'cell') 
+          ))
+
+
+# see Select
+# https://rstudio.github.io/DT/extensions.html
+
+
+# datatable(cdd,
+#           escape = FALSE,
+#           rownames = FALSE,
+#           class = "cell-border stripe",
+#           extensions = c("KeyTable","FixedHeader","Scroller"),
+#           options = list(
+#             pageLength = 10,
+#             keys = TRUE,
+#             sDom = '<"top">lrt<"bottom">pB',
+#             deferRender = TRUE,
+#             #scrollX = TRUE,
+#             #scrollX='400px',
+#             scrollY = 400,
+#             scroller = TRUE,
+#             #scroller = list(rowHeight = 100),
+#             scrollCollapse = TRUE,
+#             ordering = FALSE,
+#             fixedColumns = TRUE,
+#             #fixedColumns = list(leftColumns = 1, heightMatch = 'auto'),
+#             fixedHeader = TRUE
+#           ))
+
+
+
+
+
+
+library(DT)
+library(shiny)
+
+
+runGadget(shinyApp(
+  ui = fluidPage(DTOutput("dt")),
+  server = function(input, output){
+    output$dt <- renderDT({
+      datatable(head(iris),
+                escape = FALSE,
+                rownames = TRUE,
+                style = "bootstrap",
+                fillContainer = FALSE,
+                class = "cell-border stripe",
+                extensions = c("KeyTable", "Scroller","FixedHeader"),
+                selection = list(target = 'cell'))
+    })
+  }
+))
+
+
+
+
+library(shiny)
+library(DT)
+cs <-   tags$style(HTML("
+table.dataTable tr.selected td,
+table.dataTable td.selected {
+background-color: green !important;
+}
+"))
+
+shinyApp(
+  ui = fluidPage(
+    cs,
+    fluidRow(DT::dataTableOutput('tbl1')),
+    fluidRow(DT::dataTableOutput('tbl2')),
+    fluidRow(DT::dataTableOutput('tbl3'))
+  ),
+  server = function(input, output, session) {
+    output$tbl1 = DT::renderDataTable(datatable(head(iris), style = "default"))
+    output$tbl2 = DT::renderDataTable(datatable(head(iris), style = "bootstrap"))
+    output$tbl3 = DT::renderDataTable(datatable(head(iris), style = "bootstrap4"))
+  }
+)
+
+
+#################
+
+
+
+require(purrr)
+system.time(x <- 1:(26^4) %>% map_chr(cellranger::num_to_letter))
+
+system.time(seq_of_AA(26^4))
+
+
+# > system.time(x <- 1:(26^4) %>% map_chr(cellranger::num_to_letter))
+# user  system elapsed 
+# 6.45    0.00    6.45 
+# > 
+# > system.time(seq_of_AA(26^4))
+# user  system elapsed 
+# 1.54    0.07    1.61 
+
+# n_to_l <- function(x){
+#   
+#   nl0 <- function(n) {
+#     rems <- NULL
+#     while (n > 0) {
+#       rem <- ((n - 1)%%26) + 1
+#       rems <- c(rem, rems)
+#       n <- (n - rem)%/%26
+#     }
+#     paste(LETTERS[rems], collapse = "")
+#   }
+#   
+# }
+
+
+
+#############################
 d <-tibble(x= c(1,2), y= c("a", "b"))
 
 

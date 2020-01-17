@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(tidycells)
 ```
 
-# **tidycells** <img src="vignettes/ext/logo.png" align="right" width="200"/>
+# **tidycells** <img src="vignettes/ext/logo.svg" align="right" width="200"/>
 
 #### _Read Tabular Data from Diverse Sources and Easily Make Them Tidy_
 
@@ -60,7 +60,7 @@ dep_str <- paste0(length(imps),"/",(length(imps)+length(sugg)))
 [![CRAN checks](https://cranchecks.info/badges/summary/tidycells)](https://cran.r-project.org/web/checks/check_results_tidycells.html)
 [![Travis build status](https://travis-ci.org/r-rudra/tidycells.svg?branch=master)](https://travis-ci.org/r-rudra/tidycells)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/r-rudra/tidycells?branch=master&svg=true)](https://ci.appveyor.com/project/bedantaguru/tidycells)
-[![R-hub checks](https://img.shields.io/badge/R_Hub-10/20_OK-green?style=flat-square&logo=R)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md#all-r-hub-build-summary)
+[![R-hub checks](https://img.shields.io/badge/R_Hub-11/20_OK-green?style=flat-square&logo=R)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md#all-r-hub-build-summary)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Codecov Coverage Status](https://codecov.io/gh/r-rudra/tidycells/branch/master/graph/badge.svg)](https://codecov.io/gh/r-rudra/tidycells?branch=master)
 [![Coveralls Coverage Status](https://coveralls.io/repos/github/r-rudra/tidycells/badge.svg?branch=master&service=github)](https://coveralls.io/github/r-rudra/tidycells?branch=master)
@@ -122,15 +122,13 @@ To start with `tidycells`, I invite you to see `vignette("tidycells-intro")` or 
 
 Let's take a quick look at an example data as given in 
 
-```{r, eval=FALSE}
-system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
+```{r}
+filename <- system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE)
 ```
 
 The data looks like (in excel)
 
-```{r, out.width = "451px", echo=FALSE, eval=TRUE, dpi=300}
-knitr::include_graphics("vignettes/ext/marks.png")
-```
+<img src="vignettes/ext/marks.svg" align="center" width="500px" style="border: 0;"/>
 
 Let's try `tidycells` functions in this data
 
@@ -138,12 +136,11 @@ Read at once
 
 ```{r, eval=FALSE}
 # you should have tidyxl installed
-system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
-  read_cells()
+read_cells(filename)
 ```
 ```{r, echo=FALSE}
 if(rlang::is_installed("tidyxl")){
-  system.file("extdata", "marks.xlsx", package = "tidycells", mustWork = TRUE) %>% 
+  filename %>% 
     read_cells() %>% 
     knitr::kable()
 }
@@ -152,9 +149,7 @@ if(rlang::is_installed("tidyxl")){
 
 The function `read_cells` is a set of ordered operations connected together. The flowchart of `read_cells`:
 
-```{r, out.width = "356px", echo=FALSE, fig.align='center', dpi=300}
-knitr::include_graphics("vignettes/ext/read_cells.svg")
-```
+<img src="vignettes/ext/read_cells.svg" align="center" width="400px" style="border: 0;"/>
 
 Let's understand step by step procedures followed by `read_cells`. 
 
@@ -185,10 +180,11 @@ After this you need to run `compose_cells` (with argument `print_attribute_overv
 ```{r, echo=TRUE, eval=FALSE}
 dc <- compose_cells(da, print_attribute_overview = TRUE)
 ```
-```{r, out.width = "451px", echo=FALSE, eval=TRUE, dpi=300}
-knitr::include_graphics("vignettes/ext/compose_cells_cli1.png")
+```{r, echo=FALSE, eval=TRUE}
 dc <- compose_cells(da)
 ```
+
+<img src="vignettes/ext/compose_cells_cli1.svg" align="center" width="500px" style="border: 0;"/>
 
 If you want a well-aligned columns then you may like to do
 
@@ -303,4 +299,3 @@ This package incomplete without following packages (apart from the **unpivotr** 
 * [**tabulizer**](https://cran.r-project.org/package=tabulizer) : for pdf
 * [**XML**](https://cran.r-project.org/package=XML) : for html/xml type files
 * [**stringdist**](https://CRAN.R-project.org/package=stringdist) : for enhanced string matching in `tidycells::collate_columns`
-

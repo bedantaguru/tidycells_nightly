@@ -8,11 +8,9 @@
 \usage{
 numeric_values_classifier(x, ..., allow_chars, verbose = FALSE)
 
-\method{numeric_values_classifier}{default}(x, ..., allow_chars = NULL,
-  verbose = FALSE)
+\method{numeric_values_classifier}{default}(x, ..., allow_chars = NULL, verbose = FALSE)
 
-\method{numeric_values_classifier}{cell_df}(x, ..., allow_chars,
-  verbose = FALSE)
+\method{numeric_values_classifier}{cell_df}(x, ..., allow_chars, verbose = FALSE)
 }
 \arguments{
 \item{x}{Either a \code{\link[=cell_df-class]{cell_df}} or
@@ -28,8 +26,9 @@ Value/Attribute Classifier which considers number like cells as values
 \seealso{
 \link[=value_attribute_classify]{value_attribute_classify}
 
-Other Value/Attribute Classifier: \code{\link{basic_classifier}},
-  \code{\link{sample_based_classifier}}
+Other Value/Attribute Classifier: 
+\code{\link{basic_classifier}()},
+\code{\link{sample_based_classifier}()}
 }
 \concept{Value/Attribute Classifier}
 \keyword{internal}
