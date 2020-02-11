@@ -5,7 +5,7 @@ dat <- na_replace_this_df(cdd)
 
 rowCallback <- c(
   "function(row, data, displayNum, displayIndex){",
-  paste0("  var indices = [",paste0(seq(nrow(cdd))-1, collapse = ", "),"];"),
+  paste0("  var indices = [",paste0(seq(nrow(dat))-1, collapse = ", "),"];"),
   "  if(indices.indexOf(displayIndex) > -1){",
   "    $(row).find('td:empty').addClass('notselectable');",
   "  }",

@@ -255,8 +255,14 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
 }
 
 
-make_DT_this_df(cdd, cdt, info = list(nsht$tags$a("attribute", style = "color:#F8766D"), 
-                                      nsht$tags$a("value", style = "color:#00BFC4")))
+# fuse
+
+
+
+nshtG <- asNamespace("htmltools")
+
+make_DT_this_df(cdd, cdt, info = list(nshtG$tags$a("attribute", style = "color:#F8766D"), 
+                                      nshtG$tags$a("value", style = "color:#00BFC4")))
 
 
 # 1 : F8766D : attribute / character / major_attr
@@ -319,6 +325,43 @@ runGadget(shinyApp(
     
   }
 ))
+
+
+
+
+
+
+# fuse
+
+
+
+shinyApp(
+  ui = fluidPage(
+    DTOutput("table")
+  ),
+  server = function(input, output, session) {    
+    output[["table"]] <- renderDT({
+      make_DT_this_df(cdd, cdt, in_shiny = T, info = list(nshtG$tags$a("attribute", style = "color:#F8766D"), 
+                                            nshtG$tags$a("value", style = "color:#00BFC4")), safeMode = T)
+      
+    }, server = T)
+    observe({
+      cat("\014")
+      io <- input[["table_cells_selected_raw"]]
+      if(!is.null(io)){
+        #print(io)
+        #print(matrix(io, ncol = 3, byrow = T))
+        m <- matrix(io, ncol = 3, byrow = T)
+        colnames(m) <- names(io)[seq(3)]
+        m[,1] <- m[,1]+1
+        m <- m[,-3]
+        print(m)
+      }
+    })
+  }
+)
+
+
 
 #DataTables_Table_0 > tbody > tr:nth-child(3) > td.active
 
