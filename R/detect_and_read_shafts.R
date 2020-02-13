@@ -370,7 +370,7 @@ shaft_docx_officer <- function(prior_shaft, lo, ignore_fty = FALSE) {
           # read full data
           suppressWarnings(
             suppressMessages(
-              ctl <- read_docx_from_officer(read_try, guess_header = FALSE)
+              ctl <- read_docx_from_officer(read_try)
             )
           )
           

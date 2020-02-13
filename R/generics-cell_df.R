@@ -320,7 +320,7 @@ mutate.cell_df <- function(.data, ..., direct = FALSE){
         msg_once("column(s) starting with 'gid_' will be interpreted differently. (you may opt for 'direct = TRUE')")
       }
       
-      new_gid_map <- dts %>% seq_along() %>% 
+      new_gid_map <- dts %>% seq_along %>% 
         map_df(~{
           gto <- dts[[.x]] %>% as.character() %>% stringr::str_extract_all("gid_[0-9]+") %>% unlist()
           tibble(gid = gto, new_gid = names(dts)[.x])

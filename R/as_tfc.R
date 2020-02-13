@@ -52,7 +52,7 @@ as_tfc.exploration_findings <- function(x, ...){
   }
   
   tfco <- x$tfc %>% 
-    seq_along() %>% 
+    seq_along %>% 
     map(~{
       nn <- x$tfc[[.x]]
       if(!is.null(nn)){

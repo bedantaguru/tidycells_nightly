@@ -69,7 +69,7 @@ wand_seq_in_clone <- function(svec, pvec) {
 
   this_matches <- lapply(pvec, "==", svec)
   mls <- this_matches %>%
-    seq_along() %>%
+    seq_along %>%
     map(~ this_matches[[.x]][.x:(length(svec) - length(pvec) + .x)]) %>%
     reduce(`+`)
   which(mls == length(pvec))

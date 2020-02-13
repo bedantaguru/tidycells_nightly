@@ -1,6 +1,5 @@
 
 
-
 make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_length = 20, info = "info", safeMode = FALSE){
   cdd <- na_replace_this_df(cdd)
   cdt <- style_num_this_df(cdt)
@@ -170,3 +169,4 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
                 textAlign = "center")
   
 }
+
