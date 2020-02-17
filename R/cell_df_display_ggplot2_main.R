@@ -1,13 +1,12 @@
 
 
-plot_cell_df_ggplot2 <- function(x, ...,
+plot_cell_df_ggplot2 <- function(d, 
                                  fill,
                                  no_fill = FALSE,
                                  adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, 
                                  no_plot = FALSE,
                                  fill_alpha = 1,
-                                 background) {
-  d <- x
+                                 background = NULL, ...) {
   
   if (missing(fill)) {
     if(hasName(d, "type")){
@@ -59,7 +58,7 @@ plot_cell_df_ggplot2 <- function(x, ...,
       
     }
     
-    if(!missing(background)){
+    if(!is.null(background)){
       if(is_cell_df(background)){
         g <- g +
           ggplot2::geom_tile(data = background, mapping = ggplot2::aes(col, -row),

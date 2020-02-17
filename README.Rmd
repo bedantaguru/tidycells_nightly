@@ -49,10 +49,13 @@ usr_pkgs <- x %>% tibble::as_tibble() %>% dplyr::mutate(pkg = row.names(x)) %>% 
 # excluding only base
 # usr_pkgs <- x %>% tibble::as_tibble() %>% dplyr::mutate(pkg = row.names(x)) %>% dplyr::filter(Priority == "base") %>% dplyr::pull(pkg)
 
-imps <- intersect(imps, usr_pkgs)
-sugg <- intersect(sugg, usr_pkgs)
+imps_this <- intersect(imps, usr_pkgs)
+sugg_this <- intersect(sugg, usr_pkgs)
 
-dep_str <- paste0(length(imps),"/",(length(imps)+length(sugg)))
+pkgs_this <- tidycells:::pkg_dep_list(imps_this)
+pkgs_sugg_this <- tidycells:::pkg_dep_list(sugg_this)
+
+dep_str <- paste0(length(imps),"/",(length(pkgs_this))," [",length(pkgs_sugg_this),"]")
 
 ```
 

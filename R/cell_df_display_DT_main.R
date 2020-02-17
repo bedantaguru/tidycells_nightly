@@ -1,14 +1,66 @@
 
 
+plot_cell_df_DT <- function(d, 
+                            fill, 
+                            in_shiny = FALSE, 
+                            shrink = TRUE, 
+                            shrink_length = 20, 
+                            no_plot = FALSE, ...){
+  
+  if (missing(fill)) {
+    if(hasName(d, "type")){
+      fill <- "type"
+    }else{
+      fill <- "data_type"
+    }
+    
+  }
+  
+  if (!(fill %in% c("data_type", "type"))) {
+    abort("fill should be either of (data_type, type)")
+  }
+  
+  if (!hasName(d, fill)) {
+    abort(paste0(fill, " is not present in supplied cell_df"))
+  }
+  
+  ldd <- get_cdd_and_cdt(d, tag_name = fill)
+  
+  if(is_available("htmltools")){
+    nshtG <- asNamespace("htmltools")
+    if(fill == "data_type"){
+      inf <- list(nshtG$tags$a("character", style = "color:#F8766D"), 
+           nshtG$tags$a("numeric", style = "color:#00BFC4"))
+    }else{
+      inf <- list(nshtG$tags$a("attribute", style = "color:#F8766D"), 
+           nshtG$tags$a("value", style = "color:#00BFC4"))
+    }
+  }else{
+    inf <- ""
+  }
+  
+  
+  dt <- make_DT_this_df(ldd$cdd, ldd$cdt, 
+                        in_shiny = in_shiny, shrink = shrink, shrink_length = shrink_length,
+                        info = inf, safeMode = isTRUE(getOption("tidycells.safemode")))
+  if(!no_plot){
+    print(dt)
+  }
+  
+  invisible(dt)
+  
+}
+
 make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_length = 20, info = "info", safeMode = FALSE){
   cdd <- na_replace_this_df(cdd)
   cdt <- style_num_this_df(cdt)
   
   rowCallback <- c(
     "function(row, data, displayNum, displayIndex){",
-    paste0("  var indices = [",paste0(seq(nrow(cdd))-1, collapse = ", "),"];"),
+    paste0("var indices = [",paste0(seq(nrow(cdd))-1, collapse = ", "),"];"),
     "  if(indices.indexOf(displayIndex) > -1){",
     "    $(row).find('td:empty').addClass('notselectable');",
+    "    $(row).find('td:nth-child(1)').addClass('notselectable');",
     "  }",
     "}"
   )
@@ -27,9 +79,11 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
     "});"
   )
   
-  fd <- bind_cols(cdd, cdt)
+  fd <- dplyr::bind_cols(cdd, cdt)
   
   nsht <- asNamespace("htmltools")
+  
+  nshw <- asNamespace("htmlwidgets")
   
   this_dt_table_container <- nsht$tags$table(
     nsht$tags$style(type = "text/css", "th.dt_cols_of_whole_table {
@@ -83,7 +137,7 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
     cdfs <- list(list(targets = seq(ncol(cdd)+1, ncol(fd)), visible = FALSE),
                  list(
                    targets = seq(1, ncol(cdd)),
-                   render = JS(
+                   render = nshw$JS(
                      "function(data, type, row, meta) {",
                      paste0("return type === 'display' && data.length > ",shrink_length," ?"),
                      paste0("'<span title=\"' + data + '\">' + data.substr(0, ",shrink_length,") + '...</span>' : data;"),
@@ -121,8 +175,8 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
                       fixedHeader = TRUE
                     ))
   }else{
-    dt <- datatable(fd,
-                    callback = JS(callback),
+    dt <- DT::datatable(fd,
+                    callback = nshw$JS(callback),
                     escape = FALSE,
                     rownames = TRUE,
                     #style = "bootstrap4",
@@ -134,7 +188,7 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
                     selection = "none",
                     #editable = TRUE,
                     options = list(
-                      rowCallback = JS(rowCallback),
+                      rowCallback = nshw$JS(rowCallback),
                       columnDefs = cdfs,
                       pageLength = 10,
                       keys = TRUE,
@@ -155,14 +209,14 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
   # look for styles 
   # here https://rstudio.github.io/DT/010-style.html
   dt %>%
-    formatStyle(
+    DT::formatStyle(
       columns = colnames(cdd),
       valueColumns = colnames(cdt),
       target = "cell",
-      backgroundColor = styleEqual(
+      backgroundColor = DT::styleEqual(
         levels = c(1,2,3,4),
         values = c("#F8766D","#00BFC4","#FACE6EE9","#A3A3A31F"))) %>% 
-    formatStyle(0, 0, 
+    DT::formatStyle(0, 0, 
                 target = "cell", 
                 backgroundColor = "#cde6fa63", 
                 fontFamily = "Monospace", 

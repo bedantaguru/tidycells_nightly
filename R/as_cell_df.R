@@ -5,9 +5,9 @@
 #' for further processing in other `tidycells` functions.
 #'
 #' @param d the data (either a matrix with column name or a data.frame)
-#' @param take_row_names consider row names as separate cells
-#' (applicable only for data with no (row, col) information). Default is \code{FALSE}.
 #' @param take_col_names consider column names as separate cells
+#' (applicable only for data with no (row, col) information). Default is \code{TRUE}.
+#' @param take_row_names consider row names as separate cells
 #' (applicable only for data with no (row, col) information). Default is \code{FALSE}.
 #'
 #' @return An object of class [`cell_df`][cell_df-class].
@@ -31,21 +31,37 @@
 #' # which is not true for ---> unpivotr::as_cells
 #' # check ---> unpivotr::as_cells(iris) %>% unpivotr::as_cells()
 #' unpivotr::as_cells(iris) %>% as_cell_df()
-as_cell_df <- function(d, take_row_names = FALSE, take_col_names = FALSE) {
+as_cell_df <- function(d, take_col_names = TRUE, take_row_names = FALSE, ...) {
   UseMethod("as_cell_df")
 }
 
 #' @export
-as_cell_df.data.frame <- function(d, ...) {
-  d %>%
-    attach_intermediate_class() %>%
-    as_cell_df_internal(...)
+as_cell_df.data.frame <- function(d,  take_col_names = TRUE, take_row_names = FALSE, ...) {
+  di <- d %>%
+    attach_intermediate_class() 
+  
+  if(inherits(di, "unknown")){
+    di %>%
+      as_cell_df_internal(take_col_names = TRUE, take_row_names = FALSE, ...)
+  }else{
+    di %>%
+      as_cell_df_internal(...)
+  }
+  
 }
 
 #' @export
-as_cell_df.matrix <- function(d, ...) {
-  d %>%
-    as.data.frame() %>%
-    attach_intermediate_class() %>%
-    as_cell_df_internal(...)
+as_cell_df.matrix <- function(d, take_col_names = TRUE, take_row_names = FALSE, ...) {
+  di <- d %>%
+    as_tibble() %>%
+    attach_intermediate_class() 
+  
+  if(inherits(di, "unknown")){
+    di %>%
+      as_cell_df_internal(take_col_names = TRUE, take_row_names = FALSE, ...)
+  }else{
+    di %>%
+      as_cell_df_internal(...)
+  }
+  
 }

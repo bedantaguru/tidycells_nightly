@@ -131,117 +131,59 @@ summary.cell_df <- function(object, ..., no_print = FALSE) {
 #' @export
 plot.cell_df <- function(x, ...,
                          fill,
+                         # ggplot2 specific
                          no_fill = FALSE,
                          adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, 
-                         no_plot = FALSE,
                          fill_alpha = 1,
-                         background) {
-  d <- x
+                         background = NULL,
+                         # common
+                         no_plot = FALSE,
+                         # DT specific
+                         in_shiny = FALSE, 
+                         shrink = TRUE, 
+                         shrink_length = 20) {
   
-  if (missing(fill)) {
-    if(hasName(d, "type")){
-      fill <- "type"
+  pltmode <- getOption("tidycells.plot_mode")
+  
+  if(is.null(pltmode)) pltmode <- "auto"
+  
+  if(length(pltmode)!=1) pltmode <- "auto"
+  
+  if(!(pltmode %in% c("auto","DT","ggplot2"))) pltmode <- "auto"
+  
+  if(pltmode=="auto"){
+    if(is_available("DT")){
+      pltmode <-"DT"
     }else{
-      if (hasName(d, "gid")) {
-        fill <- "gid"
-      } else {
-        fill <- "data_type"
-      }
-    }
-    
-  }
-  
-  if (!(fill %in% c("data_type", "type","gid"))) {
-    abort("fill should be either of (data_type, type, gid)")
-  }
-  
-  if (!hasName(d, fill)) {
-    abort(paste0(fill, " is not present in supplied cell_df"))
-  }
-  
-  
-  
-  if (adaptive_txt_size) {
-    d <- d %>%
-      mutate(nc = nchar(value), txt_size_ = (min(nc) + 10^-10) / (nc + 10^-10) * txt_size/2 + txt_size/2) %>%
-      select(-nc) %>%
-      rename(txt_size = txt_size_)
-  }
-  
-  if (no_fill) {
-    g <- ggplot2::ggplot(d, ggplot2::aes(col, -row, label = value))
-    
-    g <- g +
-      ggplot2::geom_tile(color = "#00000046", alpha = 0.1, na.rm = TRUE, width = 1, height = 1)
-  } else {
-    if (fill == "data_type") {
-      g <- ggplot2::ggplot(d, ggplot2::aes(col, -row, fill = data_type, label = value)) +
-        ggplot2::labs(fill = "Data Type")
-    } else {
-      if (fill == "gid"){
-        g <- ggplot2::ggplot(d, ggplot2::aes(col, -row, fill = as.factor(gid), label = value)) +
-          ggplot2::labs(fill = "Group ID (gid)")
+      if(is_available("ggplot2")){
+        pltmode <-"ggplot2"
       }else{
-        g <- ggplot2::ggplot(d, ggplot2::aes(col, -row, fill = type, label = value)) +
-          ggplot2::labs(fill = "Type")
-      }
-      
-    }
-    
-    if(!missing(background)){
-      if(is_cell_df(background)){
-        g <- g +
-          ggplot2::geom_tile(data = background, mapping = ggplot2::aes(col, -row),
-                             color = "#00000036", na.rm = TRUE, width = 1, height = 1, inherit.aes = F, 
-                             fill = "black", alpha = 0.1)
-      }else{
-        abort("background must be a cell_df")
+        abort("Either {ggplot2} or {DT} package is required for plotting a cell-df")
       }
     }
-  
-    g <- g +
-      ggplot2::geom_tile(color = "#00000046", na.rm = TRUE, width = 1, height = 1, alpha = fill_alpha) 
-    
-    if(fill!="gid"){
-      g <- g +
-        # kept for all potential plots
-        ggplot2::scale_fill_manual(values = c(
-          attribute = "#F8766D", value = "#00BFC4", empty = "#A3A3A3A3",
-          character = "#F8766D", numeric = "#00BFC4",
-          major_attr = "#F8766D", data = "#00BFC4", minor_attr = "#FACE6EE9"
-        ))
-    }
   }
   
-  
-  
-  
-  g <- g +
-    ggplot2::theme(
-      panel.grid = ggplot2::element_blank(),
-      axis.title = ggplot2::element_blank(),
-      axis.text = ggplot2::element_blank(),
-      panel.background = ggplot2::element_blank(),
-      axis.ticks = ggplot2::element_blank()
-    )
-  
-  if (!no_txt) {
-    if (adaptive_txt_size) {
-      g <- g + ggplot2::geom_text(ggplot2::aes(size = txt_size), alpha = txt_alpha, na.rm = TRUE) +
-        ggplot2::scale_size_continuous(
-          range = d$txt_size %>% range(),
-          guide = FALSE
-        )
-    } else {
-      g <- g + ggplot2::geom_text(size = txt_size, alpha = txt_alpha, na.rm = TRUE)
-    }
+  # finally either DT or ggplot2
+  if(pltmode=="DT"){
+    plot_cell_df_DT(x, 
+                    fill, 
+                    in_shiny = in_shiny,
+                    shrink = shrink,
+                    shrink_length = shrink_length, 
+                    no_plot = no_plot, ...)
+  }else{
+    # pltmode=="ggplot2" case
+    plot_cell_df_ggplot2(x, 
+                         fill, 
+                         no_fill = no_fill, 
+                         adaptive_txt_size = adaptive_txt_size, 
+                         txt_size = txt_size, 
+                         txt_alpha = txt_alpha, 
+                         no_txt = no_txt, 
+                         no_plot = no_plot, 
+                         fill_alpha = fill_alpha, 
+                         background = background, ...)
   }
-  
-  if (!no_plot) {
-    graphics::plot(g, ...)
-  }
-  
-  return(invisible(g))
 }
 
 

@@ -4,7 +4,7 @@
 \alias{as_cell_df}
 \title{Transform data into Cell-DF Structure}
 \usage{
-as_cell_df(d, take_row_names = FALSE, take_col_names = FALSE)
+as_cell_df(d, take_row_names = FALSE, take_col_names = TRUE)
 }
 \arguments{
 \item{d}{the data (either a matrix with column name or a data.frame)}
@@ -13,7 +13,7 @@ as_cell_df(d, take_row_names = FALSE, take_col_names = FALSE)
 (applicable only for data with no (row, col) information). Default is \code{FALSE}.}
 
 \item{take_col_names}{consider column names as separate cells
-(applicable only for data with no (row, col) information). Default is \code{FALSE}.}
+(applicable only for data with no (row, col) information). Default is \code{TRUE}.}
 }
 \value{
 An object of class \code{\link[=cell_df-class]{cell_df}}.
