@@ -79,7 +79,7 @@ stitch_direction <- function(d_part, dat, attr_name, trace_it = FALSE) {
   # possibly need separate enhead like function
   suppressWarnings({
     d1 <- d0 %>%
-      enhead(a0, direction)
+      bind_header(a0, direction)
   })
 
 

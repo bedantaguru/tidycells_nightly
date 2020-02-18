@@ -112,11 +112,6 @@ NULL
 NULL
 
 
-#### unpivotr ####
-
-#' @importFrom unpivotr enhead
-NULL
-
 #### rlang ####
 
 #' @importFrom rlang abort

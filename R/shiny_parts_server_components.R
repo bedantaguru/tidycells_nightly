@@ -633,7 +633,7 @@ sps_part_orientation_modification <- function(input, output, session, plot_now, 
 
 
           if (n_dg == 1) {
-            all_dirs <- get_unpivotr_direction_names()
+            all_dirs <- get_valid_direction_names()
 
             all_dirs_mains <- all_dirs[c("N", "E", "W", "S")]
 
@@ -735,7 +735,7 @@ sps_part_orientation_modification <- function(input, output, session, plot_now, 
       dam_this <- info_this()$dam
       part_this <- info_this()$this
       dir_this <- input$new_direction[1]
-      all_dirs <- get_unpivotr_direction_names() %>% unlist()
+      all_dirs <- get_valid_direction_names() %>% unlist()
       if (dir_this %in% all_dirs) {
         if (length(setdiff(part_this$direction, dir_this))) {
           part_this$direction <- dir_this

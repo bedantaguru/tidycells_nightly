@@ -4,8 +4,8 @@
 #'
 #' @param d1 part of d_part with data_gid
 #' @param a1 part of d_part with attr_gid
-#' @param direction direction name (compatible with `unpivotr`)
-#' should be one of [`get_unpivotr_direction_names`][get_unpivotr_direction_names()]
+#' @param direction direction name 
+#' should be one of [`get_valid_direction_names`][get_valid_direction_names()]
 #'
 #' @details Used internally by [`get_direction`][get_direction()] function
 #' @keywords internal
@@ -28,7 +28,7 @@ get_direction_metric_part_raw <- function(d1, a1, direction) {
   # ref: https://github.com/nacnudus/unpivotr/issues/26
   suppressWarnings({
     d1 %>%
-      enhead(a1, direction) %>%
+      bind_header(a1, direction) %>%
       filter(!is.na(attr_gid)) %>%
       pull(attr_gid) %>%
       length()

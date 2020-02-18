@@ -1,6 +1,6 @@
 
 
-#' get optimal direction (in terms of `unpivotr` directions)
+#' get optimal direction 
 #'
 #' @param d_part parts of `data_attr_map_raw`
 #' @details Used internally
@@ -9,7 +9,7 @@
 #'
 
 get_direction <- function(d_part) {
-  directions <- get_unpivotr_direction_names()
+  directions <- get_valid_direction_names()
 
   if (d_part$direction[1] %in% names(directions)) {
     dirs <- directions[[d_part$direction[1]]]
