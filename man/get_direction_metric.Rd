@@ -11,8 +11,8 @@ get_direction_metric(d1, a1, direction)
 
 \item{a1}{part of d_part with attr_gid}
 
-\item{direction}{direction name (compatible with \code{unpivotr})
-should be one of \code{\link[=get_unpivotr_direction_names]{get_unpivotr_direction_names}}}
+\item{direction}{direction name
+should be one of \code{\link[=get_valid_direction_names]{get_valid_direction_names}}}
 }
 \value{
 a scaled fraction denoting coverage (1 means full coverage) for the supplied direction.

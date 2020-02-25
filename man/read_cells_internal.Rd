@@ -9,8 +9,8 @@
 \usage{
 \method{read_cells}{read_cell_part}(
   x,
-  at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze",
-    "compose"),
+  at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose",
+    "collate"),
   omit = NULL,
   simplify = TRUE,
   compose_main_cols_only = TRUE,
@@ -21,8 +21,8 @@
 
 \method{read_cells}{character}(
   x,
-  at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze",
-    "compose"),
+  at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose",
+    "collate"),
   omit = NULL,
   simplify = TRUE,
   compose_main_cols_only = TRUE,
@@ -31,8 +31,8 @@
 
 \method{read_cells}{default}(
   x,
-  at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze",
-    "compose"),
+  at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose",
+    "collate"),
   omit = NULL,
   simplify = TRUE,
   compose_main_cols_only = TRUE,
@@ -42,8 +42,8 @@
 
 \method{read_cells}{`NULL`}(
   x,
-  at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze",
-    "compose"),
+  at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose",
+    "collate"),
   omit = NULL,
   simplify = TRUE,
   compose_main_cols_only = TRUE,

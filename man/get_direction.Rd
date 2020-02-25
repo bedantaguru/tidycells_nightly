@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_direction.R
 \name{get_direction}
 \alias{get_direction}
-\title{get optimal direction (in terms of \code{unpivotr} directions)}
+\title{get optimal direction}
 \usage{
 get_direction(d_part)
 }
@@ -13,7 +13,7 @@ get_direction(d_part)
 a string value denoting direction
 }
 \description{
-get optimal direction (in terms of \code{unpivotr} directions)
+get optimal direction
 }
 \details{
 Used internally

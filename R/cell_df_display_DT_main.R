@@ -1,4 +1,6 @@
 
+# note 
+# https://github.com/rstudio/DT/issues/643
 
 plot_cell_df_DT <- function(d, 
                             fill, 
@@ -154,9 +156,9 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
                     #style = "bootstrap4",
                     style = ifelse(in_shiny, "bootstrap", "default"),
                     container = this_dt_table_container,
-                    fillContainer = FALSE,
+                    fillContainer = TRUE,
                     class = "cell-border stripe",
-                    extensions = c("KeyTable", "Scroller","FixedHeader"),
+                    extensions = c("KeyTable", "Scroller"),
                     selection = list(target = 'cell'),
                     #editable = TRUE,
                     options = list(
@@ -182,9 +184,9 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
                     #style = "bootstrap4",
                     style = ifelse(in_shiny, "bootstrap", "default"),
                     container = this_dt_table_container,
-                    fillContainer = FALSE,
+                    fillContainer = TRUE,
                     class = "cell-border stripe",
-                    extensions = c("KeyTable", "Scroller","FixedHeader","Select"),
+                    extensions = c("KeyTable", "Scroller","Select"),
                     selection = "none",
                     #editable = TRUE,
                     options = list(

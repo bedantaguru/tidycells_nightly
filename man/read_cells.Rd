@@ -6,8 +6,8 @@
 \usage{
 read_cells(
   x,
-  at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze",
-    "compose"),
+  at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose",
+    "collate"),
   omit = NULL,
   simplify = TRUE,
   compose_main_cols_only = TRUE,

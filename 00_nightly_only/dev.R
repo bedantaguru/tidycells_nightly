@@ -1,4 +1,53 @@
+##################################################################
+##################################################################
+##################################################################
+# trying ABS example
 
+
+require(stringr)
+
+
+
+
+tfc0 <- read_cells("00_nightly_only/ABSSelfExplore/20490do001_2016.xls")
+
+tf0 <- tfc0$Table_1.12
+
+
+saveRDS(tf0, "00_nightly_only/ABSSelfExplore/best_example.rds", version = 2)
+
+
+tf0 <- numeric_values_classifier(tf0)
+
+
+
+
+tfc0 <- read_cells("00_nightly_only/tidyABS_extdata/australian-industry.xlsx")
+
+tfc0 <- tfc0 %>% as_tfc()
+
+tfc1 <- tfc0 %>% filter(str_detect(content, "agriculture, forestry and fishing"))
+
+tfc1 <- tfc1 %>% filter(str_detect(content, "key data")) 
+
+tf0 <- tfc1 %>% pull()
+
+tf0 <- tf0 %>% numeric_values_classifier()
+
+tf1 <- cell_sample(tf0, n = 50)
+
+saveRDS(tf1, "00_nightly_only/example_tuning_check_points/ex_tidyABS_extdata_australian_industry_Table_1",version = 2)
+
+saveRDS(tf0, "00_nightly_only/example_tuning_check_points/ex_tidyABS_extdata_australian_industry_Table_4",version = 2)
+
+saveRDS(tf0, "00_nightly_only/example_tuning_check_points/ex_tidyABS_environmental_economic_accounts_Table_6.1",version = 2)
+
+ca0 <- analyse_cells(tf1)
+
+##################################################################
+##################################################################
+##################################################################
+##################################################################
 ############### DT plots #####################
 
 

@@ -2,6 +2,10 @@
 read_cell_task_orders <- c("detect_and_read", "make_cells", "va_classify", "analyze", "compose", "collate")
 
 
+# @Dev Doc need to be updated 
+# major change massage may be gievn to the user
+# major change is now read cells by default will be in make_cells stage
+# need to implement read_cells on a object should change only one level at a time. 
 
 #' Read Cells from file
 #'
@@ -85,7 +89,7 @@ read_cell_task_orders <- c("detect_and_read", "make_cells", "va_classify", "anal
 #' read_cells(fcsv)
 #' read_cells(fcsv, simplify = FALSE)
 read_cells <- function(x,
-                       at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
+                       at_level = c("make_cells", "detect_and_read",  "va_classify", "analyze", "compose", "collate"),
                        omit = NULL,
                        simplify = TRUE,
                        compose_main_cols_only = TRUE,
@@ -116,7 +120,7 @@ read_cells <- function(x,
 #' @keywords internal
 #' @export
 read_cells.read_cell_part <- function(x,
-                                      at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
+                                      at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose", "collate"),
                                       omit = NULL,
                                       simplify = TRUE,
                                       compose_main_cols_only = TRUE,
@@ -280,7 +284,7 @@ read_cells.read_cell_part <- function(x,
 #' @rdname read_cells_internal
 #' @export
 read_cells.character <- function(x,
-                                 at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
+                                 at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose", "collate"),
                                  omit = NULL,
                                  simplify = TRUE,
                                  compose_main_cols_only = TRUE,
@@ -309,7 +313,7 @@ read_cells.character <- function(x,
 #' @rdname read_cells_internal
 #' @export
 read_cells.default <- function(x,
-                               at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
+                               at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose", "collate"),
                                omit = NULL,
                                simplify = TRUE,
                                compose_main_cols_only = TRUE,
@@ -344,7 +348,7 @@ read_cells.default <- function(x,
 #' @rdname read_cells_internal
 #' @export
 read_cells.NULL <- function(x, 
-                            at_level = c("collate", "detect_and_read", "make_cells", "va_classify", "analyze", "compose"),
+                            at_level = c("make_cells", "detect_and_read", "va_classify", "analyze", "compose", "collate"),
                             omit = NULL,
                             simplify = TRUE,
                             compose_main_cols_only = TRUE,

@@ -4,16 +4,16 @@
 \alias{as_cell_df}
 \title{Transform data into Cell-DF Structure}
 \usage{
-as_cell_df(d, take_row_names = FALSE, take_col_names = TRUE)
+as_cell_df(d, take_col_names = TRUE, take_row_names = FALSE, ...)
 }
 \arguments{
 \item{d}{the data (either a matrix with column name or a data.frame)}
 
-\item{take_row_names}{consider row names as separate cells
-(applicable only for data with no (row, col) information). Default is \code{FALSE}.}
-
 \item{take_col_names}{consider column names as separate cells
 (applicable only for data with no (row, col) information). Default is \code{TRUE}.}
+
+\item{take_row_names}{consider row names as separate cells
+(applicable only for data with no (row, col) information). Default is \code{FALSE}.}
 }
 \value{
 An object of class \code{\link[=cell_df-class]{cell_df}}.
@@ -32,9 +32,6 @@ as_cell_df(iris)
 as_cell_df(iris, take_col_names = TRUE)
 
 # if the data is already in a similar format it will not further transform
-# which is not true for ---> unpivotr::as_cells
-# check ---> unpivotr::as_cells(iris) \%>\% unpivotr::as_cells()
-unpivotr::as_cells(iris) \%>\% as_cell_df()
 }
 \seealso{
 \itemize{
