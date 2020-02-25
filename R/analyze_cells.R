@@ -96,11 +96,11 @@ analyze_cells_raw <- function(d, silent = TRUE) {
   d_dat <- d_dat_orig
   d_att <- d_att_orig
 
-  setp1 <- ai_get_data_attr_map_main(d_dat, d_att)
+  step1 <- ai_get_data_attr_map_main(d_dat, d_att)
 
-  d_dat <- setp1$d_dat
-  d_att <- setp1$d_att
-  admap1 <- setp1$admap
+  d_dat <- step1$d_dat
+  d_att <- step1$d_att
+  admap1 <- step1$admap
 
   # data_gid join (if possible)
   if (nrow(d_dat$group_id_boundary) > 1) {
@@ -115,11 +115,11 @@ analyze_cells_raw <- function(d, silent = TRUE) {
       # revert back to original form
       d_att <- d_att_orig
 
-      setp2 <- ai_get_data_attr_map_main(d_dat, d_att, crude_join = FALSE)
+      step2 <- ai_get_data_attr_map_main(d_dat, d_att, crude_join = FALSE)
 
-      d_dat <- setp2$d_dat
-      d_att <- setp2$d_att
-      admap1 <- setp2$admap
+      d_dat <- step2$d_dat
+      d_att <- step2$d_att
+      admap1 <- step2$admap
     }
   }
 
