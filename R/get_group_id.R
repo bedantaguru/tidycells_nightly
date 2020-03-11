@@ -116,7 +116,44 @@ boundary_cells_part <- function(dg){
 }
 
 
+
+gid_map_link_tune <- function(gid_map){
+  grps <- list()
+  
+  if(nrow(gid_map) > 0){
+    
+    grps[[1]] <- c(gid_map$gid[1], gid_map$new_gid[1])
+    
+    if(nrow(gid_map) > 1){
+      
+      seq(2, nrow(gid_map)) %>% 
+        purrr::walk(~{
+          tl <- gid_map[.x, ] %>% as.character()
+          mch <- grps %>% map_lgl(~(length(.x %>% intersect(tl)) >0))
+          if(any(mch)){
+            grps[[which(mch)[1]]] <<- c(grps[[which(mch)[1]]], tl)
+          }else{
+            grps[[length(grps)+1]] <<- c(tl)
+          }
+        })
+    }
+    
+  }else{
+    return(tibble())
+  }
+  
+  grps %>% map_df(~{
+    tibble(gid = unique(.x), new_gid = min(.x))
+  })
+  
+}
+
+
+
 get_group_id_join_gids <- function(old_group_id_info, gid_map, no_group_boundary = FALSE) {
+  
+  gid_map <- gid_map_link_tune(gid_map)
+  
   old_group_id_info$group_id_map <- old_group_id_info$group_id_map %>%
     left_join(gid_map, by = "gid") %>%
     mutate(new_gid = ifelse(is.na(new_gid), gid, new_gid)) %>%

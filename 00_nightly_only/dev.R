@@ -4,6 +4,156 @@
 # trying ABS example
 
 
+
+
+# debug plots
+quick_plot <- function(dm, d){
+  cdf <- dm$group_id_map %>% mutate(value =gid) %>% as_cell_df
+  plot(cdf, background = d)
+}
+
+
+
+tf0 <- read_cells("00_nightly_only/wired_blocks.xlsx")[[1]]
+tf0 <- tf0 %>% detect_table_block()
+tf0<- tf0 %>% mutate(value= gid)
+
+# tf0 %>% group_by(gid) %>% summarise(lor = min(row), loc = min(col), hir = max(row), hic =max(col))
+# 
+# 
+# get_intra_block_dist <- function(gid1, gid2, cd, quick = T, far_th = 20){
+#   cd1 <- cd %>% filter(gid == gid1) %>% select(row, col) %>% as_tibble()
+#   cd2 <- cd %>% filter(gid == gid2) %>% select(row, col) %>% as_tibble()
+#   
+#   if(quick){
+#     #mnr <- min(nrow(cd1), nrow(cd2))
+#     
+#     # mcd1 <- cd1[sample(nrow(cd1),mnr),] %>% as.matrix()
+#     # mcd2 <- cd2[sample(nrow(cd2),mnr),] %>% as.matrix()
+#     # 
+#     # qd <- (mcd1-mcd2)^2 %>% apply(MARGIN = 1, sum) %>% sqrt %>% min
+#     
+#     mcd1 <- cd1[1,] %>% as.matrix()
+#     mcd2 <- cd2[1,] %>% as.matrix()
+#     
+#     qd <- sqrt(sum((mcd1-mcd2)^2))
+#     
+#     if(qd>far_th){
+#       return(far_th)
+#     }else{
+#       return(qd)
+#     }
+#   }
+#   
+#   # if(!actual){
+#   #   # this is not faster option
+#   #   cd1 <- expand.grid(row = c(min(cd1$row), max(cd1$row)),
+#   #               col = c(min(cd1$col), max(cd1$col)))
+#   #   cd2 <- expand.grid(row = c(min(cd2$row), max(cd2$row)),
+#   #                      col = c(min(cd2$col), max(cd2$col)))
+#   # }
+#   
+#   cd12 <- cd1 %>% mutate(dummy = 1) %>% full_join(cd2 %>% mutate(dummy = 1), by = "dummy")
+#   cd12 <- cd12 %>% mutate(dr = row.x - row.y, dc = col.x - col.y,
+#                           d = sqrt(dr^2+dc^2))
+#   min(cd12$d)
+# }
+# 
+# intra_block_dist <- function(cd,...){
+#   if(state(cd)!="with_table_block"){
+#     cd <- detect_table_block(cd)
+#   }
+#   gids <- cd$gid %>% unique()
+#   
+#   all_2_gids <- expand.grid(gid1 = gids, gid2 = gids, stringsAsFactors = FALSE)
+#   
+#   all_2_gids <- all_2_gids %>% filter(gid1!=gid2)
+#   
+#   all_2_gids_upper <- all_2_gids %>% filter(gid1>gid2)
+#   all_2_gids_upper <- all_2_gids_upper %>% dplyr::rowwise() %>% mutate(dist = get_intra_block_dist(gid1, gid2, cd,...)) %>% ungroup()
+#   return(all_2_gids_upper)
+# }
+# 
+# intra_block_dist(tf0, quick = F)
+# intra_block_dist(tf0)
+
+# 
+# expand.grid(1:1000,1:10000)
+# data.table::CJ(1:1000,1:10000)
+# 
+# 
+# 
+# bench::mark(
+#   expand.grid(1:31,1:31),     
+#   data.table::CJ(1:31,1:31), check = F
+# )
+
+
+# c_expgrd <- function(n){
+#   expand.grid(V1 = seq(n), V2 = seq(n)) %>% filter(V1<V2) %>% arrange(V1, V2) %>% as_tibble()
+# }
+# 
+# c_normal <- function(n){
+#   combn(seq(n), 2) %>% t %>%  as.data.frame() %>% arrange(V1, V2) %>% as_tibble()
+# }
+# 
+# c_mat <- function(n){
+#   matrix(nrow = n, ncol = n)
+# }
+# 
+# N <- 100
+# bench::mark(
+#   c_expgrd(N),
+#   c_normal(N), 
+#   c_mat(N), 
+#   check = F
+# )
+# 
+
+
+#require(dplyr)
+
+real_intra_block_dist(tf0)
+approx_intra_block_dist(tf0)
+hybrid_intra_block_dist(tf0)
+
+# d1 %>% inner_join(d2)->d
+# 
+# 
+
+
+
+#  gain is not much also problem
+dslow <- tf0 %>% real_intra_block_dist()
+df <- tf0 %>% real_intra_block_dist(fast= T)
+
+get_intra_block_dist <- function(gid1, gid2, cd, fast = FALSE){
+  if(fast){
+    cd1 <- cd %>% filter(gid == gid1) %>% select(row, col) %>% as_tibble()
+    cd2 <- cd %>% filter(gid == gid2) %>% select(row, col) %>% as_tibble()
+    
+    m <- (cd1 %>% dplyr::summarize_all(mean) %>% as.numeric()) + (cd2 %>% dplyr::summarize_all(mean) %>% as.numeric())
+    
+    m <- m/2
+    
+    t1 <- cd1 %>% apply(MARGIN = 1, function(x) sum((m-x)^2))
+    t2 <- cd2 %>% apply(MARGIN = 1, function(x) sum((m-x)^2))
+    
+    d <- (cd1[which.min(t1),] %>% as.numeric()) - cd2[which.min(t2),] %>% as.numeric()
+    
+    return(sqrt(sum(d^2)))
+  }
+  cd1 <- cd %>% filter(gid == gid1) %>% select(row, col) %>% as_tibble()
+  cd2 <- cd %>% filter(gid == gid2) %>% select(row, col) %>% as_tibble()
+  
+  cd12 <- cd1 %>% mutate(dummy = 1) %>% full_join(cd2 %>% mutate(dummy = 1), by = "dummy")
+  cd12 <- cd12 %>% mutate(dr = row.x - row.y, dc = col.x - col.y,
+                          d = sqrt(dr^2+dc^2))
+  min(cd12$d)
+}
+
+
+
 require(stringr)
 
 

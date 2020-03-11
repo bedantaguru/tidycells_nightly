@@ -9,7 +9,7 @@ stack_table_block <- function(x, ...){
 # tfc for table field collection
 stack_table_block.Table_Field_Container <- function(x, raw = FALSE, ...){
   
-  if(!("with_table_block" %in% state(x))){
+  if(!("with_table_blocks" %in% state(x))){
     tfc_blocks <- detect_table_block(x)
   }else{
     tfc_blocks <- x

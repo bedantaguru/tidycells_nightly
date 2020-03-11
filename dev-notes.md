@@ -22,6 +22,55 @@ You are most welcome to contribute to this project in any means.
 
 Apart from opening an issue in Github (preferably with [reprex](https://reprex.tidyverse.org/)), you can also contribute mainly to the "Heuristic Maturation" process for `tidycells::analyze_cells` and `tidycells::collate_columns`. If any issue is specific to a data which you would like to share with me, there is a friendly function to mask your data using `tidycells:::mask_data` (_this function is not exported to avoid possible name conflicts_).
 
+### The Badges
+
+I have added many badges already (which I thought will be helpful to the user for code quality and further assurance). You may notice that few badges are round cornered and few are sharp cornered. This is to justify the API based dynamic badges vs. static badges. 
+
+_Dynamic Badges (round corners)_ 
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/tidycells)](https://cran.r-project.org/package=tidycells)
+[![CRAN
+checks](https://cranchecks.info/badges/summary/tidycells)](https://cran.r-project.org/web/checks/check_results_tidycells.html)
+[![Travis build
+status](https://travis-ci.org/r-rudra/tidycells.svg?branch=master)](https://travis-ci.org/r-rudra/tidycells)
+[![AppVeyor build
+status](https://ci.appveyor.com/api/projects/status/github/r-rudra/tidycells?branch=master&svg=true)](https://ci.appveyor.com/project/bedantaguru/tidycells)
+[![Codecov Coverage
+Status](https://codecov.io/gh/r-rudra/tidycells/branch/master/graph/badge.svg)](https://codecov.io/gh/r-rudra/tidycells?branch=master)
+[![Coveralls Coverage
+Status](https://coveralls.io/repos/github/r-rudra/tidycells/badge.svg?branch=master&service=github)](https://coveralls.io/github/r-rudra/tidycells?branch=master)
+
+_Static Badges (sharp corners)_
+
+[![R-hub
+checks](https://img.shields.io/badge/R_Hub-11/20_OK-green?style=flat-square&logo=R)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md#all-r-hub-build-summary)
+[![Lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg?style=flat-square)](https://www.tidyverse.org/lifecycle/#maturing)
+[![Dependency
+status](https://img.shields.io/badge/Depends-9/28-orange.svg?style=flat-square)](https://CRAN.R-project.org/package=tidycells)
+[![See
+DevNotes](https://img.shields.io/badge/See-DevNotes-blue.svg?style=flat-square)](https://github.com/r-rudra/tidycells/blob/master/dev-notes.md)
+
+_Seems Static Badges (the shape of which I can't control)_
+
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/r-rudra/tidycells/master/LICENSE.md)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+
+Note the usual dependency badge (given below) is not used in main README. It is because the usual badge from [https://tinyverse.netlify.com/](https://tinyverse.netlify.com/) is raster based (png file) and does not look quite good in mobile like devices (and when the page is zoomed).
+
+Apart from these badges few other badges (some of them may make no sense yet):
+
+[![](http://cranlogs.r-pkg.org/badges/last-month/tidycells?color=blue)](https://cran.r-project.org/package=tidycells)
+[![](http://cranlogs.r-pkg.org/badges/last-week/tidycells?color=blue)](https://cran.r-project.org/package=tidycells)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/tidycells?color=blue)](https://cran.r-project.org/package=tidycells)
+[![status](https://tinyverse.netlify.com/badge/tidycells)](https://CRAN.R-project.org/package=tidycells)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d3a474fbfb04935829c38e7b61c4a17)](https://www.codacy.com/manual/bedantaguru/tidycells?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=r-rudra/tidycells&amp;utm_campaign=Badge_Grade)
+
+Development Status badges
+[![Travis dev build
+status](https://travis-ci.org/bedantaguru/tidycells_nightly.svg?branch=master)](https://travis-ci.org/bedantaguru/tidycells_nightly)
 
 ### FAQs
 

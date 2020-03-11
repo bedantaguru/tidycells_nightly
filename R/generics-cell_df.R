@@ -152,11 +152,11 @@ plot.cell_df <- function(x, ...,
   if(!(pltmode %in% c("auto","DT","ggplot2"))) pltmode <- "auto"
   
   if(pltmode=="auto"){
-    if(is_available("DT")){
-      pltmode <-"DT"
+    if(is_available("ggplot2")){
+      pltmode <-"ggplot2"
     }else{
-      if(is_available("ggplot2")){
-        pltmode <-"ggplot2"
+      if(is_available("DT")){
+        pltmode <-"DT"
       }else{
         abort("Either {ggplot2} or {DT} package is required for plotting a cell-df")
       }
@@ -223,19 +223,105 @@ state.cell_df <- function(x, ...){
   }
   
   if(hasName(x, "gid")){
-    st <- c(st, "with_table_block")
+    st <- c(st, "with_table_blocks")
   }
   
   if(!is.null(attr(x, "meta"))){
     st <- c(st, "with_meta_for_table_blocks")
   }
   
+  if(!is.null(attr(x, "meta_intra_block_dist"))){
+    st <- c(st, "with_meta_for_intra_block_dist")
+  }
   
   formalize_state(st)
 }
 
 
-mutate.cell_df <- function(.data, ..., direct = FALSE){
+calc_meta_for_tf <- function(x, fresh = FALSE){
+  
+  if(!("with_table_blocks" %in% state(x))){
+    abort("Need <table_blocks>")
+  }
+  
+  last_meta <- attr(x, "meta")
+  
+  refresh <- FALSE
+  if(is.null(last_meta) | !is.data.frame(last_meta) | fresh | 
+     !hasName(last_meta, "gid") | !hasName(last_meta, "content") | !hasName(last_meta, "nrow") | !hasName(last_meta, "ncol") | 
+     !hasName(last_meta, "size")
+  ){
+    refresh <- TRUE
+  }
+  
+  # this is for obsolete meta
+  if(is.data.frame(last_meta)){
+    if(hasName(last_meta, "gid")){
+      if(length(unique(intersect(x$gid, last_meta$gid))) < length(unique(x$gid))){
+        refresh <- TRUE
+      }
+    }
+  }
+  
+  if(!refresh){
+    return(last_meta)
+  }
+  
+  xl <- x %>% as_tibble() %>% split(.$gid)
+  last_meta <- tibble(id = seq_along(xl), gid = xl %>% map("gid") %>% map(1) %>% unlist())
+  
+  xl <- xl[last_meta$gid]
+  
+  xl <- xl %>% map(~new_cell_df(.x, minimal = TRUE))
+  
+  last_meta <- last_meta %>% mutate(content = xl %>% map_chr(get_content))
+  
+  last_meta <- last_meta %>% mutate(nrow = xl %>% map_dbl(~max(.x$row)-min(.x$row)+1))
+  
+  last_meta <- last_meta %>% mutate(ncol = xl %>% map_dbl(~max(.x$col)-min(.x$col)+1))
+  
+  last_meta <- last_meta %>% mutate(size = ncol*nrow)
+  
+  last_meta
+  
+}
+
+calc_meta_intra_block_dist_for_tf <- function(x, fresh = FALSE){
+  
+  if(!("with_table_blocks" %in% state(x))){
+    abort("Need <table_blocks>")
+  }
+  
+  lm <- attr(x, "meta_intra_block_dist")
+  
+  refresh <- FALSE
+  if(is.null(lm) | !is.data.frame(lm) | fresh | 
+     !hasName(lm, "gid1") | !hasName(lm, "gid2") | !hasName(lm, "d")
+  ){
+    refresh <- TRUE
+  }
+  
+  # this is for obsolete meta_intra_block_dist
+  # this check may be made more robust
+  if(is.data.frame(lm)){
+    if(hasName(lm, "gid1") & hasName(lm, "gid2")){
+      if(length(unique(intersect(x$gid, c(lm$gid1, lm$gid2)))) < length(unique(x$gid))){
+        refresh <- TRUE
+      }
+    }
+  }
+  
+  if(!refresh){
+    return(lm)
+  }
+  
+  # nearby_threshold sqrt(2) gives corner cases and 1.9 is upper value than that
+  intra_block_dist(x, nearby_threshold = 1.9)
+  
+}
+
+
+mutate.cell_df <- function(.data, ..., direct = FALSE, join = 0, join_table_blocks_around = join, corner_join = FALSE, refresh = FALSE){
   dthis <- .data
   dthis <- as_tibble(dthis)
   
@@ -255,6 +341,7 @@ mutate.cell_df <- function(.data, ..., direct = FALSE){
       }
       
       if(!body_gid_present){
+        # @Dev#  this check need to update properly  not working for two gid cases mutate(gid_9 = gid_29+gid_13+gid_14, gid_1 = 13+1)
         abort("Group id merge specification is not correct. Example of such expression: gid_1 = gid_1 + gid_2")
       }
       
@@ -264,11 +351,18 @@ mutate.cell_df <- function(.data, ..., direct = FALSE){
       
       new_gid_map <- dts %>% seq_along %>% 
         map_df(~{
-          gto <- dts[[.x]] %>% as.character() %>% stringr::str_extract_all("gid_[0-9]+") %>% unlist()
+          #@Dev changed from as.character to rlang::as_label for following warning
+          # Warning message:
+          #   Using `as.character()` on a quosure is deprecated as of rlang 0.3.0.
+          # Please use `as_label()` or `as_name()` instead.
+          #  this can be traces by rlang:::as.character.quosure
+          gto <- dts[[.x]] %>% rlang::as_label() %>% stringr::str_extract_all("gid_[0-9]+") %>% unlist()
           tibble(gid = gto, new_gid = names(dts)[.x])
         })
       
       new_gid_map <- new_gid_map %>% mutate_all(~stringr::str_replace(.x, "gid_","")) %>% unique()
+      
+      #@Dev need to take dists merge in case intra block dist is there
       
       dthis <- get_group_id_join_gids(old_group_id_info = list(group_id_map = dthis), 
                                       gid_map = new_gid_map, no_group_boundary = TRUE)$group_id_map
@@ -281,60 +375,44 @@ mutate.cell_df <- function(.data, ..., direct = FALSE){
   }else{
     dthis <- mutate(dthis, ...)
   }
-  new_cell_df(dthis, minimal = TRUE)
-}
-
-
-calc_meta_for_tf <- function(x, fresh = FALSE){
   
-  if(!("with_table_block" %in% state(x))){
-    x <- detect_table_block(x)
-  }
+  dout <- new_cell_df(dthis, minimal = TRUE)
   
-  last_meta <- attr(x, "meta")
-  
-  refresh <- FALSE
-  if(is.null(last_meta) | !is.data.frame(last_meta) | fresh | 
-     !hasName(last_meta, "gid") | !hasName(last_meta, "content") | !hasName(last_meta, "nrow") | !hasName(last_meta, "ncol") | 
-     !hasName(last_meta, "size")
-  ){
-    refresh <- TRUE
-  }
-  
-  if(is.data.frame(last_meta)){
-    if(hasName(last_meta, "gid")){
-      if(length(unique(intersect(x$gid, last_meta$gid))) < length(unique(x$gid))){
-        refresh <- TRUE
+  if(corner_join | join_table_blocks_around > 0){
+    xmeta <- dout %>% 
+      calc_meta_intra_block_dist_for_tf(fresh = refresh)
+    
+    if(corner_join){
+      if(join_table_blocks_around > 0){
+        # 1.5 is appx sqrt(2)+delta for corner cases
+        join_table_blocks_around <- max(join_table_blocks_around, 1.5)
+      }else{
+        join_table_blocks_around <- 1.5
       }
     }
+    
+    if(join_table_blocks_around>0){
+      xmeta_this <- xmeta %>% 
+        filter(d <= join_table_blocks_around) %>% 
+        mutate(mgid = pmin(gid1, gid2))
+      
+      new_gid_map <- xmeta_this %>% select(gid = gid1, new_gid = mgid) %>% 
+        bind_rows(xmeta_this %>% select(gid = gid2, new_gid = mgid)) %>% unique() 
+      
+      dthis <- get_group_id_join_gids(old_group_id_info = list(group_id_map = dthis), 
+                                      gid_map = new_gid_map, no_group_boundary = TRUE)$group_id_map
+      
+      dout <- new_cell_df(dthis, minimal = TRUE)
+    }
+    
   }
   
-  if(refresh){
-    xl <- x %>% as_tibble() %>% split(.$gid)
-    last_meta <- tibble(id = seq_along(xl), gid = xl %>% map("gid") %>% map(1) %>% unlist())
-  }else{
-    return(last_meta)
-  }
-  
-  
-  xl <- xl[last_meta$gid]
-  
-  xl <- xl %>% map(~new_cell_df(.x, minimal = TRUE))
-  
-  last_meta <- last_meta %>% mutate(content = xl %>% map_chr(get_content))
-  
-  last_meta <- last_meta %>% mutate(nrow = xl %>% map_dbl(~max(.x$row)-min(.x$row)+1))
-  
-  last_meta <- last_meta %>% mutate(ncol = xl %>% map_dbl(~max(.x$col)-min(.x$col)+1))
-  
-  last_meta <- last_meta %>% mutate(size = ncol*nrow)
-  
-  last_meta
+  dout
   
 }
 
 
-filter.cell_df <- function(.data, ..., refresh = FALSE){
+filter.cell_df <- function(.data, ..., keep = 0, keep_table_blocks_around = keep, refresh = FALSE, Row, Col, Relative = FALSE){
   
   x <- .data %>% as_tibble()
   
@@ -370,6 +448,54 @@ filter.cell_df <- function(.data, ..., refresh = FALSE){
     
   }else{
     xo <- filter(x, ...)
+  }
+  
+  # sallow selection by Row and Col and Relative
+  if(!missing(Row) & !missing(Col)){
+    if(Relative){
+      Row <- Row*max(x$row)
+      Col <- Col*max(x$col)
+    }
+    xo <- xo %>% filter(((row-Row)^2+(col-Col)^2) == min(((row-Row)^2+(col-Col)^2)))
+  }else{
+    if(!missing(Row)){
+      if(Relative){
+        Row <- Row*max(x$row)
+      }
+      xo <- xo %>% filter(abs(row-Row) == min(abs(row-Row)))
+    }
+    
+    if(!missing(Col)){
+      if(Relative){
+        Col <- Col*max(x$col)
+      }
+      xo <- xo %>% filter(abs(col-Col) == min(abs(col-Col)))
+    }
+  }
+  
+  # surrounding gids
+  if(keep_table_blocks_around>0){
+    xmeta <- calc_meta_intra_block_dist_for_tf(.data, fresh = refresh)
+    
+    xmeta_this <- xmeta %>% 
+      filter(gid1 %in% xo$gid | gid2 %in% xo$gid) %>% 
+      filter(d <= keep_table_blocks_around)
+    
+    if(nrow(xmeta_this)>0){
+      take_gids <- c(xmeta_this$gid1, xmeta_this$gid2, xo$gid) %>% unique()
+    }else{
+      # case of single gid
+      take_gids <- c(xo$gid) %>% unique()
+    }
+    
+    
+    xmeta_this <- xmeta %>% 
+      filter(gid1 %in% take_gids | gid2 %in% take_gids)
+    
+    xo <- x %>% filter(gid %in% take_gids)
+    
+    attr(xo, "meta_intra_block_dist") <- xmeta_this
+    
   }
   
   xo %>% new_cell_df(minimal = TRUE)
