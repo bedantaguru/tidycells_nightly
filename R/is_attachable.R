@@ -1,48 +1,64 @@
 
-is_attachable <- function(gid1, gid2, group_info, whole_data, data_attr_map) {
-
-  # should have similar major sides (of attributes)
+is_attachable <- function(gid1, gid2, d_dat, d_att, data_attr_map, whole_data) {
+  
+  ########## logic #########
+  #### should have similar major sides (of attributes)
   if (!identical(
-    data_attr_map %>% filter(data_gid == gid1) %>% pull(direction) %>% sort(),
-    data_attr_map %>% filter(data_gid == gid2) %>% pull(direction) %>% sort()
+    data_attr_map %>% filter(attr_group == "major", data_gid == gid1) %>% pull(direction) %>% sort(),
+    data_attr_map %>% filter(attr_group == "major", data_gid == gid2) %>% pull(direction) %>% sort()
   )) {
     return(FALSE)
   }
-
-  # if any intersecting cell present
-  gc1 <- group_info$group_id_map %>%
-    filter(gid == gid1) %>%
-    select(row, col)
-  gc2 <- group_info$group_id_map %>%
-    filter(gid == gid2) %>%
-    select(row, col)
-  gcj <- gc1 %>% inner_join(gc2, by = c("row", "col"))
-  if (nrow(gcj) > 0) {
+  
+  ########## logic #########
+  #### if any intersecting cell present
+  # this is ensured already skipping this test
+  
+  ########## logic #########
+  #### should have no other entry within the enclosed combined boundary (direction-wise)
+  # @Dev this log is changing to
+  #### should have no other entry (non empty) within the enclosed combined boundary attaching major attributes (direction-wise)
+  
+  data_attr_map_this <- data_attr_map %>% filter(data_gid %in% c(gid1, gid2))
+  
+  chks <- c("N","E","W","S") %>% map_lgl(~{
+    
+    dm0 <- data_attr_map_this %>% filter(direction == .x)
+    
+    if(nrow(dm0)>0){
+      this_group_info <- d_dat %>% filter(gid %in% c(gid1, gid2)) %>% 
+        bind_rows(
+          # attached attributes to these data_gids
+          d_att %>% filter(gid %in% (dm0 %>% pull(attr_gid)))
+        )
+      this_group_info <- this_group_info %>% distinct(row, col) %>% mutate(gid = "dummy")
+      combined_boundary <- get_group_id_boundary(this_group_info)
+      this_region_data <- whole_data %>%
+        filter(type!="empty") %>% 
+        filter(
+          row <= combined_boundary$r_max,
+          row >= combined_boundary$r_min,
+          col <= combined_boundary$c_max,
+          col >= combined_boundary$c_min
+        )
+      this_region_data_rest <- this_region_data %>%
+        anti_join(this_group_info, by = c("row", "col")) %>%
+        filter(type %in% c("value", "attribute"))
+      
+      if (nrow(this_region_data_rest) > 0) {
+        return(FALSE)
+      }
+      
+    }
+    
     return(TRUE)
-  }
-
-  # should have no other entry within the enclosed combined boundary
-  this_group_info <- group_info
-  this_group_info$group_id_map <- this_group_info$group_id_map %>% filter(gid %in% c(gid1, gid2))
-  this_group_info <- get_group_id_join_gids(
-    this_group_info,
-    tibble(gid = c(gid1, gid2), new_gid = gid1)
-  )
-  combined_boundary <- this_group_info$group_id_boundary
-  this_region_data <- whole_data %>%
-    filter(
-      row <= combined_boundary$r_max,
-      row >= combined_boundary$r_min,
-      col <= combined_boundary$c_max,
-      col >= combined_boundary$c_min
-    )
-  this_region_data_rest <- this_region_data %>%
-    anti_join(this_group_info$group_id_map, by = c("row", "col")) %>%
-    filter(type %in% c("value", "attribute"))
-
-  if (nrow(this_region_data_rest) > 0) {
+  })
+  
+  if(any(!chks)){
+    # if any direction is non-attachable
     return(FALSE)
   }
-
+  
+  
   return(TRUE)
 }

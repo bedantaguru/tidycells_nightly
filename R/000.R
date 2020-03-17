@@ -17,3 +17,7 @@ assign("temp_files", NULL, envir = tidycells_pkg_env)
 
 # used in --> utils-etc.R
 assign("notifications", NULL, envir = tidycells_pkg_env)
+
+# used in --> common_knowledge.R
+assign("common_knowledge", NULL, envir = tidycells_pkg_env)
+

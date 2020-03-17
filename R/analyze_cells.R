@@ -74,6 +74,7 @@ analyze_cells_raw <- function(d, silent = TRUE) {
   d_orig <- d
   d <- d %>% filter(type != "empty")
 
+  # the term 'data' and 'value' are interchangeably used going forward
   data_cells <- d %>%
     filter(type == "value") %>%
     as_rc_df()
@@ -90,11 +91,8 @@ analyze_cells_raw <- function(d, silent = TRUE) {
     abort("No `attribute` cells found")
   }
 
-  d_dat_orig <- get_group_id(data_cells)
-  d_att_orig <- get_group_id(attr_cells)
-
-  d_dat <- d_dat_orig
-  d_att <- d_att_orig
+  d_dat <- get_group_id(data_cells, gid_tag = "d")
+  d_att <- get_group_id(attr_cells, gid_tag = "a")
 
   step1 <- ai_get_data_attr_map_main(d_dat, d_att)
 
@@ -103,10 +101,10 @@ analyze_cells_raw <- function(d, silent = TRUE) {
   admap1 <- step1$admap
 
   # data_gid join (if possible)
-  if (nrow(d_dat$group_id_boundary) > 1) {
-    d_dat0 <- ai_data_gid_join(d_dat,
+  if (length(unique(d_dat$gid)) > 1) {
+    d_dat0 <- ai_data_gid_join(d_dat, d_att, 
       data_attr_map = admap1$map,
-      full_data = d
+      full_data = d %>% as_tibble()
     )
     if (!identical(d_dat0, d_dat)) {
       # this means results has been invalidated
@@ -152,7 +150,7 @@ analyze_cells_raw <- function(d, silent = TRUE) {
     setdiff(d_att$missed_blocks$gid)
 
   admap_fc1 <- admap_fc0$map %>%
-    ai_get_data_attr_map_details(d_dat, d_att, major_direction_relax = FALSE)
+    ai_get_dimention_analysis_details(d_dat, d_att, major_direction_relax = FALSE)
 
   # try to attach rest attr_gid if any to nearest data_gid [on data_gid boundary]
   if (length(unmapped_attr_gids) > 0) {
@@ -166,7 +164,7 @@ analyze_cells_raw <- function(d, silent = TRUE) {
       setdiff(admap_other0$map$attr_gid)
 
     admap_other1 <- admap_other0$map %>%
-      ai_get_data_attr_map_details(d_dat, d_att, major_direction_relax = FALSE)
+      ai_get_dimention_analysis_details(d_dat, d_att, major_direction_relax = FALSE)
 
     admap_fc1 <- merge_admaps(admap_fc1, admap_other1)
   }
@@ -191,7 +189,7 @@ analyze_cells_raw <- function(d, silent = TRUE) {
 
   admap3 <- admap2$map %>%
     select(-attr_group) %>%
-    ai_get_data_attr_map_details(d_dat, d_att)
+    ai_get_dimention_analysis_details(d_dat, d_att)
 
   if (!identical(admap3$map, admap2$map)) {
     # I think this can be iterated
@@ -207,7 +205,7 @@ analyze_cells_raw <- function(d, silent = TRUE) {
 
     admap <- admap3_pass %>%
       select(-attr_group) %>%
-      ai_get_data_attr_map_details(d_dat, d_att)
+      ai_get_dimention_analysis_details(d_dat, d_att)
   } else {
     admap <- admap3
   }

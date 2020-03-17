@@ -1,26 +1,27 @@
 
 # dimention analysis and raw maps
-ai_get_data_attr_map_details <- function(basic_map, d_dat, d_att, major_direction_relax = TRUE) {
+ai_get_dimention_analysis_details <- function(basic_map, d_dat, d_att, major_direction_relax = TRUE) {
   dimension_analysis <- list()
 
-  dimension_analysis$data_gid_dim <- d_dat$group_id_map %>%
+  dimension_analysis$data_gid_dim <- d_dat %>%
     group_by(gid) %>%
     summarise(
       r_dim_data = n_distinct(row),
       c_dim_data = n_distinct(col)
-    )
+    ) %>% 
+    rename(data_gid = gid)
 
 
   d_att_dat_map <- basic_map
 
   d_att_dat_map_raw <- d_att_dat_map %>%
     # join with data_gid to attach all data-cells
-    inner_join(d_dat$group_id_map %>%
+    inner_join(d_dat %>%
       select(row_d = row, col_d = col, data_gid = gid),
     by = "data_gid"
     ) %>%
     # join with attr_gid to attach all attr-cells
-    inner_join(d_att$group_id_map %>%
+    inner_join(d_att %>%
       select(row_a = row, col_a = col, attr_gid = gid),
     by = "attr_gid"
     )
@@ -34,13 +35,15 @@ ai_get_data_attr_map_details <- function(basic_map, d_dat, d_att, major_directio
       direction_group = direction_group[1]
     ) %>%
     ungroup() %>%
-    inner_join(dimension_analysis$data_gid_dim, by = c("data_gid" = "gid")) %>%
+    inner_join(dimension_analysis$data_gid_dim, by = c("data_gid")) %>%
     mutate(rel_dim = ifelse(direction_group == "NS", c_dim / c_dim_data, r_dim / r_dim_data)) %>%
     mutate(rel_dim = ifelse(direction_group == "corner", 0, rel_dim)) %>%
     mutate(full_dim = (rel_dim >= 1))
 
   # in case only non full dim major (NS or WE) attr present
-  if (major_direction_relax) {
+  chk <- dimension_analysis$attr_data_dim %>% filter(direction_group %in% c("NS","WE")) %>% pull(full_dim)
+  chk <- any(!chk)
+  if (major_direction_relax & chk) {
     dimension_analysis$attr_data_dim <- dimension_analysis$attr_data_dim %>%
       group_by(data_gid, direction_group) %>%
       mutate(
@@ -55,7 +58,8 @@ ai_get_data_attr_map_details <- function(basic_map, d_dat, d_att, major_directio
           full_dim_orig,
           this_attr_max_rel
         )
-      ))
+      )) %>% 
+      select(-is_full_dim_present, -this_attr_max_rel, -full_dim_orig)
   }
 
   # fix major minor

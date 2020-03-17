@@ -39,7 +39,7 @@ as_cell_df.data.frame <- function(d,  take_col_names = TRUE, take_row_names = FA
   
   if(inherits(di, "unknown")){
     di %>%
-      as_cell_df_internal(take_col_names = TRUE, take_row_names = FALSE, ...)
+      as_cell_df_internal(take_col_names = take_col_names, take_row_names = take_row_names, ...)
   }else{
     di %>%
       as_cell_df_internal(...)
@@ -55,7 +55,7 @@ as_cell_df.matrix <- function(d, take_col_names = TRUE, take_row_names = FALSE, 
   
   if(inherits(di, "unknown")){
     di %>%
-      as_cell_df_internal(take_col_names = TRUE, take_row_names = FALSE, ...)
+      as_cell_df_internal(take_col_names = take_col_names, take_row_names = take_row_names, ...)
   }else{
     di %>%
       as_cell_df_internal(...)

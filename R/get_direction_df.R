@@ -3,8 +3,12 @@
 #' Get Directional Orientation for Attributes corresponding to a given data
 #' group
 #'
+#' @description for a data block boundary this provides relative location of each attribute cells. 
+#' 
 #' @param dp single data group boundary information
+#' @param allow_inside enables option for attributes which are inside the data block boundary
 #' @param datt attribute data (including attribute group id)
+#'
 #' @details Used internally by get_data_block_information function
 #' @keywords internal
 #' @return Directional Orientation for Attributes

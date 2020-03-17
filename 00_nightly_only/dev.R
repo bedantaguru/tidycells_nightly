@@ -4,7 +4,24 @@
 # trying ABS example
 
 
+# as_tibble() %>% t() %>% as_tibble() %>% rename(gid= V1, new_gid= V2) %>% gid_map_link_tune()%>% arrange(new_gid, gid)
 
+
+
+
+c(1,2,2,3,3,4,5,6,6,10,8,10,9,10,7,11,12,11) %>% as.character() %>% matrix(nrow = 2) %>% as_tibble()%>% get_links_df %>% arrange(new_gid, gid)
+
+
+
+c(1,2,2,3,3,4,5,6,6,10,8,10,9,10,7,11,12,11) %>% as.character() %>% matrix(nrow = 2) %>% as_tibble() %>% t() %>% as_tibble() %>% rename(gid= V1, new_gid= V2) %>% gid_map_link_tune()%>% arrange(new_gid, gid)
+
+
+bench::mark(c(1,2,2,3,3,4,5,6,6,10,8,10,9,10,7,11,12,11) %>% as.character() %>% matrix(nrow = 2) %>% as_tibble()%>% get_links_df %>% arrange(new_gid, gid)
+            
+,            
+            
+            c(1,2,2,3,3,4,5,6,6,10,8,10,9,10,7,11,12,11) %>% as.character() %>% matrix(nrow = 2) %>% as_tibble() %>% t() %>% as_tibble() %>% rename(gid= V1, new_gid= V2) %>% gid_map_link_tune()%>% arrange(new_gid, gid)
+)
 
 # debug plots
 quick_plot <- function(dm, d){

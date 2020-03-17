@@ -7,9 +7,9 @@
 #'
 #' @details Used internally by get_data_block_information function
 #' @keywords internal
-#' @return Group ID attached information in a list
+#' @return Group ID attached information
 #'
-get_group_id <- function(dat, no_group_boundary = FALSE, allow_corner = FALSE) {
+get_group_id <- function(dat, allow_corner = FALSE, gid_tag) {
   
   dat_a <- as_tibble(dat) %>%
     select(row, col)
@@ -58,7 +58,13 @@ get_group_id <- function(dat, no_group_boundary = FALSE, allow_corner = FALSE) {
     }
   })
   
-  drc_id <- drc_id %>% mutate(gid = as.character(gid))
+  if(missing(gid_tag)){
+    drc_id <- drc_id %>% mutate(gid = as.character(gid))
+  }else{
+    drc_id <- drc_id %>% mutate(gid = paste0(gid_tag, gid))
+  }
+  
+  drc_id <- drc_id %>% select(-rid, -cid)
   
   if(allow_corner){
     repeat({
@@ -71,23 +77,20 @@ get_group_id <- function(dat, no_group_boundary = FALSE, allow_corner = FALSE) {
     
   }
   
-  if(no_group_boundary){
-    return(list(group_id_map = drc_id))
-  }
-  # boundary
-  drc_boundary <- get_group_id_boundary(drc_id)
-  
-  list(group_id_map = drc_id, group_id_boundary = drc_boundary)
+  # @Dev major change only group ids returned df no list
+  drc_id
 }
 
 
+# get boundary of group_id
+# @Dev this possibly can be merged to intra block dist approx_intra_block_dist
 get_group_id_boundary <- function(drc_id) {
   drc_id %>%
     group_by(gid) %>%
     summarise(r_min = min(row), c_min = min(col), r_max = max(row), c_max = max(col))
 }
 
-
+# for corner cells this algo may be tuned
 boundary_cells <- function(dat){
   bdr <- dat %>% split(.$gid) %>% map_df(~{
     dpart <- .x %>% boundary_cells_part() %>% mutate(gid = .x$gid[1]) %>% 
@@ -116,7 +119,8 @@ boundary_cells_part <- function(dg){
 }
 
 
-
+# gid map need to tune for multiple maps
+# thi enables it in a one go (gid merges)
 gid_map_link_tune <- function(gid_map){
   grps <- list()
   
@@ -149,12 +153,11 @@ gid_map_link_tune <- function(gid_map){
 }
 
 
-
-get_group_id_join_gids <- function(old_group_id_info, gid_map, no_group_boundary = FALSE) {
+get_group_id_join_gids <- function(old_group_id_info, gid_map) {
   
   gid_map <- gid_map_link_tune(gid_map)
   
-  old_group_id_info$group_id_map <- old_group_id_info$group_id_map %>%
+  old_group_id_info <- old_group_id_info %>%
     left_join(gid_map, by = "gid") %>%
     mutate(new_gid = ifelse(is.na(new_gid), gid, new_gid)) %>%
     select(-gid) %>%
@@ -163,9 +166,5 @@ get_group_id_join_gids <- function(old_group_id_info, gid_map, no_group_boundary
     dplyr::summarise_all(min) %>% 
     ungroup()
   
-  if(no_group_boundary){
-    return(old_group_id_info)
-  }
-  old_group_id_info$group_id_boundary <- get_group_id_boundary(old_group_id_info$group_id_map)
   old_group_id_info
 }

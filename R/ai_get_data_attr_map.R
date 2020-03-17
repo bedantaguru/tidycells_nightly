@@ -4,31 +4,23 @@ ai_get_data_attr_map <- function(dat_boundary,
                                  attr_to_near_data = FALSE, leave_inside = FALSE) {
 
   # check relative location of each attr_gid (gid) wrt each data_gid
-  if (!leave_inside) {
-    d_att_map <- dat_boundary %>%
-      split(.$gid) %>%
-      map_df(~ get_direction_df(.x, datt = att_gid_map))
-  } else {
-    d_att_map <- dat_boundary %>%
-      split(.$gid) %>%
-      map_df(~ get_direction_df(.x, datt = att_gid_map, allow_inside = TRUE))
-  }
+  d_att_map <- dat_boundary %>%
+    split(.$gid) %>%
+    map_df(~ get_direction_df(.x, datt = att_gid_map, allow_inside = leave_inside)) %>%
+    rename(attr_gid = gid)
 
 
   # for each attr_gid (gid), data_gid, direction, direction_group :- get minimum distance
   d_gid_att_map <- d_att_map %>%
-    group_by(gid, data_gid, direction, direction_group) %>%
-    summarise(md = min(dist)) %>%
-    ungroup()
+    group_by(attr_gid, data_gid, direction, direction_group) %>%
+    summarise(dist = min(dist)) %>%
+    ungroup() 
 
   # attach nearest attr_gid to each data gid
   d_gid_att_map_min_d <- d_gid_att_map %>%
     group_by(data_gid, direction_group) %>%
-    mutate(m_dist = min(md)) %>%
-    ungroup() %>%
-    filter(md == m_dist) %>%
-    select(-md) %>%
-    rename(attr_gid = gid, dist = m_dist)
+    filter(dist == min(dist)) %>%
+    ungroup() 
 
   # by default each data gid will choose nearest attr_gid (multiple allowed)
   if (attr_to_near_data) {
@@ -37,10 +29,8 @@ ai_get_data_attr_map <- function(dat_boundary,
 
     d_gid_att_map_min_d <- d_gid_att_map_min_d %>%
       group_by(attr_gid) %>%
-      mutate(md = min(dist)) %>%
-      ungroup() %>%
-      filter(md == dist) %>%
-      select(-md)
+      filter(dist == min(dist)) %>%
+      ungroup() 
   }
 
 

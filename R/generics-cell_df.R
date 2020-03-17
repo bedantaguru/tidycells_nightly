@@ -320,6 +320,29 @@ calc_meta_intra_block_dist_for_tf <- function(x, fresh = FALSE){
   
 }
 
+# transpose operation
+
+t.cell_df <- function(x){
+  x %>% mutate(row0 = row, row = col, col = row0) %>% select(-row0)
+}
+
+# flip operation 
+flip_cell_df <- function(x, by_row = TRUE){
+  if(by_row){
+    x %>% mutate(row = nrow(x)-row) 
+  }else{
+    x %>% mutate(col = ncol(x)-col)
+  }
+}
+
+# rotate operation
+rotate_cell_df <- function(x, clockwise = F){
+  if(clockwise){
+    x %>% flip_cell_df(by_row = T) %>% t
+  }else{
+    x %>% flip_cell_df(by_row = F) %>% t
+  }
+} 
 
 mutate.cell_df <- function(.data, ..., direct = FALSE, join = 0, join_table_blocks_around = join, corner_join = FALSE, refresh = FALSE){
   dthis <- .data
