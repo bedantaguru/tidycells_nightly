@@ -18,8 +18,7 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     rel_gids <- rel_gids %>%
       mutate(new_attr_gid = paste(attr_gid, data_gid, direction, sep = "_"))
     
-    # major change here 
-    # Tuning point 1
+    # mapping strength is higher
     rel_gids <- relative_gid_map_pattern_fix(rel_gids)
 
     d_att <- rel_gids %>%
@@ -32,6 +31,8 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     # mbc : missed_block_connections
     mbc <- chk %>% distinct(attr_gid, data_gid)
     attr(d_att, "missed_block_connections") <- mbc
+    
+    common_knowledge(missed_block_connections = mbc)
 
     admap_new <- basic_map
     
@@ -40,14 +41,9 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     admap_new$raw <- admap_new$raw %>%
       anti_join(mbc, by = c("attr_gid", "data_gid")) %>% 
       bind_rows(rel_gids)
-    admap_new$all_map <- admap_new$raw %>%
-      group_by(attr_gid, data_gid, direction, direction_group) %>%
-      summarise(dist = min(dist)) %>%
-      ungroup()
-    admap_new$map <- admap_new$all_map %>% 
-      group_by(data_gid, direction_group) %>%
-      filter(dist == min(dist)) %>%
-      ungroup() 
+    
+    admap_new <- connect_data_and_attr_groups_from_raw_map(admap_new$raw)
+    
     
   } else {
     admap_new <- basic_map
@@ -69,29 +65,58 @@ relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids){
   allocations <- list()
   
   for(this_dir in c("N","E","W","S")){
-    if(any(stringr::str_detect(rel_gids$direction,this_dir))){
-      allocations[[paste0("no_",this_dir)]] <- central_allocation_of_rel_gids(rel_gids %>% filter(!stringr::str_detect(direction,this_dir)))
-    }
+    
   }
+  
+  dirs <- c("N","E","W","S")
+  
+  allocations <- dirs %>% map(~{
+    if(any(stringr::str_detect(rel_gids$direction,.x))){
+      central_allocation_of_rel_gids(rel_gids %>% filter(!stringr::str_detect(direction,.x)))
+    }else{
+      tibble()
+    }
+  })
+  
+  names(allocations) <- paste0("no_", dirs)
   
   allocations$base0 <- central_allocation_of_rel_gids(rel_gids)
   
+  # it has to be non-lossy
+  # base0 will not be lossy
   allocations <- allocations %>% purrr::keep(~nrow(.x)==nrow(allocations$base0))
   
-  if(length(allocations)==1){
-    return(allocations[[1]])
+  if(length(allocations)!=1){
+    
+    alo_vars <- allocations %>% map_dbl(variation_in_allocations_of_rel_gids)
+    
+    allocations <- allocations[alo_vars==min(alo_vars)]
+    
+    allocations <- allocations %>% map(~.x %>% mutate(mapping_strength = 1-min(alo_vars)))
+    
   }
   
-  alo_vars <- allocations %>% map_dbl(variation_in_allocations_of_rel_gids)
+  out <- allocations[[1]]
   
-  allocations <- allocations[alo_vars==min(alo_vars)]
+  # update in common knowledge about non-join possibilities of data-gids
+  # if <corner> present in between in <row, col> or <col, row> seq then underlying block as non joinable
+  seq1 <- out %>% arrange(row, col) %>% pull(direction_group)
+  seq2 <- out %>% arrange(col, row) %>% pull(direction_group)
+  seqt1 <- which(seq1=="corner")
+  seqt2 <- which(seq2=="corner")
+  chk <- (length(seqt1[seqt1>1 & seqt1 < length(seq1)]) > 0) | (length(seqt2[seqt2>1 & seqt2 < length(seq2)]) > 0)
+  if(chk){
+    common_knowledge(non_joinable = tibble(id = paste0("by_attr_id_", out$attr_gid[1]), data_gid = unique(out$data_gid)))
+  }
   
-  return(allocations[[1]])
+  return(out)
   
 }
 
 central_allocation_of_rel_gids <- function(rel_gids){
-  rel_gids %>% group_by(row, col) %>% filter(dist == min(dist)) %>% ungroup()
+  rel_gids %>% group_by(row, col) %>% filter(dist == min(dist)) %>% 
+    ungroup() %>% 
+    mutate(mapping_strength = 0.5)
 }
 
 variation_in_allocations_of_rel_gids <- function(alo){

@@ -18,41 +18,19 @@ ai_get_data_attr_map_main <- function(d_dat, d_att) {
   # dimension analysis done here (major minor classification) 
   # phase 1
   admap1_major_minor <- admap0$all_map %>%
-    filter(direction_group != "corner") %>%
+    filter(mapping_strength>0 | direction_group != "corner") %>%
     ai_get_dimention_analysis_details(d_dat, d_att)
 
-  # @Dev
-  #  why comapting required?
-  admap1_major_compact <- admap1_major_minor$map %>%
-    filter(attr_group == "major") %>%
+  # as we started with all_map (yet near data to attr map is not done)
+  # this is equivalent to admap0$map
+  admap1 <- admap1_major_minor$map %>%
+    filter(mapping_strength>0 | attr_group != "minor") %>%
     group_by(data_gid, direction_group) %>%
     filter(dist == min(dist)) %>%
     ungroup()
-    
-  admap1_major_compact <- admap1_major_compact %>%
-    # @Dev this filter seems redundant
-    # filter(direction_group != "corner") %>%
-    unique() %>%
-    select(-attr_group)
-
-  
-  # dimension analysis done here (major minor classification)
-  # phase 2 
-  admap1 <- admap1_major_compact %>%
-    ai_get_dimention_analysis_details(d_dat, d_att)
 
   ##########################
-  # @Dev why do we need two phase??
-  # really reaquired ? if so why two why not iterative ?? Check it..
-  if(!identical(admap1_major_minor, admap1)){
-    cat("you need to see it now!!\n")
-    browser()
-    # this is the situation
-  }
-  ##########################
   
   
-  # @Dev
-  # d_dat does not change 
-  list(admap = admap1, d_dat = d_dat, d_att = d_att)
+  list(admap = admap1, d_att = d_att)
 }

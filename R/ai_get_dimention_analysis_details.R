@@ -14,17 +14,7 @@ ai_get_dimention_analysis_details <- function(basic_map, d_dat, d_att, major_dir
 
   d_att_dat_map <- basic_map
 
-  d_att_dat_map_raw <- d_att_dat_map %>%
-    # join with data_gid to attach all data-cells
-    inner_join(d_dat %>%
-      select(row_d = row, col_d = col, data_gid = gid),
-    by = "data_gid"
-    ) %>%
-    # join with attr_gid to attach all attr-cells
-    inner_join(d_att %>%
-      select(row_a = row, col_a = col, attr_gid = gid),
-    by = "attr_gid"
-    )
+  d_att_dat_map_raw <- get_data_attr_cell_wise_map_raw(basic_map, d_dat, d_att)
 
   # attach dimension
   dimension_analysis$attr_data_dim <- d_att_dat_map_raw %>%
@@ -71,11 +61,24 @@ ai_get_dimention_analysis_details <- function(basic_map, d_dat, d_att, major_dir
     select(-full_dim)
 
 
-
-  d_att_dat_map_raw <- d_att_dat_map_raw %>%
-    inner_join(d_att_dat_map %>% select(attr_gid, data_gid, direction, attr_group),
-      by = c("attr_gid", "direction", "data_gid")
-    )
-
-  list(raw_map = d_att_dat_map_raw, map = d_att_dat_map, dimension_analysis = dimension_analysis)
+  list(map = d_att_dat_map, dimension_analysis = dimension_analysis)
 }
+
+
+# helpers
+# @Dev this may be kept in different file
+
+get_data_attr_cell_wise_map_raw <- function(map, d_dat, d_att){
+  map %>%
+    # join with data_gid to attach all data-cells
+    inner_join(d_dat %>%
+                 select(row_d = row, col_d = col, data_gid = gid),
+               by = "data_gid"
+    ) %>%
+    # join with attr_gid to attach all attr-cells
+    inner_join(d_att %>%
+                 select(row_a = row, col_a = col, attr_gid = gid),
+               by = "attr_gid"
+    )
+}
+

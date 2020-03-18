@@ -94,19 +94,23 @@ analyze_cells_raw <- function(d, silent = TRUE) {
   d_dat <- get_group_id(data_cells, gid_tag = "d")
   d_att <- get_group_id(attr_cells, gid_tag = "a")
 
+  #@Dev
+  #  this function name may be changed
   step1 <- ai_get_data_attr_map_main(d_dat, d_att)
 
-  d_dat <- step1$d_dat
   d_att <- step1$d_att
   admap1 <- step1$admap
 
   # data_gid join (if possible)
   if (length(unique(d_dat$gid)) > 1) {
-    d_dat0 <- ai_data_gid_join(d_dat, d_att, 
-      data_attr_map = admap1$map,
+    d_dat_potential_joins <- ai_data_gid_join(
+      d_dat, d_att, 
+      data_attr_map = admap1,
       full_data = d %>% as_tibble()
     )
-    if (!identical(d_dat0, d_dat)) {
+    
+    if (d_dat_potential_joins$done) {
+      # @Dev  need to fix
       # this means results has been invalidated
       d_dat <- d_dat0
 
@@ -121,138 +125,146 @@ analyze_cells_raw <- function(d, silent = TRUE) {
     }
   }
 
-  # join attr based on block merges possible
+  # join attr based on block merges (potentially possible)
   rel_chk <- ai_relative_data_join_attr(admap_main = admap1, d_att = d_att)
   if (rel_chk$done) {
     d_att <- rel_chk$d_att %>% map(unique)
     admap1 <- rel_chk$admap
   }
 
-  #  now time for corners (potential)
-  #  extend data block to include major (NS and WE) attributes
-  d_dat$group_id_extended_boundary <- extend_data_block(d_dat$group_id_boundary, admap1$map, d_att)
+  # now time for corners (potential) / minor / less strong mappings
+  # information blocks are introduced from here
+  
+  # @Dev check and delink functions
+  # d_dat$group_id_extended_boundary <- extend_data_block(d_dat$group_id_boundary, admap1$map, d_att)
 
-  unmapped_attr_gids <- d_att$group_id_boundary$gid %>%
-    setdiff(admap1$map$attr_gid) %>%
-    setdiff(d_att$missed_blocks$gid)
+  info_block <- ai_get_information_blocks(admap1, d_dat, d_att)
+  
+  admap1 <- info_block$map
+  
+  d_inf <- info_block$d_inf
+  
+  
+  
+  unmapped_attr_gids <- d_att$gid %>% unique() %>% 
+    setdiff(admap1$attr_gid) %>% 
+    # @Dev
+    # following may not be perfect as it discards the <missed_block_connections> $ <attr_gid> without seeeing
+    # <data_gid> <- this is stale now (for this we may opt for <row, col> sample in <missed_block_connections>)
+    # for now solving purpose but may be dropped later
+    # 
+    setdiff(common_knowledge("missed_block_connections")$attr_gid)
 
-  # fc: for corners
-  admap_fc0 <- ai_get_data_attr_map(
-    dat_boundary = d_dat$group_id_extended_boundary,
-    att_gid_map = d_att$group_id_map %>% filter(gid %in% unmapped_attr_gids),
-    attr_to_near_data = TRUE,
-    leave_inside = TRUE
-  )
-  unmapped_attr_gids <-
-    admap1$map$attr_gid %>%
-    c(admap_fc0$map$attr_gid) %>%
-    setdiff(d_att$group_id_boundary$gid, .) %>%
-    setdiff(d_att$missed_blocks$gid)
-
-  admap_fc1 <- admap_fc0$map %>%
-    ai_get_dimention_analysis_details(d_dat, d_att, major_direction_relax = FALSE)
-
-  # try to attach rest attr_gid if any to nearest data_gid [on data_gid boundary]
-  if (length(unmapped_attr_gids) > 0) {
-    admap_other0 <- ai_get_data_attr_map(
-      dat_boundary = d_dat$group_id_boundary,
-      att_gid_map = d_att$group_id_map %>% filter(gid %in% unmapped_attr_gids),
-      attr_to_near_data = TRUE
+  if(length(unmapped_attr_gids)>0){
+    
+    # attach unmapped_attr_gids to info_blocks
+    
+    # fr: for rest attr_ids (this actually mean <unmapped_attr_gids> and can include corners and non-corners also)
+    admap_fr0 <- ai_get_data_attr_map(
+      dat_boundary = get_group_id_boundary(d_inf),
+      att_gid_map = d_att %>% filter(gid %in% unmapped_attr_gids),
+      attr_to_near_data = TRUE,
+      leave_inside = TRUE
     )
+    
+    admap_fr1 <- admap_fr0$map %>%
+      ai_get_dimention_analysis_details(d_inf, d_att, major_direction_relax = FALSE)
+    
+    admap_fr1 <- admap_fr1$map %>% 
+      # since data_gid is dummy name for info_gid 
+      rename(info_gid = data_gid) %>% 
+      # data_gid has to be added to make it comparable to admap1
+      inner_join(admap1 %>% distinct(data_gid, info_gid), by = "info_gid")
+    
+    
     unmapped_attr_gids <-
-      unmapped_attr_gids %>%
-      setdiff(admap_other0$map$attr_gid)
-
-    admap_other1 <- admap_other0$map %>%
-      ai_get_dimention_analysis_details(d_dat, d_att, major_direction_relax = FALSE)
-
-    admap_fc1 <- merge_admaps(admap_fc1, admap_other1)
+      admap1$attr_gid %>%
+      c(admap_fr0$map$attr_gid) %>%
+      setdiff(d_att$gid, .) %>%
+      #@Dev
+      # this is suffering from same problem mentioned earlier
+      setdiff(common_knowledge("missed_block_connections")$attr_gid)
+    
   }
 
+  # merge two maps
+  admap2 <- admap1 %>% bind_rows(admap_fr1)
 
-  # last stage of analysis
-  # this is not required
-  # d_dat$group_id_whole_boundary <- extend_data_block(d_dat$group_id_extended_boundary, admap_fc1$map, d_att)
-
-  admap2 <- merge_admaps(admap1, admap_fc1)
-
-  # join attr based on block merges possible (one more time)
-  rel_chk <- ai_relative_data_join_attr(admap_main = admap2, d_att = d_att)
-  if (rel_chk$done) {
-    d_att <- rel_chk$d_att %>% map(unique)
-    admap2 <- rel_chk$admap
-  }
-
+  # @Dev
+  # I think this should be moved to split ai case
+  # following setp is required for: 
+  # diffrent split resulted in same attr_gid
+  # these will be compated to single group
   cmp <- compact_gid_maps(d_att, admap2)
-  d_att <- cmp$gid_map
+  d_att <- cmp$d_att
   admap2 <- cmp$admap
 
-  admap3 <- admap2$map %>%
-    select(-attr_group) %>%
-    ai_get_dimention_analysis_details(d_dat, d_att)
+  # @Dev
+  # del it later
+  # admap3 <- admap2 %>%
+  #   select(-attr_group) %>%
+  #   ai_get_dimention_analysis_details(d_dat, d_att)
+  # 
+  # if (!identical(admap3$map, admap2$map)) {
+  #   # I think this can be iterated
+  #   # KFL
+  #   admap3_pass <- admap3$map %>%
+  #     rename(md = dist) %>%
+  #     group_by(data_gid, direction_group, attr_group) %>%
+  #     mutate(m_dist = min(md)) %>%
+  #     ungroup() %>%
+  #     filter(md == m_dist) %>%
+  #     select(-md) %>%
+  #     rename(dist = m_dist)
+  # 
+  #   admap <- admap3_pass %>%
+  #     select(-attr_group) %>%
+  #     ai_get_dimention_analysis_details(d_dat, d_att)
+  # } else {
+  #   admap <- admap3
+  # }
 
-  if (!identical(admap3$map, admap2$map)) {
-    # I think this can be iterated
-    # KFL
-    admap3_pass <- admap3$map %>%
-      rename(md = dist) %>%
-      group_by(data_gid, direction_group, attr_group) %>%
-      mutate(m_dist = min(md)) %>%
-      ungroup() %>%
-      filter(md == m_dist) %>%
-      select(-md) %>%
-      rename(dist = m_dist)
-
-    admap <- admap3_pass %>%
-      select(-attr_group) %>%
-      ai_get_dimention_analysis_details(d_dat, d_att)
-  } else {
-    admap <- admap3
-  }
-
-  # once admap is done
-  d_dat$group_id_extended_boundary <- NULL
-  d_dat$group_id_whole_boundary <- extend_data_block(d_dat$group_id_boundary, admap$map, d_att)
-
-
+  
+  admap <- admap2
+  
+  # @Dev
+  # this may not be accurate 
+  # one cell can be mapped in multiple manner
   # str-detection done
   this_cells <- get_cells_from_admap(admap, d_dat, d_att)
 
-  # natural gid for easier understanding
-  gid_ngid <- d_dat$group_id_map %>%
+  # natural gid for easier user selection
+  gid_ngid <- d_dat %>%
     distinct(gid) %>%
-    mutate(natural_gid = gid %>% as.factor() %>% as.numeric())
+    mutate(natural_gid = gid %>% as.factor() %>% as.numeric() %>% paste0("d",.))
 
   # attach natural gid
   this_cells <- this_cells %>%
     left_join(gid_ngid, by = "gid")
-  admap$raw_map <- admap$raw_map %>%
-    mutate(gid = data_gid) %>%
-    left_join(gid_ngid, by = "gid")
-  admap$map <- admap$map %>%
-    mutate(gid = data_gid) %>%
-    left_join(gid_ngid, by = "gid") %>%
-    select(-gid)
-  d_dat$group_id_whole_boundary <- d_dat$group_id_whole_boundary %>%
-    left_join(gid_ngid, by = "gid")
-
+  
+  admap <- admap %>%
+    left_join(gid_ngid, by = c("data_gid"="gid"))
+  
   # attach directions to it
-  admap$raw_map <- ai_attach_direction(admap$raw_map)
+  admap_with_dir <- get_data_attr_cell_wise_map_raw(admap,d_dat, d_att) %>% 
+    ai_attach_direction()
 
-  df_details <- get_definiteness_details(admap$raw_map,
-    all_attr_gids = d_att$group_id_boundary$gid %>%
-      setdiff(d_att$missed_blocks$gid)
-  )
-  definiteness_checks <- get_definiteness_checks(df_details, silent = silent)
+  # @Dev
+  #  issues to be covered differently or later
+  # df_details <- get_definiteness_details(admap$raw_map,
+  #   all_attr_gids = d_att$group_id_boundary$gid %>%
+  #     setdiff(d_att$missed_blocks$gid)
+  # )
+  # definiteness_checks <- get_definiteness_checks(df_details, silent = silent)
 
   obj <- list(
     cells = this_cells,
-    sections = d_dat$group_id_whole_boundary,
+    sections = get_group_id_boundary(d_dat) %>% left_join(gid_ngid, by = "gid"),
     details = list(
       attr_details = d_att,
       data_details = d_dat,
-      data_attr_map_raw = admap$raw_map,
-      definiteness_checks = definiteness_checks
+      data_attr_map_raw = admap_with_dir,
+      definiteness_checks = NULL
     ),
     cell_df = d_orig
   )

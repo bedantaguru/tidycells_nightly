@@ -1,7 +1,7 @@
 
 
 ai_relative_data_join_attr <- function(admap_main, d_att) {
-  chk <- admap_main$raw_map %>%
+  chk <- admap_main %>%
     distinct(attr_gid, data_gid, direction, attr_group) %>%
     group_by(data_gid, direction, attr_group) %>%
     mutate(n_att = n_distinct(attr_gid)) %>%

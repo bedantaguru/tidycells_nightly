@@ -9,6 +9,16 @@
 
 
 
+df_footprint <- function(df){
+  df <- df[sort(colnames(df))]
+  df <- df %>% arrange(!!! rlang::syms(colnames(df)))
+  df %>% as.matrix() %>% as.character() %>% paste0(collapse = "+") %>% paste0("__",paste0(colnames(df), collapse = "_"))
+}
+
+
+
+####################################
+
 c(1,2,2,3,3,4,5,6,6,10,8,10,9,10,7,11,12,11) %>% as.character() %>% matrix(nrow = 2) %>% as_tibble()%>% get_links_df %>% arrange(new_gid, gid)
 
 

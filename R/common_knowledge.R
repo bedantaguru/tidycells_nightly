@@ -2,7 +2,7 @@
 
 # get and set common_knowledge
 # this is to share information across multiple modules of analyze_cells
-common_knowledge <- function(..., clean = FALSE, is = FALSE, simplify = TRUE){
+common_knowledge <- function(..., clean = FALSE, add = TRUE, is = FALSE, simplify = TRUE){
   if(clean){
     tidycells_pkg_env$common_knowledge <- NULL
     return(invisible(0))
@@ -30,7 +30,20 @@ common_knowledge <- function(..., clean = FALSE, is = FALSE, simplify = TRUE){
       ck_put <- dots_with_name
     }else{
       ck_now_nomatch <- ck_now[setdiff(names(ck_now), names(dots_with_name))]
-      ck_put <- c(ck_now_nomatch, dots_with_name)
+      ck_now_match <- ck_now[intersect(names(ck_now), names(dots_with_name))]
+      
+      if(length(ck_now_match)>0 & add){
+        dots_with_name_exists <- dots_with_name[intersect(names(ck_now), names(dots_with_name))]
+        c_this <- ck_now_match %>% seq_along() %>% map(~{
+          Append(ck_now_match[[.x]], dots_with_name_exists[[.x]])
+        })
+        names(c_this) <- names(ck_now_match)
+        ck_put <- c(c_this, ck_now_nomatch)
+      }else{
+        ck_put <- c(dots_with_name, ck_now_nomatch)
+      }
+      
+      
     }
     tidycells_pkg_env$common_knowledge <- ck_put
   }
@@ -57,4 +70,16 @@ common_knowledge <- function(..., clean = FALSE, is = FALSE, simplify = TRUE){
 
 is_common_knowledge <- function(...){
   isTRUE(common_knowledge(..., is= TRUE))
+}
+
+
+Append <- function(x, y){
+  UseMethod("Append")
+}
+
+Append.data.frame <- function(x, y){
+  bind_rows(x, y) %>% unique()
+}
+Append.default <- function(x, y){
+  unique(c(x, y))
 }
