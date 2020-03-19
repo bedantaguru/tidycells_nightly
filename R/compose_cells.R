@@ -50,6 +50,7 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
     abort("A 'Cell Analysis' expected.")
   }
 
+  # dam : Data Attr Map
   dam <- ca$details$data_attr_map_raw
 
   dam <- dam %>%

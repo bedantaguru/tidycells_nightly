@@ -329,9 +329,9 @@ t.cell_df <- function(x){
 # flip operation 
 flip_cell_df <- function(x, by_row = TRUE){
   if(by_row){
-    x %>% mutate(row = nrow(x)-row) 
+    x %>% mutate(row = max(row)-row+1) 
   }else{
-    x %>% mutate(col = ncol(x)-col)
+    x %>% mutate(col = max(col)-col+1)
   }
 }
 

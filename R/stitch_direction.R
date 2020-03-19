@@ -57,8 +57,7 @@ stitch_direction <- function(d_part, dat, attr_name, trace_it = FALSE) {
 
 
 
-  direction <- d_part$direction %>% unique()
-  direction <- direction[1]
+  direction <- d_part$direction[1]
 
   d0 <- d0 %>%
     select(-data_gid) %>%

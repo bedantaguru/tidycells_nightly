@@ -10,6 +10,10 @@ tf0 %>% filter(Row = 1, Col = 1, keep= 5) -> xx
 
 xx <- xx %>% numeric_values_classifier()
 
-analyze_cells(xx)
+ca <- analyze_cells(xx)
+
+compose_cells(ca)
 
 # for a attr_gid
+
+stitch_direction(dcomp00[[1]][[1]], xx)
