@@ -39,7 +39,8 @@ Imports:
     tibble,
     tidyr,
     unpivotr (>= 0.5.1),
-    utils
+    utils,
+    Rcpp
 Suggests: 
     cli,
     covr,
@@ -67,3 +68,5 @@ Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 RoxygenNote: 7.0.2
+LinkingTo: 
+    Rcpp

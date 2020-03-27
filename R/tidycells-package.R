@@ -27,3 +27,8 @@
 # pkg share global vars
 # is tidycells_pkg_env which is in 000.R
 
+## usethis namespace: start
+#' @importFrom Rcpp sourceCpp
+#' @useDynLib tidycells, .registration = TRUE
+## usethis namespace: end
+NULL
