@@ -53,39 +53,25 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
   # dam : Data Attr Map
   dam <- ca$details$data_attr_map_raw
 
-  dam <- dam %>%
-    group_by(data_gid, direction_basic, direction_group) %>%
-    mutate(dist_order = dist %>% as.factor() %>% as.integer()) %>%
-    ungroup()
-
-  dam <- dam %>%
-    group_by(data_gid, attr_gid) %>%
-    mutate(attr_gid_split_order = attr_gid_split %>% as.factor() %>% as.integer()) %>%
-    ungroup()
-
   dcomp00 <- dam %>%
-    group_by(data_gid) %>%
-    group_split() %>%
-    map(~ .x %>%
-      group_by(attr_gid, direction, attr_gid_split) %>%
-      group_split())
+    group_by(data_gid, attr_micro_gid) %>%
+    group_split()
+  
+  cdf <- ca$cell_df %>% filter(type!="empty")
 
   dcomp0 <- dcomp00 %>%
-    map(~ .x %>%
+    map(~ {
       # this try should be removed if unpivotr::enhead is internalized
       # or similar behaving fucntions is developed.
-      map(~ {
-        e <- try(stitch_direction(.x, ca$cell_df, trace_it = trace_it_back), silent = TRUE)
-        .ok <- !inherits(e, "try-error")
-        .d <- NULL
-        if (!.ok) .d <- .x
-        list(ok = .ok, out = e, dat = .d)
-      }))
+      e <- try(stitch_direction(.x, cdf, trace_it = trace_it_back), silent = TRUE)
+      .ok <- !inherits(e, "try-error")
+      .d <- NULL
+      if (!.ok) .d <- .x
+      list(ok = .ok, out = e, dat = .d)
+    })
 
   chk0 <- dcomp0 %>%
-    map_lgl(~ .x %>%
-      map_lgl(~ !.x$ok) %>%
-      any()) %>%
+    map_lgl(~ !.x$ok) %>%
     any()
 
   if (chk0) {
@@ -130,14 +116,11 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
     }
   }
 
-  dcomp0 <- dcomp0 %>% map(~ .x %>%
-    map_lgl(~ .x$ok) %>%
-    .x[.] %>%
-    map(~ .x$out))
+  dcomp0 <- dcomp0 %>% map_lgl(~ .x$ok) %>%
+    dcomp0[.] %>%
+    map(~ .x$out)
 
-  chk1 <- dcomp0 %>%
-    map_int(length) %>%
-    sum()
+  chk1 <- length(dcomp0)
 
   if (chk1 > 0) {
     dcomp <- dcomp0 %>%

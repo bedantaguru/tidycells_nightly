@@ -36,23 +36,8 @@ stitch_direction <- function(d_part, dat, attr_name, trace_it = FALSE) {
 
 
   if (missing(attr_name)) {
-    daty <- d_part$attr_group[1]
-
-    dgn <- d_part$direction_group[1] %>%
-      recode(WE = "row", NS = "col")
-
-    dn <- d_part$direction_basic[1] %>%
-      recode(
-        N = "top", W = "left", S = "bottom", E = "right",
-        NW = "topLeft", NE = "topRight", SW = "bottomLeft", SE = "bottomRight"
-      )
-
-    datsp <- d_part$attr_gid_split_order[1]
-
-    dd <- d_part$dist_order[1]
-
-
-    attr_name <- paste(daty, dgn, dn, datsp, dd, sep = "_")
+    
+    attr_name <- d_part$attr_var_sync_name[1]
   }
 
 

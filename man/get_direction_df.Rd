@@ -11,13 +11,14 @@ get_direction_df(dp, datt, allow_inside = FALSE)
 \item{dp}{single data group boundary information}
 
 \item{datt}{attribute data (including attribute group id)}
+
+\item{allow_inside}{enables option for attributes which are inside the data block boundary}
 }
 \value{
 Directional Orientation for Attributes
 }
 \description{
-Get Directional Orientation for Attributes corresponding to a given data
-group
+for a data block boundary this provides relative location of each attribute cells.
 }
 \details{
 Used internally by get_data_block_information function

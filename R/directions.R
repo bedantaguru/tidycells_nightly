@@ -6,6 +6,18 @@
 # possible names : enhead_mount bind_header
 
 bind_header <- function(data_cell_df, header_cell_df, direction){
+  #@Dev
+  # it will create lot problem with direction name. but it will work as expected.
+  if(nrow(header_cell_df)==1){
+    # special case
+    colnames(header_cell_df) %>% 
+      setdiff(c("row","col")) %>% 
+      map(~{data_cell_df[[.x]] <<- header_cell_df[[.x]]})
+    
+    # exit early
+    return(data_cell_df)
+    
+  }
   # as of now unpivotr is in use
   unpivotr::enhead(data_cells = data_cell_df, 
                    header_cells = header_cell_df, 

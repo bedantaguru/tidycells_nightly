@@ -13,6 +13,15 @@ get_direction <- function(d_part) {
 
   if (d_part$direction[1] %in% names(directions)) {
     dirs <- directions[[d_part$direction[1]]]
+    
+    a1 <- d_part %>%
+      distinct(attr_gid, row = row_a, col = col_a)
+    
+    if(nrow(a1)==1){
+      # special case where
+      # @Dev need to sort out definition
+      dirs <- "DIRECT"
+    }
 
     if (length(dirs) > 1) {
       d0 <- d_part %>%
@@ -26,9 +35,6 @@ get_direction <- function(d_part) {
         ) %>%
         mutate(data_gid = d0$data_gid[1]) %>%
         unique()
-
-      a1 <- d_part %>%
-        distinct(attr_gid, row = row_a, col = col_a)
 
       dmd <- tibble()
       for (dir in dirs) {

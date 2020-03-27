@@ -34,7 +34,10 @@ read_excel_whole_readxl <- function(fn) {
     abort("'readxl' package is required")
   }
   sheets <- readxl::excel_sheets(fn)
-  lout <- sheets %>% map(~ read_excel_whole_part_readxl(fn, sheet = .x))
+  lout <- sheets %>% map(~ read_excel_whole_part_readxl(fn, sheet = .x)) %>% 
+    # @Dev this is to match new behaviour
+    # make sure all philosophy align properly.
+    map(~as_cell_df(.x,take_col_names = F))
   names(lout) <- sheets
   lout
 }

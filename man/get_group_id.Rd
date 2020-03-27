@@ -4,13 +4,13 @@
 \alias{get_group_id}
 \title{Get Group ID for joined cells}
 \usage{
-get_group_id(dat, no_group_boundary = FALSE, allow_corner = FALSE)
+get_group_id(dat, allow_corner = FALSE, gid_tag)
 }
 \arguments{
 \item{dat}{the (data or attribute) cells (in at least row-col format)}
 }
 \value{
-Group ID attached information in a list
+Group ID attached information
 }
 \description{
 Get Group ID for joined cells
