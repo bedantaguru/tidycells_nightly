@@ -175,7 +175,7 @@ library(unpivotr)
 setwd("C:/Users/RBI/Documents/tidycells_nightly")
 devtools::load_all(".")
 
-# copied from enhead help:
+# copied from enhead help: https://nacnudus.github.io/unpivotr/reference/enhead.html
 (x <- purpose$`up-left left-up`)
 # Make a tidy representation
 cells <- as_cells(x)
@@ -214,8 +214,8 @@ data_cells %>%
   attach_header(age, "h") %>%
   select(-row, -col) ->dt
 
-
-
+# own testing function
+df_equal(dt, du)
 
 microbenchmark::microbenchmark(
   data_cells %>%
