@@ -8,6 +8,6 @@
 #' @examples 
 #' LCS(c("hi","hello and hi","only hi"))
 LCS <- function(ss) {
-    .Call('_tidycells_LCS', PACKAGE = 'tidycells', ss)
+    .Call(`_tidycells_LCS`, ss)
 }
 

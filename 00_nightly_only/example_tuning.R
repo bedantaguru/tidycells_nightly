@@ -36,4 +36,28 @@ unique(tt) %>% map(~{
 })
 
 
-PTXQC::LCS
+iris %>% select(matches("^Petal.Length$|^Sepal.Length$"))
+
+
+new_sel <- function(...){
+  browser()
+}
+
+
+iris %>% select(new_sel("hi"))
+
+if_width <- function(n, vars = peek_vars(fn = "if_width")) {
+  vars[nchar(vars) == n]
+}
+
+
+if_width <- function(n, dat = peek_data(fn = "if_width")) {
+  #browser()
+  length(dat)
+}
+
+
+mtcars %>% rename(if_width(2))
+
+
+

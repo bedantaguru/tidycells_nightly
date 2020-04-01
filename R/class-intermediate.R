@@ -34,24 +34,28 @@ detect_cell_df_pattern <- function(dat) {
     type = c(
       "tidyxl",
       "unpivotr",
-      "readr"
+      "readr",
+      "cell_df"
     ),
 
     col_names = list(
       c("sheet", "address", "row", "col", "is_blank", "data_type", "error", "logical", "numeric", "date", "character"),
       c("row", "col", "data_type"),
+      c("row", "col", "data_type", "value"),
       c("row", "col", "data_type", "value")
     ),
 
     data_types = list(
       c("error", "logical", "numeric", "date", "character", "blank"),
       c("chr", "cplx", "cplx", "dbl", "fct", "int", "lgl", "list", "ord"),
-      c("integer", "character", "date")
+      c("integer","double", "character", "date"),
+      c("numeric", "character")
     ),
 
     optional_cols = list(
       c("sheet", "error", "logical", "numeric", "date", "character", "blank"),
       c("chr", "cplx", "cplx", "dbl", "fct", "int", "lgl", "list", "ord"),
+      c(),
       c()
     )
   )

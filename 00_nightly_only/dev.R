@@ -6,26 +6,345 @@
 
 # as_tibble() %>% t() %>% as_tibble() %>% rename(gid= V1, new_gid= V2) %>% gid_map_link_tune()%>% arrange(new_gid, gid)
 
+require(rlang)
 
+library(magrittr)
 
-
-df_footprint <- function(df, only_content = F){
-  if(only_content){
-    colnames(df) <- df %>% map_chr(~.x %>% as.character %>% sort %>% digest::digest())
+select_base_nse <- function(data, ...){
+  el <- rlang::exprs(...)
+  if(length(el)>0){
+    sels <- as.character(el)
+    if(any(stringr::str_detect(sels,"-"))){
+      rems <- stringr::str_remove(sels,"-") %>% stringr::str_trim()
+      data <- data[setdiff(colnames(data),rems)]
+    }else{
+      data <- data[as.character(el)]
+      nms <- names(el)
+      if(!is.null(nms)){
+        nms <- nms[nchar(nms)>0]
+        eln <- el[nms]
+        if(length(eln)>0){
+          data <- rename_base(data, new_names = nms, old_names = as.character(eln))
+        }
+      }
+    }
   }
-  df <- df[sort(colnames(df))]
-  df <- df %>% arrange(!!! rlang::syms(colnames(df)))
-  if(only_content){
-    df %>% as.matrix() %>% as.character() %>% paste0(collapse = "+")
-  }else{
-    df %>% as.matrix() %>% as.character() %>% paste0(collapse = "+") %>% paste0("__",paste0(colnames(df), collapse = "_"))
+  data
+}
+
+rename_base <- function(data, old_names, new_names){
+  cn <- colnames(data)
+  cnt <- seq_along(cn)
+  names(cnt) <- cn
+  cn[cnt[old_names]] <- new_names
+  colnames(data) <- cn
+  data
+}
+
+rename_base_nse <- function(data, ...){
+  el <- rlang::exprs(...)
+  if(length(el)>0){
+    rns <- names(el)
+    ons <- as.character(el)
+    data <- rename_base(data, new_names = rns, old_names = ons)
   }
+  data
+}
+
+
+microbenchmark::microbenchmark(iris[c("Sepal.Length", "Sepal.Width")],
+                               select_base_nse(iris, Sepal.Length, Sepal.Width),
+                               dplyr::select(iris, Sepal.Length, Sepal.Width))
+
+
+microbenchmark::microbenchmark(iris[c("Sepal.Length", "Sepal.Width")] %>% 
+                                 rename_base(old_names = "Sepal.Width",new_names = "tst"),
+                               select_base_nse(iris, Sepal.Length, tst = Sepal.Width),
+                               dplyr::select(iris, Sepal.Length, tst = Sepal.Width))
+
+
+microbenchmark::microbenchmark(rename_base(iris, old_names = "Sepal.Width",new_names = "tst"),
+                               rename_base_nse(iris, tst = Sepal.Width),
+                               dplyr::rename(iris, tst = Sepal.Width))
+
+
+microbenchmark::microbenchmark(
+  grepl("-", rep(c("-ff","-tt","kk"), N)),
+  stringr::str_detect(rep(c("-ff","-tt","kk"), N), "-")
+)
+
+iris %>% group_by(Species) %>% summarise(m = mean(Petal.Width))
+
+aggregate(iris["Petal.Width"], by = iris["Species"], mean)
+
+suppressPackageStartupMessages(library(dplyr))
+microbenchmark::microbenchmark(
+  iris %>% group_by(Species) %>% summarise(m = mean(Petal.Width)),
   
+  aggregate(iris["Petal.Width"], by = iris["Species"], mean)
+)
+
+
+
+
+microbenchmark::microbenchmark(rename_base(iris, old_names = "Sepal.Width",new_names = "tst"),
+                               rename_base_nse(iris, tst = Sepal.Width),
+                               dplyr::rename(iris, tst = Sepal.Width))
+
+suppressPackageStartupMessages(library(dplyr))
+
+inner_join_base <- function(x, y, by = NULL, suffix = c(".x",".y")){
+  if(is.null(by)){
+    by <- intersect(colnames(x), colnames(y))
+  }
+  nmd <- !is.null(names(by))
+  if(nmd){
+    merge(x, y, by.x = names(by), by.y = as.character(by), all = F)
+  }else{
+    merge(x, y, by = by, all = F)
+  }
 }
 
-df_equal <- function(df1, df2, only_content = F){
-  identical(df_footprint(df1, only_content = only_content), df_footprint(df2, only_content = only_content))
+N <- 1e3
+
+d1 <- tibble(x = rbinom(N, 20, runif(N)), lt = letters[sample(26, size = N, replace = T)])
+d2 <- tibble(x = rbinom(N, 20, runif(N)/2), LTbig = LETTERS[sample(26, size = N, replace = T)])
+
+
+microbenchmark::microbenchmark(inner_join(d1, d2, by = "x"),
+                               inner_join_base(d1, d2, by = "x"))
+
+N <- 1e2
+
+d1 <- tibble(x = rbinom(N, 20, runif(N)), lt = letters[sample(26, size = N, replace = T)])
+d2 <- tibble(x = rbinom(N, 20, runif(N)/2), LTbig = LETTERS[sample(26, size = N, replace = T)])
+
+
+microbenchmark::microbenchmark(inner_join(d1, d2, by = "x"),
+                               inner_join_base(d1, d2, by = "x"))
+
+
+microbenchmark::microbenchmark(
+  d1 %>% group_by(lt) %>% summarise(m = mean(x)),
+  
+  aggregate(d1["x"], by = d1["lt"], mean)
+  
+)
+
+# inner_join lot faster
+
+
+
+
+
+map_base <- function(x, f, ...){
+  lapply(x, purrr::as_mapper(f,...))
 }
+
+N <- 10^5
+microbenchmark::microbenchmark(lapply(1:N, sqrt),
+                               unlist(lapply(1:N, sqrt)),
+                               map_base(1:N,sqrt),
+                               map(1:N, sqrt),
+                               map_dbl(1:N, sqrt))
+
+# direction system
+
+# horitontal vertical and up down left right
+# hu : horiz up
+# hd , vl, vr
+# h v (no 2nd direction)
+
+unpivotr::purpose$`up-left left-up` %>% as_cell_df(take_col_names = F)->cd
+
+dat <- cd %>% filter(col>2, row>2)
+
+h_in_hu <- cd %>% filter(col == 1)
+
+
+
+
+###############
+######################
+
+
+library(dplyr)
+library(unpivotr)
+# Load some pivoted data
+
+setwd("C:/Users/RBI/Documents/tidycells_nightly")
+devtools::load_all(".")
+
+# copied from enhead help:
+(x <- purpose$`up-left left-up`)
+# Make a tidy representation
+cells <- as_cells(x)
+cells <- cells[!is.na(cells$chr), ]
+head(cells)
+# Select the cells containing the values
+data_cells <-
+  filter(cells, row >= 3, col >= 3) %>%
+  transmute(row, col, count = as.integer(chr))
+head(data_cells)
+# Select the headers
+qualification <-
+  filter(cells, col == 1) %>%
+  select(row, col, qualification = chr)
+age <-
+  filter(cells, col == 2) %>%
+  select(row, col, age = chr)
+gender <-
+  filter(cells, row == 1) %>%
+  select(row, col, gender = chr)
+satisfaction <-
+  filter(cells, row == 2) %>%
+  select(row, col, satisfaction = chr)
+# From each data cell, search for the nearest one of each of the headers
+data_cells %>%
+  enhead(gender, "up-left") %>%
+  enhead(satisfaction, "up") %>%
+  enhead(qualification, "left-up") %>%
+  enhead(age, "left") %>%
+  select(-row, -col) ->du
+
+data_cells %>%
+  attach_header(gender, "vl") %>%
+  attach_header(satisfaction, "v") %>%
+  attach_header(qualification, "hu") %>%
+  attach_header(age, "h") %>%
+  select(-row, -col) ->dt
+
+
+
+
+microbenchmark::microbenchmark(
+  data_cells %>%
+    enhead(gender, "up-left") %>%
+    enhead(satisfaction, "up") %>%
+    enhead(qualification, "left-up") %>%
+    enhead(age, "left") %>%
+    select(-row, -col),
+  data_cells %>%
+    attach_header(gender, "vl") %>%
+    attach_header(satisfaction, "v") %>%
+    attach_header(qualification, "hu") %>%
+    attach_header(age, "h") %>%
+    select(-row, -col)
+)
+
+
+
+attach_header_vl(data_cells, gender)
+attach_header_h(data_cells,age)
+
+hdr <-gender
+dat <- data_cells
+
+
+# select is time taking
+
+
+f <- function(d,col){
+  d[[col]] <-NULL
+  d
+}
+
+f2 <- function(d,col){
+  d[col]
+}
+
+# for small data
+# removal
+bench::mark(dplyr::select(iris, -Species),
+            f(iris, "Species"))
+
+microbenchmark::microbenchmark(
+  dplyr::select(iris, -Species),
+  f(iris, "Species")
+)
+
+# selection
+bench::mark(dplyr::select(iris, Species),
+            f2(iris, "Species"))
+
+microbenchmark::microbenchmark(dplyr::select(iris, Species),
+                               f2(iris, "Species"))
+
+
+bd <- data.frame(x = rnorm(1e7), y= rnorm(1e7))
+
+# true for large data also
+microbenchmark::microbenchmark(dplyr::select(bd, x),
+                               f2(bd, "x"))
+
+devtools::session_info()
+
+
+
+# for twiiter
+
+bd <- data.frame(x = rnorm(1e7), y= rnorm(1e7))
+
+microbenchmark::microbenchmark(dplyr::select(bd, x),
+                               bd["x"])
+
+
+hdr %>% rename(jk = col) %>% select(-row)
+hdr <- hdr %>% rename(jk = col)
+hdr$row <- NULL
+# hdr$jk <- hdr$col
+# hdr$row <- NULL
+# hdr$col <- NULL
+#colnames(hdr)[which(colnames(hdr)=="col")]<-"jk"
+
+dat <- dat %>% 
+  mutate(jk = header_data_dir_cuts(col, 
+                                   hdr$jk %>% unique() %>% sort()))
+inner_join(dat, hdr, by = "jk", suffix = c("",".header")) %>% select(-jk)
+
+data_cells %>%
+  attach_header(gender, "vl") %>%
+  attach_header(satisfaction, "v") %>%
+  attach_header(qualification, "hu") %>%
+  attach_header(age, "h") %>%
+  select(-row, -col) ->dt
+
+
+microbenchmark::microbenchmark(
+  select(attach_header(attach_header(attach_header(attach_header(data_cells, gender, "vl"),satisfaction, "v"),qualification, "hu"),age, "h"),-row, -col)
+  ,
+  data_cells %>%
+    attach_header(gender, "vl") %>%
+    attach_header(satisfaction, "v") %>%
+    attach_header(qualification, "hu") %>%
+    attach_header(age, "h") %>%
+    select(-row, -col)
+)
+
+
+microbenchmark::microbenchmark(
+  data_cells %>%
+    enhead(gender, "up-left") %>%
+    enhead(satisfaction, "up") %>%
+    enhead(qualification, "left-up") %>%
+    enhead(age, "left") %>%
+    select(-row, -col),
+  data_cells %>%
+    attach_header(gender, "vl") %>%
+    attach_header(satisfaction, "v") %>%
+    attach_header(qualification, "hu") %>%
+    attach_header(age, "h") %>%
+    select(-row, -col)
+)
+###########################
+
+
+
+
+
+unpivotr::purpose$`right-ish down-ish` %>% as_cell_df(take_col_names = F)->cd
+
+
 
 
 
@@ -40,7 +359,7 @@ c(1,2,2,3,3,4,5,6,6,10,8,10,9,10,7,11,12,11) %>% as.character() %>% matrix(nrow 
 
 bench::mark(c(1,2,2,3,3,4,5,6,6,10,8,10,9,10,7,11,12,11) %>% as.character() %>% matrix(nrow = 2) %>% as_tibble()%>% get_links_df %>% arrange(new_gid, gid)
             
-,            
+            ,            
             
             c(1,2,2,3,3,4,5,6,6,10,8,10,9,10,7,11,12,11) %>% as.character() %>% matrix(nrow = 2) %>% as_tibble() %>% t() %>% as_tibble() %>% rename(gid= V1, new_gid= V2) %>% gid_map_link_tune()%>% arrange(new_gid, gid)
 )
@@ -395,7 +714,7 @@ shinyApp(
   server = function(input, output, session) {    
     output[["table"]] <- renderDT({
       make_DT_this_df(cdd, cdt, in_shiny = T, info = list(nshtG$tags$a("attribute", style = "color:#F8766D"), 
-                                            nshtG$tags$a("value", style = "color:#00BFC4")), safeMode = T)
+                                                          nshtG$tags$a("value", style = "color:#00BFC4")), safeMode = T)
       
     }, server = T)
     observe({
