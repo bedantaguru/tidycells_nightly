@@ -15,8 +15,9 @@ NULL
 #' @importFrom dplyr pull
 NULL
 
-#' @importFrom dplyr rename
-NULL
+# Check "R/dataframe_operations_bindings.R"
+# #' @importFrom dplyr rename
+# NULL
 
 #' @importFrom dplyr arrange
 NULL
@@ -36,8 +37,9 @@ NULL
 #' @importFrom dplyr anti_join
 NULL
 
-#' @importFrom dplyr select
-NULL
+# Check "R/dataframe_operations_bindings.R"
+# #' @importFrom dplyr select
+# NULL
 
 #' @importFrom dplyr filter
 NULL

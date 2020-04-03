@@ -7,9 +7,11 @@
     # single setting for disabling all enhanced features
     tidycells.safemode = FALSE,
     # tidycells.plot_mode can be either of (auto, ggplot2, DT)
-    tidycells.plot_mode = "auto",
+    tidycells.plot_mode = "auto", # this sets option to use DT or ggplot2 for cell plots
     # tidycells.header_binder can be either of (tidycells, unpivotr)
-    tidycells.header_binder = "tidycells"
+    tidycells.header_binder = "tidycells", # this controls which package to use for binding header and data cells
+    # tidycells.df_operator can be either of (dplyr, base)
+    tidycells.df_operator = "dplyr" # this controls which package to use for data operations (as of now only select and rename)
   )
   toset <- !(names(op.tidycells) %in% names(op))
   if (any(toset)) options(op.tidycells[toset])
