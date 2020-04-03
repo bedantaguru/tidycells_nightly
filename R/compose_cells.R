@@ -82,37 +82,7 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
         "\nCheck whether output is as expected.",
         "\nYou can disable this by setting silent = TRUE."
       ))
-      if (interactive() & ask_user) {
-        user_res <- rstudioapi_ask(
-          title = "Some attributes failed to compose.",
-          message = "Do you want to return back the failed analysis part? (yes/no)",
-          default = "yes",
-          ok = "Yes", cancel = "No",
-          is_question = TRUE
-        )
-
-        if (identical(user_res, TRUE)) {
-          user_res <- "yes"
-        }
-
-        if (user_res == "yes") {
-          # return failed analysis part for observing
-          patched_ca <- ca
-
-          dp0 <- dcomp0 %>% map_df(~ .x %>%
-            map_lgl(~ !.x$ok) %>%
-            .x[.] %>%
-            map_df(~ .x$dat))
-          patched_ca$details$data_attr_map_raw <- unique(dp0[colnames(patched_ca$details$data_attr_map_raw)])
-
-          warn(paste0(
-            "Failed portion of Cell-Analysis is returned",
-            "\nIn the plots you should see texts, only in failed attributes."
-          ))
-
-          return(patched_ca)
-        }
-      }
+      
     }
   }
 
@@ -123,11 +93,12 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
   chk1 <- length(dcomp0)
 
   if (chk1 > 0) {
-    dcomp <- dcomp0 %>%
-      map(~ reduce(.x, fj,
-        join_by = c("row", "col", "value", "data_block"),
-        sallow_join = TRUE, sep = attr_sep
-      ))
+    dblks <- dcomp0 %>% map_chr(~.x$data_block[1])
+    
+    dcomp <- unique(dblks) %>% map(~{
+      dblk <- .x
+      dcomp0[dblks==dblk] %>% reduce(full_join, by = c("row", "col", "value", "data_block"))
+    })
   } else {
     abort("Failed to compose")
   }
@@ -143,14 +114,17 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
       purrr::imap_chr(~ paste0(cli_br(.y), "\n", paste0(.x, collapse = "\n"))) %>%
       paste0(collapse = "\n")
 
-    cat(xmsg)
+    cat(paste0(xmsg, "\n\n"))
   }
 
   if (!post_process) {
     return(invisible(dcomp))
   }
 
-  compose_cells_raw_post_process(dcomp, details = details, discard_raw_cols = discard_raw_cols, attr_sep = attr_sep)
+  # @Dev
+  #compose_cells_raw_post_process(dcomp, details = details, discard_raw_cols = discard_raw_cols, attr_sep = attr_sep)
+  
+  bind_rows(dcomp)
 }
 
 compose_cells_raw_post_process <- function(dcomp, details = FALSE, discard_raw_cols = FALSE, attr_sep = " :: ") {

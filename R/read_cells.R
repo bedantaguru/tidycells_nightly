@@ -257,6 +257,7 @@ read_cells.read_cell_part <- function(x,
 
   this_lvl_mx <- min(max(at_level, this_level), length(read_cell_task_orders))
   reached_lvl <- which(read_cell_task_orders == ran_till)
+  if(length(reached_lvl)==0) reached_lvl <- 0
 
   if (reached_lvl < this_lvl_mx) {
     warn(paste0(

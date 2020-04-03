@@ -29,8 +29,10 @@ ai_get_information_blocks <- function(admap, d_dat, d_att){
       
       if (any(info_gid_comb_chk)) {
         info_gid_joins <- info_gid_comb[info_gid_comb_chk]
+        info_gid_joins <- info_gid_joins %>% t()
+        colnames(info_gid_joins) <- c("gid","new_gid")
         
-        info_gid_join_map <- info_gid_joins %>% t() %>% as_tibble() %>% rename(gid= V1, new_gid= V2)
+        info_gid_join_map <- info_gid_joins %>% as_tibble()
         info_gid_join_map <- gid_map_link_tune(info_gid_join_map)
         
         admap <- admap %>% 
