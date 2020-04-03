@@ -1,10 +1,27 @@
 ##################################################################
 ##################################################################
 ##################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+##############################################################
+
 # trying ABS example
 
 
 # as_tibble() %>% t() %>% as_tibble() %>% rename(gid= V1, new_gid= V2) %>% gid_map_link_tune()%>% arrange(new_gid, gid)
+
+
 
 require(rlang)
 
@@ -114,10 +131,13 @@ d2 <- tibble(x = rbinom(N, 20, runif(N)/2), LTbig = LETTERS[sample(26, size = N,
 microbenchmark::microbenchmark(inner_join(d1, d2, by = "x"),
                                inner_join_base(d1, d2, by = "x"))
 
-N <- 1e2
+N <- 1e4
 
 d1 <- tibble(x = rbinom(N, 20, runif(N)), lt = letters[sample(26, size = N, replace = T)])
 d2 <- tibble(x = rbinom(N, 20, runif(N)/2), LTbig = LETTERS[sample(26, size = N, replace = T)])
+
+
+
 
 
 microbenchmark::microbenchmark(inner_join(d1, d2, by = "x"),
@@ -162,6 +182,24 @@ dat <- cd %>% filter(col>2, row>2)
 h_in_hu <- cd %>% filter(col == 1)
 
 
+
+
+
+library(dplyr, quietly = T)
+
+N <- 1e4
+
+d1 <- tibble(x = rbinom(N, 20, runif(N)), lt = letters[sample(26, size = N, replace = T)])
+
+microbenchmark::microbenchmark(
+  d1 %>% filter(x>5, lt<"t"),
+  d1[d1$x>5 & d1$lt< "t",]
+)
+
+bench::mark(
+  d1 %>% filter(x>5, lt<"t"),
+  d1[d1$x>5 & d1$lt< "t",]
+)
 
 
 ###############

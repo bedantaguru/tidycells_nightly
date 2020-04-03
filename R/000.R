@@ -21,3 +21,6 @@ assign("notifications", NULL, envir = tidycells_pkg_env)
 # used in --> common_knowledge.R
 assign("common_knowledge", NULL, envir = tidycells_pkg_env)
 
+# used in --> zzz.R
+assign("options_to_clean", NULL, envir = tidycells_pkg_env)
+

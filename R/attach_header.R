@@ -1,6 +1,7 @@
 
 
-
+#@Dev
+# document it
 
 attach_header <- function(dat, hdr, 
                           direction = c("v","h","vl","vr","vm","hu","hd","hm","direct")){
