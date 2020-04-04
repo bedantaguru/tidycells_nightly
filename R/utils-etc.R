@@ -28,6 +28,33 @@ msg_once <- function(...){
   
 }
 
+
+# to be called like
+# .fixed <- nse_to_se_colname_picker(substitute(.fixed))
+nse_to_se_colname_picker <- function(sbs){
+  # rlang fucntions which needs to consider
+  # enquo enquos enexpr enexprs
+  # or base enquote, quote, substitute can be used
+  # sbs <- substitute(.exp)
+  
+  if(is.null(sbs)){
+    return(NULL)
+  }
+  
+  c1 <- as.character(sbs)
+  
+  c1 <- c1[nchar(c1)>0]
+  
+  c2 <- as.character(base::enquote(sbs))
+  
+  if(any(stringr::str_detect(c2, "c\\(|c +\\("))){
+    return(setdiff(c1, "c"))
+  }
+  
+  return(c1)
+  
+}
+
 string_signature <- function(x){
   x <- x[!is.na(x)] %>% 
     unique() %>% 

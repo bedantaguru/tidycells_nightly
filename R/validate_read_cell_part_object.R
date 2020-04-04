@@ -73,6 +73,8 @@ validate_read_cell_part_object <- function(x, level) {
       }
       if (level == read_cell_task_orders[5]) {
         if (is.data.frame(x)) {
+          # @Dev
+          # delinking defcols
           if (all(hasName(x, setdiff(defcols, "table_tag")))) {
             return(list(chk = TRUE, level = level))
           }

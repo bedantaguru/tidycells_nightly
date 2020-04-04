@@ -67,16 +67,40 @@ get_connected_cols_cc <- function(col_map_with_dist) {
 }
 
 # cc : collate_columns
-reduce_2dfs_cc <- function(dc1, dc2, combine_th = 0.6, rest_cols = Inf, retain_other_cols = FALSE) {
-  colnames(dc1) <- stringr::str_replace_all(colnames(dc1), "uncollated_", "d1_old_uc_")
-  colnames(dc1) <- stringr::str_replace_all(colnames(dc1), "collated_", "d1_old_c_")
+reduce_2dfs_cc <- function(dc1, dc2, 
+                           combine_th = 0.6,
+                           common_names_rbind = FALSE,
+                           fixed_columns = NULL,
+                           retain_signature = TRUE,
+                           rest_cols = Inf, 
+                           retain_other_cols = FALSE) {
   
-  colnames(dc2) <- stringr::str_replace_all(colnames(dc2), "uncollated_", "d2_old_uc_")
-  colnames(dc2) <- stringr::str_replace_all(colnames(dc2), "collated_", "d2_old_c_")
+  
+  if(common_names_rbind){
+    common_names <- intersect(colnames(dc1), colnames(dc2))
+    fixed_columns <- unique(c(fixed_columns, common_names))
+  }
+  # this renaming is required for recursive calling
+  # maybe a better implementation be in place
+  
+  pre_exist_cname <- tibble(df = character(0), pre_exist_name = logical(0))
+  if(stringr::str_detect(colnames(dc1), "collated_") %>% any()){
+    pre_exist_cname <- pre_exist_cname %>% 
+      bind_rows(tibble(df= "n1",pre_exist_name = T))
+    colnames(dc1) <- stringr::str_replace_all(colnames(dc1), "^uncollated_", "d1_old_uc_")
+    colnames(dc1) <- stringr::str_replace_all(colnames(dc1), "^collated_", "d1_old_c_")
+  }
+  
+  if(stringr::str_detect(colnames(dc2), "collated_") %>% any()){
+    pre_exist_cname <- pre_exist_cname %>% 
+      bind_rows(tibble(df= "n1",pre_exist_name = T))
+    colnames(dc2) <- stringr::str_replace_all(colnames(dc2), "^uncollated_", "d2_old_uc_")
+    colnames(dc2) <- stringr::str_replace_all(colnames(dc2), "^collated_", "d2_old_c_")
+  }
   
   
-  cr1 <- get_all_col_representative(dc1)
-  cr2 <- get_all_col_representative(dc2)
+  cr1 <- get_all_col_representative(dc1, except_cols = fixed_columns)
+  cr2 <- get_all_col_representative(dc2, except_cols = fixed_columns)
   
   # if either of cr1 or cr2 is empty simply rbind and return
   if (length(cr1) * length(cr2) == 0) {
@@ -85,8 +109,7 @@ reduce_2dfs_cc <- function(dc1, dc2, combine_th = 0.6, rest_cols = Inf, retain_o
   }
   
   all_maps <- expand.grid(n1 = names(cr1), n2 = names(cr2), stringsAsFactors = FALSE)
-  all_maps <- all_maps %>% 
-    filter(n1>=n2)
+  
   m1 <- seq_len(nrow(all_maps)) %>%
     map(~ similarity_score(cr1[[all_maps$n1[.x]]], cr2[[all_maps$n2[.x]]]) %>% t()) %>%
     reduce(rbind)
@@ -127,7 +150,7 @@ reduce_2dfs_cc <- function(dc1, dc2, combine_th = 0.6, rest_cols = Inf, retain_o
     })
   }
   
-  cmap <- tibble(new_name = NA, old_name = NA, block = NA) %>% filter(FALSE)
+  cmap <- tibble(new_name = NA, old_name = NA, df = NA) %>% filter(FALSE)
   
   if (nrow(amap_ok) > 0) {
     amap_ok <- amap_ok %>%
@@ -136,38 +159,28 @@ reduce_2dfs_cc <- function(dc1, dc2, combine_th = 0.6, rest_cols = Inf, retain_o
     
     cmap_this <- amap_ok %>%
       select(-dist) %>%
-      tidyr::gather(cr, old_name, -new_name)
-    
-    cmap_this <- cmap_this %>%
-      mutate(block = recode(cr, n1 = dc1$data_block[1], n2 = dc2$data_block[1])) %>%
-      select(-cr)
+      tidyr::gather(df, old_name, -new_name)
     
     cmap <- cmap %>% bind_rows(cmap_this)
   }
   
   if (nrow(amap_not_ok) > 0) {
-    cmap_this <- amap_not_ok %>%
-      select(-dist) %>%
-      tidyr::gather(cr, old_name) %>%
-      mutate(new_name = paste0("uncollated_", seq_along(old_name)))
     
-    cmap_this <- cmap_this %>%
-      mutate(block = recode(cr, n1 = dc1$data_block[1], n2 = dc2$data_block[1])) %>%
-      select(-cr)
+    cmap_this <- amap_not_ok %>%
+      arrange(dist) %>% 
+      select(-dist) %>%
+      tidyr::gather(df, old_name) %>%
+      mutate(new_name = paste0("uncollated_", seq_along(old_name)))
     
     cmap <- cmap %>% bind_rows(cmap_this)
   }
   
-  cmap1 <- cmap %>% filter(block == dc1$data_block[1])
-  cmap2 <- cmap %>% filter(block == dc2$data_block[1])
+  cmap1 <- cmap %>% filter(df == "n1")
+  cmap2 <- cmap %>% filter(df == "n2")
   
-  for (i in seq_len(nrow(cmap1))) {
-    colnames(dc1)[which(colnames(dc1) == cmap1$old_name[[i]])] <- cmap1$new_name[[i]]
-  }
+  dc1 <- rename_base(dc1, old_names = cmap1$old_name, new_names = cmap1$new_name)
   
-  for (i in seq_len(nrow(cmap2))) {
-    colnames(dc2)[which(colnames(dc2) == cmap2$old_name[[i]])] <- cmap2$new_name[[i]]
-  }
+  dc2 <- rename_base(dc2, old_names = cmap2$old_name, new_names = cmap2$new_name)
   
   dcnew <- dc1 %>% bind_rows(dc2)
   
@@ -175,7 +188,29 @@ reduce_2dfs_cc <- function(dc1, dc2, combine_th = 0.6, rest_cols = Inf, retain_o
     nc_cols <- colnames(dcnew) %>%
       stringr::str_detect("collated") %>%
       colnames(dcnew)[.]
-    dcnew <- dcnew[c(intersect(defcols, colnames(dcnew)), nc_cols)]
+    dcnew <- dcnew[c(intersect(fixed_columns, colnames(dcnew)), nc_cols)]
+  }
+  
+  if(retain_signature){
+    # keep a trail of which columns merged into one
+    old_sig <- attr(dc1, "collate_columns_map") %>% 
+      bind_rows(attr(dc2, "collate_columns_map")) %>% 
+      unique()
+    if(nrow(old_sig)>0){
+      attr(dcnew, "collate_columns_map") <- cmap %>% 
+        left_join(pre_exist_cname, by = "df") %>% 
+        mutate(pre_exist_name = ifelse(is.na(pre_exist_name), FALSE, T),
+               iter = max(old_sig$iter)+1) %>% 
+        bind_rows(old_sig,.) %>% 
+        unique()
+    }else{
+      attr(dcnew, "collate_columns_map") <- cmap %>% 
+        left_join(pre_exist_cname, by = "df") %>% 
+        mutate(pre_exist_name = ifelse(is.na(pre_exist_name), FALSE, T),
+               iter = 1) 
+    }
+    
+      
   }
   
   dcnew

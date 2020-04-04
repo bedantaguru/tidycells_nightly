@@ -118,13 +118,17 @@ compose_cells_raw <- function(ca, post_process = TRUE, attr_sep = " :: ",
   }
 
   if (!post_process) {
+    class(dcomp) <- composed_list_class
     return(invisible(dcomp))
   }
 
   # @Dev
   #compose_cells_raw_post_process(dcomp, details = details, discard_raw_cols = discard_raw_cols, attr_sep = attr_sep)
   
-  bind_rows(dcomp)
+  dout <- bind_rows(dcomp)
+  # @DFOut
+  class(dout) <- composed_df_class
+  dout
 }
 
 compose_cells_raw_post_process <- function(dcomp, details = FALSE, discard_raw_cols = FALSE, attr_sep = " :: ") {

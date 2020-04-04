@@ -36,109 +36,120 @@
 #' dc <- compose_cells(da, print_attribute_overview = TRUE)
 #'
 #' collate_columns(dc)
-collate_columns <- function(composed_data,
+collate_columns <- function(x, ...,
+                            common_names_rbind = FALSE,
+                            fixed_columns = NULL,
                             combine_threshold = 1,
+                            retain_signature = TRUE,
                             rest_cols = Inf,
-                            retain_other_cols = FALSE,
-                            retain_cell_address = FALSE) {
-  ok <- FALSE
+                            retain_other_cols = FALSE){
+  fixed_columns <- nse_to_se_colname_picker(substitute(fixed_columns))
+  UseMethod("collate_columns")
+}
 
-  defcols_this <- defcols
-  if (is.data.frame(composed_data)) {
-    if (!hasName(composed_data, "table_tag")) {
-      defcols_this <- setdiff(defcols_this, "table_tag")
-    }
-    if (all(hasName(composed_data, defcols_this))) {
-      ok <- TRUE
-
-      if (hasName(composed_data, "table_tag")) {
-        dcl <- composed_data %>%
-          group_by(data_block, table_tag)
-      } else {
-        dcl <- composed_data %>%
-          group_by(data_block)
-      }
-
-      dcl <- dcl %>%
-        group_split() %>%
-        map(~ {
-          .d <- ungroup(.x)
-          this_cols <- colnames(.d)
-          nm_cols <- this_cols[stringr::str_detect(this_cols, "row|col|corner")]
-          nm_cols <- setdiff(nm_cols, defcols_this)
-          if (length(nm_cols) == 0) {
-            nm_cols <- setdiff(this_cols, defcols_this)
-          }
-          .d <- .d[c(defcols_this, nm_cols)]
-          na_c <- .d %>% map_lgl(~ is.na(.x) %>% all())
-          .d[!na_c]
-        })
-    }
-  } else {
-    # data.frame is a list,  first data.frame check is required
-    if (is.list(composed_data)) {
-      if (all(map_lgl(composed_data, is.data.frame))) {
-        if (!any(map_lgl(composed_data, ~ hasName(.x, "table_tag")))) {
-          defcols_this <- setdiff(defcols_this, "table_tag")
-        }
-        if (all(map_lgl(composed_data, ~ all(hasName(.x, defcols_this))))) {
-          ok <- TRUE
-          dcl <- composed_data
-        }
-      }
-    }
-  }
-
-
-
-  if (!ok) {
-    abort("The argument composed_data has to be output of compose_cells. Given composed_data has no known format.")
-  }
-
-  if (length(dcl) == 1) {
-    out_d <- dcl[[1]]
-
-    colnames(out_d) <- stringr::str_replace_all(colnames(out_d), "uncollated_", "old_uc_")
-    colnames(out_d) <- stringr::str_replace_all(colnames(out_d), "collated_", "old_c_")
-
-    restcols <- setdiff(colnames(out_d), defcols_this)
-    if (length(restcols) > 0) {
-      cn_map_0 <- tibble(cn = restcols) %>%
-        mutate(is_major = stringr::str_detect(tolower(cn), "major")) %>%
-        arrange(cn) %>%
-        mutate(sn = seq_along(cn), sn_m = sn - is_major * (10^10)) %>%
-        arrange(sn_m) %>%
-        mutate(fsn = seq_along(cn), new_cn = paste0("collated_", fsn)) %>%
-        select(cn, new_cn)
-
-      for (i in seq_along(cn_map_0$cn)) {
-        colnames(out_d)[which(colnames(out_d) == cn_map_0$cn[i])] <- cn_map_0$new_cn[i]
-      }
-    }
-  } else {
-    out_d <- dcl %>% reduce(reduce_2dfs,
-      combine_th = combine_threshold,
-      rest_cols = rest_cols,
-      retain_other_cols = retain_other_cols
-    )
-  }
-
-
-
-
-
+collate_columns.composed_list <- function(x,  ...,
+                                          common_names_rbind = FALSE,
+                                          fixed_columns = NULL,
+                                          combine_threshold = 1,
+                                          retain_signature = TRUE,
+                                          rest_cols = Inf,
+                                          retain_other_cols = FALSE,
+                                          retain_cell_address = FALSE) {
+  
+  # @Dev
+  # table tag for tcf may be considered
+  this_fixed_cols <- c("row", "col", "data_block", "value")
+  fixed_columns <- c(fixed_columns, this_fixed_cols) %>% unique()
+  
+  out_d <-  reduce(x,
+                   reduce_2dfs_cc,
+                   combine_th = combine_threshold, 
+                   common_names_rbind = common_names_rbind,
+                   fixed_columns = fixed_columns, 
+                   retain_signature = retain_signature, 
+                   rest_cols = rest_cols, 
+                   retain_other_cols = retain_other_cols)
+  
   if (!retain_cell_address) {
     out_d <- out_d[setdiff(colnames(out_d), c("row", "col", "data_block"))]
   }
-
+  
   out_d[sort(colnames(out_d))]
 }
 
 
-collate_columns <- function(x, ...,
-                            common_names_rbind = FALSE,
-                            fixed_columns,
-                            combine_threshold = 1,
-                            retain_signature = TRUE){
+collate_columns.composed_df <- function(x,  ...,
+                                        common_names_rbind = FALSE,
+                                        fixed_columns = NULL,
+                                        combine_threshold = 1,
+                                        retain_signature = TRUE,
+                                        rest_cols = Inf,
+                                        retain_other_cols = FALSE,
+                                        retain_cell_address = FALSE) {
+  
+  
+  
+  
+  xl <- split(x, x$data_block)
+  collate_columns.composed_list(xl, ...,
+                                common_names_rbind = common_names_rbind,
+                                fixed_columns = fixed_columns,
+                                combine_threshold = combine_threshold,
+                                retain_signature = retain_signature,
+                                rest_cols = rest_cols,
+                                retain_other_cols = retain_other_cols,
+                                retain_cell_address = retain_cell_address)
+}
 
+
+collate_columns.list <- function(x,  ...,
+                                 common_names_rbind = FALSE,
+                                 fixed_columns = NULL,
+                                 combine_threshold = 1,
+                                 retain_signature = TRUE,
+                                 rest_cols = Inf,
+                                 retain_other_cols = FALSE){
+  
+  reduce(x,
+         reduce_2dfs_cc,
+         combine_th = combine_threshold, 
+         common_names_rbind = common_names_rbind,
+         fixed_columns = fixed_columns, 
+         retain_signature = retain_signature, 
+         rest_cols = rest_cols, 
+         retain_other_cols = retain_other_cols)
+}
+
+collate_columns.data.frame <- function(x, y, ...,
+                                       common_names_rbind = FALSE,
+                                       fixed_columns = NULL,
+                                       combine_threshold = 1,
+                                       retain_signature = TRUE,
+                                       rest_cols = Inf,
+                                       retain_other_cols = FALSE){
+  reduce_2dfs_cc(x, y, 
+                 combine_th = combine_threshold, 
+                 common_names_rbind = common_names_rbind,
+                 fixed_columns = fixed_columns, 
+                 retain_signature = retain_signature, 
+                 rest_cols = rest_cols, 
+                 retain_other_cols = retain_other_cols)
+}
+
+collate_columns.matrix <- function(x, y, ...,
+                                   common_names_rbind = FALSE,
+                                   fixed_columns = NULL,
+                                   combine_threshold = 1,
+                                   retain_signature = TRUE,
+                                   rest_cols = Inf,
+                                   retain_other_cols = FALSE){
+  x <- as.data.frame(x)
+  y <- as.data.frame(y)
+  reduce_2dfs_cc(x, y, 
+                 combine_th = combine_threshold, 
+                 common_names_rbind = common_names_rbind,
+                 fixed_columns = fixed_columns, 
+                 retain_signature = retain_signature, 
+                 rest_cols = rest_cols, 
+                 retain_other_cols = retain_other_cols)
 }
