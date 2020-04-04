@@ -11,6 +11,12 @@ tf0 %>% filter(Row = 1, Col = 1, keep= 5) -> xx
 
 xx <- xx %>% numeric_values_classifier()
 
+ca <- analyze_cells(xx)
 
 d0 <- compose_cells(ca)
 
+
+d1 <- prune(d0)
+
+setdiff(colnames(d1), c("row","col","value","data_block")) %>% 
+  map(~name_suggest(.x, ca))

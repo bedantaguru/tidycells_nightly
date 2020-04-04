@@ -1,5 +1,6 @@
 
-
+# Dev
+# clean documentation
 
 #' Collate Columns Based on Content
 #'
@@ -131,4 +132,13 @@ collate_columns <- function(composed_data,
   }
 
   out_d[sort(colnames(out_d))]
+}
+
+
+collate_columns <- function(x, ...,
+                            common_names_rbind = FALSE,
+                            fixed_columns,
+                            combine_threshold = 1,
+                            retain_signature = TRUE){
+
 }

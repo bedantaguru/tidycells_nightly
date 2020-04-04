@@ -4,7 +4,7 @@
 \alias{get_valid_direction_names}
 \title{get direction names compatible to tidycells}
 \usage{
-get_valid_direction_names()
+get_valid_direction_names(header_binder = getOption("tidycells.header_binder"))
 }
 \value{
 directions as used in \code{\link[=bind_header]{bind_header}} applicant (\emph{like unpivotr package}) with directional grouping

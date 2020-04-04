@@ -2,7 +2,73 @@
 ##################################################################
 ##################################################################
 
+# for each attr_micro_gid having more than one 
 
+# info_gid plays a major role 
+# need to consider correctly
+name_suggest <- function(composed_col_name, ca, for_attr_micro_gid, details = F){
+  
+  dam <- ca$details$data_attr_map_raw
+  
+  if(missing(for_attr_micro_gid)){
+    # fetch name
+    cn_map <- dam %>% distinct(attr_var_sync_name, attr_micro_gid)
+    for_attr_micro_gid <- cn_map$attr_micro_gid[cn_map$attr_var_sync_name %in% composed_col_name]
+  }
+  
+  all_attrs <- dam %>% 
+    select(info_gid, attr_gid, attr_micro_gid, row = row_a, col = col_a) %>% unique()
+  all_attrs <- all_attrs %>% 
+    left_join(ca$cell_df[c("row","col","value")], by = c("row","col"))
+  
+  this_attrs <- all_attrs %>% filter(attr_micro_gid %in% for_attr_micro_gid)
+  rest_attrs <- all_attrs %>% anti_join(this_attrs, by = c("row", "col"))
+  t_to_r_map <- ai_get_data_attr_map(
+    dat_boundary = this_attrs %>% 
+      select(row, col, gid = info_gid) %>% 
+      get_group_id_boundary(),
+    att_gid_map = rest_attrs %>% select(row, col, gid = attr_micro_gid), 
+    attr_to_near_data = T
+  )
+  
+  connected_attrs <- rest_attrs %>% 
+    inner_join(t_to_r_map$map %>% 
+                 select(attr_micro_gid = attr_gid, info_gid = data_gid, direction, direction_group, dist),
+               by = c("info_gid","attr_micro_gid")) %>% 
+    inner_join(this_attrs %>% 
+                 distinct(info_gid, attr_gid), 
+               by = "info_gid", suffix = c("" ,"_this"))
+  
+  
+  connected_attrs <- connected_attrs %>% 
+    group_by(info_gid, attr_micro_gid) %>% 
+    mutate(n_cells = n(), n_distinct_cells = n_distinct(value)) %>% 
+    ungroup()
+  
+  connected_attrs <- connected_attrs %>% 
+    mutate(
+      score = 
+        # is they both belongs to same mother attr gets more priority
+        ifelse(attr_gid==attr_gid_this, 2, 0) +
+        # less dist is better
+        1/(dist+1) + 
+        # corner gets less value
+        ifelse(direction=="corner",0,1) +
+        # less n_cells gets more preference similarly less n_distinct_cells
+        1/(n_cells+1)+1/(n_distinct_cells+1)
+    )
+  
+  if(details){
+    return(connected_attrs)
+  }
+  
+  unique(connected_attrs$value[which.max(connected_attrs$score)])
+}
+
+
+
+# fetch name
+dam %>% distinct(attr_var_sync_name, attr_micro_gid)
 
 
 

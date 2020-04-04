@@ -28,6 +28,31 @@ msg_once <- function(...){
   
 }
 
+string_signature <- function(x){
+  x <- x[!is.na(x)] %>% 
+    unique() %>% 
+    as.character()
+  
+  dx <- tibble(original_name = x)
+  
+  
+  dx <- dx %>% 
+    mutate(name_signature = original_name %>% 
+             as.character() %>% 
+             tolower() %>% 
+             stringr::str_replace_all("[^a-z0-9]"," ") %>% 
+             stringr::str_replace_all(" +"," ") %>% 
+             stringr::str_trim())
+  
+  dx <- dx %>% 
+    filter(nchar(name_signature)>0)
+  
+  dx %>% 
+    group_by(name_signature) %>% 
+    summarise(original_name = max(original_name)) %>% 
+    mutate(trim_name = stringr::str_trim(original_name))
+}
+
 
 state <- function(x, ...){
   UseMethod("state")
