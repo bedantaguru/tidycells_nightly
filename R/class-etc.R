@@ -41,3 +41,6 @@ setOldClass(composed_df_class)
 composed_list_class <- c("composed_list", "list")
 setOldClass(composed_list_class)
 
+
+column_collated_df_class <- c("column_collated_df",df_class)
+setOldClass(column_collated_df_class)

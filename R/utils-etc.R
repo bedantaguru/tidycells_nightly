@@ -55,6 +55,14 @@ nse_to_se_colname_picker <- function(sbs){
   
 }
 
+clean_string <- function(x){
+  x %>% 
+    tolower() %>% 
+    stringr::str_replace_all("[^a-z0-9]"," ") %>% 
+    stringr::str_replace_all(" +"," ") %>% 
+    stringr::str_trim()
+}
+
 string_signature <- function(x){
   x <- x[!is.na(x)] %>% 
     unique() %>% 
@@ -65,11 +73,7 @@ string_signature <- function(x){
   
   dx <- dx %>% 
     mutate(name_signature = original_name %>% 
-             as.character() %>% 
-             tolower() %>% 
-             stringr::str_replace_all("[^a-z0-9]"," ") %>% 
-             stringr::str_replace_all(" +"," ") %>% 
-             stringr::str_trim())
+             clean_string())
   
   dx <- dx %>% 
     filter(nchar(name_signature)>0)

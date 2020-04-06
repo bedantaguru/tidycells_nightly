@@ -44,6 +44,7 @@ collate_columns <- function(x, ...,
                             rest_cols = Inf,
                             retain_other_cols = FALSE){
   fixed_columns <- nse_to_se_colname_picker(substitute(fixed_columns))
+  # @DFOut always
   UseMethod("collate_columns")
 }
 
@@ -68,12 +69,19 @@ collate_columns.composed_list <- function(x,  ...,
                    fixed_columns = fixed_columns, 
                    retain_signature = retain_signature, 
                    rest_cols = rest_cols, 
-                   retain_other_cols = retain_other_cols)
+                   retain_other_cols = retain_other_cols, 
+                   signature_tuner_function = function(cmap, d1, d2){
+                     dmap <- tibble(
+                       df = c("n1","n2"),
+                       data_block = c(d1$data_block[1], d2$data_block[1]))
+                     cmap %>% left_join(dmap, by = "df")
+                   })
   
   if (!retain_cell_address) {
     out_d <- out_d[setdiff(colnames(out_d), c("row", "col", "data_block"))]
   }
   
+  class(out_d) <- column_collated_df_class
   out_d[sort(colnames(out_d))]
 }
 
@@ -110,14 +118,17 @@ collate_columns.list <- function(x,  ...,
                                  rest_cols = Inf,
                                  retain_other_cols = FALSE){
   
-  reduce(x,
-         reduce_2dfs_cc,
-         combine_th = combine_threshold, 
-         common_names_rbind = common_names_rbind,
-         fixed_columns = fixed_columns, 
-         retain_signature = retain_signature, 
-         rest_cols = rest_cols, 
-         retain_other_cols = retain_other_cols)
+  out_d <- reduce(x,
+                  reduce_2dfs_cc,
+                  combine_th = combine_threshold, 
+                  common_names_rbind = common_names_rbind,
+                  fixed_columns = fixed_columns, 
+                  retain_signature = retain_signature, 
+                  rest_cols = rest_cols, 
+                  retain_other_cols = retain_other_cols)
+  
+  class(out_d) <- column_collated_df_class
+  out_d
 }
 
 collate_columns.data.frame <- function(x, y, ...,
@@ -127,13 +138,15 @@ collate_columns.data.frame <- function(x, y, ...,
                                        retain_signature = TRUE,
                                        rest_cols = Inf,
                                        retain_other_cols = FALSE){
-  reduce_2dfs_cc(x, y, 
-                 combine_th = combine_threshold, 
-                 common_names_rbind = common_names_rbind,
-                 fixed_columns = fixed_columns, 
-                 retain_signature = retain_signature, 
-                 rest_cols = rest_cols, 
-                 retain_other_cols = retain_other_cols)
+  out_d <- reduce_2dfs_cc(x, y, 
+                          combine_th = combine_threshold, 
+                          common_names_rbind = common_names_rbind,
+                          fixed_columns = fixed_columns, 
+                          retain_signature = retain_signature, 
+                          rest_cols = rest_cols, 
+                          retain_other_cols = retain_other_cols)
+  class(out_d) <- column_collated_df_class
+  out_d
 }
 
 collate_columns.matrix <- function(x, y, ...,
@@ -145,11 +158,13 @@ collate_columns.matrix <- function(x, y, ...,
                                    retain_other_cols = FALSE){
   x <- as.data.frame(x)
   y <- as.data.frame(y)
-  reduce_2dfs_cc(x, y, 
-                 combine_th = combine_threshold, 
-                 common_names_rbind = common_names_rbind,
-                 fixed_columns = fixed_columns, 
-                 retain_signature = retain_signature, 
-                 rest_cols = rest_cols, 
-                 retain_other_cols = retain_other_cols)
+  out_d <- reduce_2dfs_cc(x, y, 
+                          combine_th = combine_threshold, 
+                          common_names_rbind = common_names_rbind,
+                          fixed_columns = fixed_columns, 
+                          retain_signature = retain_signature, 
+                          rest_cols = rest_cols, 
+                          retain_other_cols = retain_other_cols)
+  class(out_d) <- column_collated_df_class
+  out_d
 }

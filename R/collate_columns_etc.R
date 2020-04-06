@@ -73,7 +73,8 @@ reduce_2dfs_cc <- function(dc1, dc2,
                            fixed_columns = NULL,
                            retain_signature = TRUE,
                            rest_cols = Inf, 
-                           retain_other_cols = FALSE) {
+                           retain_other_cols = FALSE,
+                           signature_tuner_function = NULL) {
   
   
   if(common_names_rbind){
@@ -196,6 +197,9 @@ reduce_2dfs_cc <- function(dc1, dc2,
     old_sig <- attr(dc1, "collate_columns_map") %>% 
       bind_rows(attr(dc2, "collate_columns_map")) %>% 
       unique()
+    if(is.function(signature_tuner_function)){
+      cmap <- signature_tuner_function(cmap, dc1, dc2)
+    }
     if(nrow(old_sig)>0){
       attr(dcnew, "collate_columns_map") <- cmap %>% 
         left_join(pre_exist_cname, by = "df") %>% 

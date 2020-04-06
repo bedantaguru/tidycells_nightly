@@ -15,8 +15,13 @@ ca <- analyze_cells(xx)
 
 d0 <- compose_cells(ca)
 
+d1 <- collate_columns(d0)
 
-d1 <- prune(d0)
+# name suggest will come here
+name_suggest(d1, ca)
 
-setdiff(colnames(d1), c("row","col","value","data_block")) %>% 
-  map(~name_suggest(.x, ca))
+
+
+# 
+# setdiff(colnames(d1), c("row","col","value","data_block")) %>% 
+#   map(~name_suggest(.x, ca))
