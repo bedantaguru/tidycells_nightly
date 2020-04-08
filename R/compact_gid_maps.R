@@ -5,12 +5,10 @@ compact_gid_maps <- function(d_att, admap) {
   
   foot_prints <- d_att %>%
     filter(gid %in% admap$attr_gid) %>% 
-    group_by(gid) %>%
-    group_split() %>%
-    map_df(~ .x %>%
-      distinct(row, col, gid) %>%
-      arrange(row, col) %>%
-      summarise(gid = gid[1], fp = paste0(row, ",", col, collapse = ";")))
+    distinct(row, col, gid) %>% 
+    group_by(gid) %>% 
+    arrange(row, col) %>%
+    summarise(fp = paste0(row, ",", col, collapse = ";"))
 
   chk <- foot_prints %>% count(fp) %>% filter(n>1)
   
@@ -30,11 +28,7 @@ compact_gid_maps <- function(d_att, admap) {
       rename(gid = new_gid) %>%
       distinct()
     
-    # @Dev
-    # need to see this situation 
-    browser()
-    
-    admap_main_raw_map_new <- admap_main$raw_map %>%
+    admap_main_raw_map_new <- admap %>%
       left_join(ngmap %>% rename(attr_gid = gid, new_attr_gid = new_gid), by = "attr_gid")
     admap_main_raw_map_new <- admap_main_raw_map_new %>%
       mutate(new_attr_gid = ifelse(is.na(new_attr_gid), attr_gid, new_attr_gid)) %>%
@@ -42,10 +36,7 @@ compact_gid_maps <- function(d_att, admap) {
       rename(attr_gid = new_attr_gid) %>%
       distinct()
     
-    admap_main$raw_map <- admap_main_raw_map_new
-    
-    admap_main$map <- admap_main$raw_map %>%
-      distinct(attr_gid, data_gid, direction, direction_group, dist, attr_group)
+    admap <- admap_main_raw_map_new
     
   }
   

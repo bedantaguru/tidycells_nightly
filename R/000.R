@@ -24,3 +24,8 @@ assign("common_knowledge", NULL, envir = tidycells_pkg_env)
 # used in --> zzz.R
 assign("options_to_clean", NULL, envir = tidycells_pkg_env)
 
+
+
+# global constant variables
+
+ordinary_compass_direction_names <- c("N","NW","W","SW","S","SE","E","NE")

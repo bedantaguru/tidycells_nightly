@@ -124,11 +124,13 @@ variation_in_allocations_of_rel_gids <- function(alo){
   
   dgid_summary <- alo %>% group_by(data_gid, direction) %>% summarise(adist = mean(dist)) %>% ungroup()
   
-  ref_df <- expand.grid(data_gid = unique(dgid_summary$data_gid), direction = c("N","NW","W","SW","S","SE","E","NE"), stringsAsFactors = F)
+  ref_df <- expand.grid(data_gid = unique(dgid_summary$data_gid), 
+                        direction = ordinary_compass_direction_names, 
+                        stringsAsFactors = F)
   
   ref_calc <-  dgid_summary %>% full_join(ref_df, by = c("data_gid", "direction")) %>% mutate(adist = ifelse(is.na(adist), 0, adist))
   calc_mat <- ref_calc %>% tidyr::pivot_wider(id_cols = data_gid, names_from = direction, values_from = adist) %>% select(-data_gid) %>% as.matrix()
-  d0 <- (calc_mat-matrix(rep(colMeans(calc_mat),2), nrow = nrow(calc_mat), byrow = T))^2 %>% sum()
+  d0 <- (calc_mat-matrix(rep(colMeans(calc_mat),nrow(calc_mat)), nrow = nrow(calc_mat), byrow = T))^2 %>% sum()
   d0/ nrow(calc_mat)
 }
 

@@ -4,11 +4,7 @@ ai_get_data_attr_map <- function(dat_boundary,
                                  attr_to_near_data = FALSE, leave_inside = FALSE) {
 
   # check relative location of each attr_gid (gid) wrt each data_gid
-  d_att_map <- dat_boundary %>%
-    split(.$gid) %>%
-    map_df(~ get_direction_df(.x, datt = att_gid_map, allow_inside = leave_inside)) %>%
-    rename(attr_gid = gid) %>% 
-    mutate(mapping_strength = 0)
+  d_att_map <- get_raw_map_for_ai_get_data_attr_map(dat_boundary, att_gid_map, leave_inside)
 
 
   #  connect data and attr gids based on above raw map
@@ -17,6 +13,20 @@ ai_get_data_attr_map <- function(dat_boundary,
 }
 
 # helpers
+# @Dev use this to reduce computation wheever raw map only is required
+# this can be done in attr_split mostly.
+get_raw_map_for_ai_get_data_attr_map  <- function(dat_boundary,
+                                                  att_gid_map,
+                                                  leave_inside = FALSE){
+  d_att_map <- dat_boundary %>%
+    split(.$gid) %>%
+    map_df(~ get_direction_df(.x, datt = att_gid_map, allow_inside = leave_inside)) %>%
+    rename(attr_gid = gid) %>% 
+    mutate(mapping_strength = 0)
+  d_att_map
+}
+
+
 connect_data_and_attr_groups_from_raw_map <- function(raw_map,
                                                       attr_to_near_data = FALSE, leave_inside = FALSE){
   

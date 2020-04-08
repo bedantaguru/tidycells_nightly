@@ -109,7 +109,8 @@ sample_based_classifier.cell_df <- function(x, ...,
 #' @seealso [value_attribute_classify][value_attribute_classify()]
 numeric_values_classifier <- function(x, ...,
                                       allow_chars,
-                                      verbose = FALSE) {
+                                      verbose = FALSE,
+                                      orientation_based_attribute_recovery = FALSE) {
   UseMethod("numeric_values_classifier")
 }
 
@@ -117,11 +118,13 @@ numeric_values_classifier <- function(x, ...,
 #' @export
 numeric_values_classifier.default <- function(x, ...,
                                               allow_chars = NULL,
-                                              verbose = FALSE) {
+                                              verbose = FALSE, 
+                                              orientation_based_attribute_recovery = FALSE) {
   function(d) {
     numeric_values_raw(d,
       allow_chars = allow_chars,
-      verbose = verbose
+      verbose = verbose,
+      orientation_based_attribute_recovery = orientation_based_attribute_recovery
     )
   }
 }
@@ -130,10 +133,12 @@ numeric_values_classifier.default <- function(x, ...,
 #' @export
 numeric_values_classifier.cell_df <- function(x, ...,
                                               allow_chars,
-                                              verbose = FALSE) {
+                                              verbose = FALSE, 
+                                              orientation_based_attribute_recovery = FALSE) {
   numeric_values_raw(x,
     allow_chars = allow_chars,
-    verbose = verbose
+    verbose = verbose, 
+    orientation_based_attribute_recovery = orientation_based_attribute_recovery
   )
 }
 
@@ -435,8 +440,10 @@ check_num <- function(x, allowed_strings) {
     pull(decision)
 }
 
-
-numeric_values_raw <- function(d, allow_chars, verbose = FALSE) {
+# @Dev
+# update doc for orientation_based_attribute_recovery
+numeric_values_raw <- function(d, allow_chars, verbose = FALSE, 
+                               orientation_based_attribute_recovery = FALSE) {
   d <- basic_classifier(d)
 
   if (!missing(allow_chars)) {
@@ -460,5 +467,17 @@ numeric_values_raw <- function(d, allow_chars, verbose = FALSE) {
     print(tibble::as_tibble(discover))
   }
 
-  d0 %>% select(row, col, data_type, value, type = new_type)
+  d0 <- d0 %>% select(row, col, data_type, value, type = new_type)
+  
+  if(orientation_based_attribute_recovery){
+    dr <- d0 %>% group_by(row) %>% summarise(ar_score = sum(type=="attribute")/n())
+    dc <- d0 %>% group_by(col) %>% summarise(ac_score = sum(type=="attribute")/n())
+    
+    d0 <- d0 %>% left_join(dr, by = "row") %>% left_join(dc, by = "col") %>% 
+      mutate(a_score = pmax(ar_score,ac_score))
+    
+    d0 <- d0 %>% 
+      mutate(type = ifelse(a_score>0.7, "attribute", type)) %>% 
+      select(-ar_score, -ac_score, -a_score)
+  }
 }

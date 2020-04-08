@@ -2,6 +2,43 @@
 ##################################################################
 ##################################################################
 
+
+
+###############################################################
+
+# this kind of orientation detection is not so robust
+
+
+ddf <- d %>% filter(type == "value") %>% get_group_id()
+adf <- d %>% filter(type == "attribute") %>% get_group_id()
+
+rawmap <- get_raw_map_for_ai_get_data_attr_map(
+  dat_boundary = get_group_id_boundary(ddf),
+  att_gid_map = adf)
+
+ori_base <- rawmap %>% 
+  group_by(direction) %>% 
+  summarise(nc = n())
+
+ori_base <- ori_base %>% 
+  full_join(tibble(direction = ordinary_compass_direction_names), by = "direction")
+
+ori_base <- ori_base %>% 
+  mutate(nc = ifelse(is.na(nc), 0, nc)) %>% 
+  mutate(N_score = 
+           ifelse(stringr::str_detect(direction, "N"), 1, 
+                  ifelse(stringr::str_detect(direction, "S"), -1, 0)) * nc / nchar(direction),
+         W_score = 
+           ifelse(stringr::str_detect(direction, "W"), 1, 
+                  ifelse(stringr::str_detect(direction, "E"), -1, 0)) * nc / nchar(direction))
+
+scores <- ori_base %>% 
+  summarise(N_score = sum(N_score)/sum(abs(N_score)), 
+            W_score = sum(W_score)/sum(abs(W_score)))
+
+
+
+##########################################
 # for each attr_micro_gid having more than one 
 
 # info_gid plays a major role 
@@ -69,14 +106,6 @@ name_suggest <- function(composed_col_name, ca, for_attr_micro_gid, details = F)
 
 # fetch name
 dam %>% distinct(attr_var_sync_name, attr_micro_gid)
-
-
-
-
-
-
-
-
 
 
 

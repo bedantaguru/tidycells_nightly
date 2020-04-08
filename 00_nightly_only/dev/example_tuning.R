@@ -21,10 +21,17 @@ d1 <- collate_columns(d0)
 name_suggest(d1, ca)
 
 
+f <- "00_nightly_only/dev/ABSSelfExplore/20490do001_2016.xls"
 
-d <- readxl::read_excel(f, sheet = "Table_1.12", col_names = F, col_types = "text")
+d_abs <- readxl::read_excel(f, sheet = "Table_1.4", col_names = F, col_types = "text")
 
+d_abs <- d_abs %>% as_cell_df(take_col_names = F)
 
+d_abs <- d_abs %>% numeric_values_classifier(orientation_based_attribute_recovery = T)
+
+abs <- d_abs %>% filter(row < 108)
+
+rm(d_abs,f)
 # 
 # setdiff(colnames(d1), c("row","col","value","data_block")) %>% 
 #   map(~name_suggest(.x, ca))
