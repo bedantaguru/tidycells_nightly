@@ -480,4 +480,6 @@ numeric_values_raw <- function(d, allow_chars, verbose = FALSE,
       mutate(type = ifelse(a_score>0.7, "attribute", type)) %>% 
       select(-ar_score, -ac_score, -a_score)
   }
+  
+  d0
 }

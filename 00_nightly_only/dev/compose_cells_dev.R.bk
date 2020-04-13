@@ -1,5 +1,5 @@
 
-
+# delink 
 #' Compose a Cell Analysis to a tidy form
 #'
 #' @description After [`analyze_cells`][analyze_cells()] carried out, you may like to use this function in order to

@@ -27,5 +27,12 @@ assign("options_to_clean", NULL, envir = tidycells_pkg_env)
 
 
 # global constant variables
-
+# note 
+# > ordinary_compass_direction_names %>% matrix(nrow = 4)
+# [,1] [,2]
+# [1,] "N"  "S" 
+# [2,] "NW" "SE"
+# [3,] "W"  "E" 
+# [4,] "SW" "NE"
+# each row holds opposites
 ordinary_compass_direction_names <- c("N","NW","W","SW","S","SE","E","NE")

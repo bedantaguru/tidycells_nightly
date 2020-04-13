@@ -112,6 +112,7 @@ analyze_cells_raw <- function(d, silent = TRUE) {
     if (d_dat_potential_joins$done) {
       # @Dev  need to fix
       # this means results has been invalidated
+      browser()
       d_dat <- d_dat0
 
       # revert back to original form
@@ -128,6 +129,8 @@ analyze_cells_raw <- function(d, silent = TRUE) {
   # join attr based on block merges (potentially possible)
   rel_chk <- ai_relative_data_join_attr(admap_main = admap1, d_att = d_att)
   if (rel_chk$done) {
+    # this also need to fix
+    browser()
     d_att <- rel_chk$d_att %>% map(unique)
     admap1 <- rel_chk$admap
   }
@@ -242,12 +245,13 @@ analyze_cells_raw <- function(d, silent = TRUE) {
   this_cells <- this_cells %>%
     left_join(gid_ngid, by = "gid")
   
-  admap <- admap %>%
-    left_join(gid_ngid, by = c("data_gid"="gid"))
-  
   # attach directions to it
   admap_with_dir <- get_data_attr_cell_wise_map_raw(admap,d_dat, d_att) %>% 
     ai_attach_direction()
+  
+  # this need to be added after ai_attach_direction
+  admap_with_dir <- admap_with_dir %>%
+    left_join(gid_ngid, by = c("data_gid"="gid"))
 
   # @Dev
   #  issues to be covered differently or later

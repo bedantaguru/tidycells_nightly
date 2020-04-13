@@ -5,13 +5,13 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     summarise(n_dirs = n_distinct(direction)) %>%
     ungroup() %>%
     filter(n_dirs > 1)
-
+  
   done <- FALSE
-
+  
   if (nrow(chk) > 0) {
     # relative split required
     done <- TRUE
-
+    
     rel_gids <- chk %>%
       select(-n_dirs) %>%
       inner_join(basic_map$raw, by = c("data_gid", "attr_gid"))
@@ -20,20 +20,20 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     
     # mapping strength is higher
     rel_gids <- relative_gid_map_pattern_fix(rel_gids)
-
+    
     d_att <- rel_gids %>%
       select(row, col, gid = new_attr_gid) %>%
       bind_rows(d_att) %>% 
       unique()
     
-
+    
     # information kept for missing link detection
     # mbc : missed_block_connections
     mbc <- chk %>% distinct(attr_gid, data_gid)
     attr(d_att, "missed_block_connections") <- mbc
     
     common_knowledge(missed_block_connections = mbc)
-
+    
     admap_new <- basic_map
     
     rel_gids <- rel_gids %>% select(-attr_gid) %>% rename(attr_gid = new_attr_gid)
@@ -48,7 +48,7 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
   } else {
     admap_new <- basic_map
   }
-
+  
   list(done = done, d_att = d_att, admap = admap_new)
 }
 
@@ -64,10 +64,6 @@ relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids){
   
   allocations <- list()
   
-  for(this_dir in c("N","E","W","S")){
-    
-  }
-  
   dirs <- c("N","E","W","S")
   
   allocations <- dirs %>% map(~{
@@ -82,11 +78,39 @@ relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids){
   
   allocations$base0 <- central_allocation_of_rel_gids(rel_gids)
   
+  # remove empty dfs
+  allocations <- allocations %>% map_lgl(~nrow(.x)>0) %>% allocations[.]
+  
   # it has to be non-lossy
-  # base0 will not be lossy
-  allocations <- allocations %>% purrr::keep(~nrow(.x)==nrow(allocations$base0))
+  # base0 will not be lossy but duplicacy can be there
+  # this duplicacy is not good also
+  acells <- rel_gids %>% select(row, col) %>% unique()
+  
+  # strong check which is not required in this case : kept for refernece
+  # al_checks1 <- allocations %>% 
+  #   map_lgl(~nrow(
+  #     distinct(.x, new_attr_gid, row, col) %>% 
+  #       inner_join(acells, by = c("row","col")))==nrow(acells))
+  
+  
+  # check for perfectly fit situations
+  
+  al_checks1 <- allocations %>% 
+    map_lgl(~nrow(distinct(.x, new_attr_gid, row, col))==nrow(acells))
+  
+  if(any(al_checks1)){
+    allocations <- allocations[al_checks1]
+  }else{
+    # duplicacy discouraged  and will be alloted only if no other options is present
+    al_checks2 <- allocations %>% 
+      map_lgl(~is_conforms_to_rcdf(.x))
+    if(any(al_checks2)){
+      allocations <- allocations[al_checks2]
+    }
+  }
   
   if(length(allocations)!=1){
+    # this will be touched in rare conditions
     
     alo_vars <- allocations %>% map_dbl(variation_in_allocations_of_rel_gids)
     

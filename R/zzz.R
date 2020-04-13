@@ -11,7 +11,9 @@
     # tidycells.header_binder can be either of (tidycells, unpivotr)
     tidycells.header_binder = "tidycells", # this controls which package to use for binding header and data cells
     # tidycells.df_operator can be either of (dplyr, base)
-    tidycells.df_operator = "dplyr" # this controls which package to use for data operations (as of now only select and rename)
+    tidycells.df_operator = "dplyr", # this controls which package to use for data operations (as of now only select and rename)
+    # tidycells.analyze_cells_options should be a list of options (named list)
+    tidycells.analyze_cells_options = list(hierarchical_reallocation = T)
   )
   toset <- !(names(op.tidycells) %in% names(op))
   if (any(toset)) options(op.tidycells[toset])

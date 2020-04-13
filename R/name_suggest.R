@@ -128,8 +128,7 @@ name_suggest_part_2 <- function(for_attr_micro_gid,
     dat_boundary = this_attrs %>% 
       select(row, col, gid = info_gid) %>% 
       get_group_id_boundary(),
-    att_gid_map = rest_attrs %>% select(row, col, gid = attr_micro_gid), 
-    attr_to_near_data = T
+    att_gid_map = rest_attrs %>% select(row, col, gid = attr_micro_gid)
   )
   
   connected_attrs <- rest_attrs %>% 
@@ -191,7 +190,7 @@ name_suggest_part_2 <- function(for_attr_micro_gid,
               values = value %>% 
                 string_signature() %>% 
                 pull(trim_name) %>% 
-                as.list(),
+                list(),
               str_sig = str_sig %>% 
                 string_signature() %>% 
                 pull(name_signature) %>% 
@@ -203,13 +202,13 @@ name_suggest_part_2 <- function(for_attr_micro_gid,
     summarise(score = mean(score), 
               attr_micro_gids = attr_micro_gid %>% 
                 unique() %>% 
-                as.list(),
+                list(),
               certainty_score = mean(certainty_score),
               values = values %>% 
                 unlist() %>% 
                 string_signature() %>% 
                 pull(trim_name) %>% 
-                as.list())
+                list())
   
 }
 

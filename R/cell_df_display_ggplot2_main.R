@@ -3,7 +3,7 @@
 plot_cell_df_ggplot2 <- function(d, 
                                  fill,
                                  no_fill = FALSE,
-                                 adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, 
+                                 adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, txt_angle = 0,
                                  no_plot = FALSE,
                                  fill_alpha = 1,
                                  background = NULL, ...) {
@@ -97,13 +97,13 @@ plot_cell_df_ggplot2 <- function(d,
   
   if (!no_txt) {
     if (adaptive_txt_size) {
-      g <- g + ggplot2::geom_text(ggplot2::aes(size = txt_size), alpha = txt_alpha, na.rm = TRUE) +
+      g <- g + ggplot2::geom_text(ggplot2::aes(size = txt_size), alpha = txt_alpha, na.rm = TRUE, angle = txt_angle) +
         ggplot2::scale_size_continuous(
           range = d$txt_size %>% range(),
           guide = FALSE
         )
     } else {
-      g <- g + ggplot2::geom_text(size = txt_size, alpha = txt_alpha, na.rm = TRUE)
+      g <- g + ggplot2::geom_text(size = txt_size, alpha = txt_alpha, na.rm = TRUE, angle = txt_angle)
     }
   }
   

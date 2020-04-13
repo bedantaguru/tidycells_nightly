@@ -29,9 +29,15 @@ d_abs <- d_abs %>% as_cell_df(take_col_names = F)
 
 d_abs <- d_abs %>% numeric_values_classifier(orientation_based_attribute_recovery = T)
 
-abs <- d_abs %>% filter(row < 108)
+absd <- d_abs %>% filter(row < 108)
 
 rm(d_abs,f)
 # 
 # setdiff(colnames(d1), c("row","col","value","data_block")) %>% 
 #   map(~name_suggest(.x, ca))
+
+ca <- analyse_cells(absd)
+
+d0 <- compose_cells(ca)
+
+

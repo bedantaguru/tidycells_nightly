@@ -1,54 +1,157 @@
 
-shiny_admap_display <- function(cd, admap, d_dat, d_att){
+shiny_admap_display <- function(admap, cd, d_dat, d_att){
   
   
-  require(shiny)
-  require(miniUI)
+  library(shiny)
+  library(miniUI)
+  library(shinyBS)
+  library(DT)
+  
+  if(missing(cd)){
+    cd <- (admap %>% distinct(row = row_d, col = col_d, value = data_gid)) %>% 
+      bind_rows(admap %>% distinct(row = row_a, col = col_a, value = attr_gid))
+    cd <- cd %>% group_by(row, col) %>% summarise(value = paste0(value, " + ")) %>% 
+      mutate(data_type = "character", type = "attribute") %>% new_cell_df() %>% mutate(gid = "dummy")
+  }
+  
+  if(missing(d_dat)){
+    d_dat <- get_group_id(cd %>% filter(type == "value"), gid_tag = "d")
+  }
+  
+  if(missing(d_att)){
+    d_att <- get_group_id(cd %>% filter(type == "attribute"), gid_tag = "a")
+  }
+  
+  
+  if(!("row_d" %in% colnames(admap)) & !("row_a" %in% colnames(admap))){
+    admap <- get_data_attr_cell_wise_map_raw(admap, d_dat, d_att)
+  }
   
   if(!("row_d" %in% colnames(admap))){
-    admap <- get_data_attr_cell_wise_map_raw(admap, d_dat, d_att)
+    admap <- admap %>%
+      # join with data_gid to attach all data-cells
+      inner_join(d_dat %>%
+                   select(row_d = row, col_d = col, data_gid = gid),
+                 by = "data_gid"
+      ) 
+  }
+  
+  if(!("row_a" %in% colnames(admap))){
+    admap <- admap %>%
+      # join with data_gid to attach all data-cells
+      inner_join(d_att %>%
+                   select(row_a = row, col_a = col, attr_gid = gid),
+                 by = "attr_gid"
+      )
   }
   # cd  cell df
   # admap : cellwise raw
   
   ui <- miniPage(
-    gadgetTitleBar("Data Attribute Map Inspection"),
-    miniTabstripPanel(
-      miniTabPanel("A-D Map",
-                   icon = icon("cubes"),
-                   miniContentPanel(
-                     plotOutput("plot_admap", height = "100%")
-                   ),
-                   
-                   miniButtonBlock(
-                     div(sliderInput("row_range", label = "Row Range", 
+    # gadgetTitleBar("Data Attribute Map Inspection"),
+    miniContentPanel(
+      plotOutput("plot_admap", height = "100%")
+    ),
+    
+    ################# 
+    # Control Panel #
+    #################
+    
+    absolutePanel(
+      draggable = T, 
+      top = 200,
+      style = "opacity: 0.9;",
+      
+      bsCollapse(id = "Control_Panel_collapse", open = "Control Panel",
+                 bsCollapsePanel(
+                   "Control Panel", 
+                   div(
+                     
+                     ####################### 
+                     # Control Panel Start #
+                     #######################
+                     
+                     div(style = "float: left; margin: 5px;",
+                         sliderInput("row_range", label = "Row Range", 
                                      min = min(cd$row), max = max(cd$row), 
                                      value = range(cd$row), step = 1L),
                          sliderInput("col_range", label = "Col Range", 
                                      min = min(cd$col), max = max(cd$col), 
                                      value = range(cd$col), step = 1L),
                          checkboxInput("no_txt", label = "No text", value = F),
-                         sliderInput("txt_size", "Text Size", min = 1, max = 5, value = 2, step = 0.5),
+                         sliderInput("txt_size", "Text Size", min = 1, max = 8, value = 4, step = 0.5),
+                         sliderInput("txt_angle", "Text Angle", min = 0, max = 90, value = 0, step = 15),
                          checkboxInput("zoom", label = "Zoom", value = T)),
                      
-                     div(selectizeInput("filter_by", "Filter AD map by:", 
+                     div(style = "float: left; margin: 5px;",
+                         selectizeInput("filter_by", "Filter AD map by:", 
                                         choices = colnames(admap), selected = "data_gid"),
                          selectizeInput("filter_by_value", "Values of Filter Column:", 
                                         choices = unique(admap$data_gid) ),
                          radioButtons("filter_by_rc","Row Col", choices = c("A","D"))),
                      
-                     div(actionButton("swap_filter_by_cols", "Swap")),
+                     div(style = "float: left; margin: 5px;",
+                         rep(list(br()), 5),
+                         actionButton("swap_filter_by_cols", "Swap")),
                      
-                     div(selectizeInput("filter_by_mapped", "Further Filter AD map by:", 
+                     div(style = "float: left; margin: 5px;",
+                         selectizeInput("filter_by_mapped", "Further Filter AD map by:", 
                                         choices = colnames(admap), selected = "attr_gid"),
                          selectizeInput("filter_by_mapped_value", "Values of Filter Column:", 
                                         choices = unique(admap$attr_gid),  multiple = T ),
                          radioButtons("filter_by_mapped_rc","Row Col", choices = c("A","D")))
                      
-                   )
-      ),
-      id = "now_tab_main"
+                     ##################### 
+                     # Control Panel End #
+                     #####################
+                   ),
+                   
+                   style = "info"
+                 ))
+      
+      
     )
+    
+    ################# 
+    # Control Panel #
+    #################
+    , # data panel
+    
+    ############## 
+    # Data Panel #
+    ##############
+    absolutePanel( 
+      top = 50,
+      draggable = T, 
+      style = "opacity: 0.95;",
+      
+      bsCollapse(id = "Data_Panel_collapse",
+                 bsCollapsePanel(
+                   "Data", 
+                   div(style = "width: 800px;",
+                     ####################
+                     # Data Panel Start #
+                     ####################
+                     
+                     selectInput("which_data_to_show", label = "Display:", 
+                                 choices = c("Filtered (by both filters)"="f2","Filtered (by 1st filter)"="f1", "Generated Cell-DF"="cdf")),
+                     DT::dataTableOutput("data_display")
+                     
+                     ##################
+                     # Data Panel End #
+                     ##################
+                     
+                   ),
+                   
+                   style = "success"
+                 ))
+      
+      
+    )
+    ############## 
+    # Data Panel #
+    ##############
+    
   )
   
   ########## Server ##########
@@ -138,7 +241,7 @@ shiny_admap_display <- function(cd, admap, d_dat, d_att){
       admap0 <- admap_filtered_by_mapped()
       
       d_try <- try({
-        isolate({
+          
           if(input$filter_by_rc == "A"){
             rccols_d <- c("row_a","col_a")
           }else{
@@ -150,6 +253,7 @@ shiny_admap_display <- function(cd, admap, d_dat, d_att){
           }else{
             rccols_a <- c("row_d","col_d")
           }
+          
           ddf <- admap0[c(input$filter_by,rccols_d)] %>% unique()
           adf <- admap0[c(input$filter_by_mapped,rccols_a)] %>% unique()
           
@@ -165,11 +269,17 @@ shiny_admap_display <- function(cd, admap, d_dat, d_att){
           
           adf <- adf %>% mutate(gid = value)
           ddf <- ddf %>% mutate(gid = value)
+          
           cdf0 <- rbind(ddf, adf)
+          
+          cdf0 <- cdf0 %>% group_by(row, col) %>% 
+            summarise(value = paste0(value, collapse = " + "), gid = min(gid)) %>% 
+            ungroup()
+          
           cdf0$data_type = "character"
           cdf0 <- new_cell_df(cdf0, minimal = T)
           cdf0
-        })
+        
       }, silent = T)
       
       if(!inherits(d_try, "try-error")){
@@ -225,9 +335,50 @@ shiny_admap_display <- function(cd, admap, d_dat, d_att){
                col <= cr[2], col >= cr[1]) %>% 
         plot_cell_df_ggplot2(no_txt = isTRUE(input$no_txt), fill = "gid", 
                              txt_size = input$txt_size,
+                             txt_angle = input$txt_angle,
                              background = cd %>% 
                                filter(row <= rr[2], row >= rr[1],
                                       col <= cr[2], col >= cr[1]))
+    })
+    
+    
+    output$data_display <- DT::renderDT({
+      dt <- tibble()
+      if(!is.null(input$which_data_to_show)){
+        if(input$which_data_to_show=="f2"){
+          dt <- admap_filtered_by_mapped()
+        }else{
+          if(input$which_data_to_show=="f1"){
+            dt<-admap_filtered()
+          }else{
+            dt <- cdf()
+          }
+        }
+      }
+      
+      datatable(dt,
+                selection = "none",
+                escape = FALSE,
+                rownames = FALSE,
+                style = "bootstrap",
+                class = "cell-border stripe",
+                extensions = c("KeyTable", "Scroller", "Buttons"),
+                options = list(
+                  pageLength = 5,
+                  keys = TRUE,
+                  sDom = '<"top">lrt<"bottom">ipB',
+                  deferRender = TRUE,
+                  scrollX = TRUE,
+                  scrollY = 200,
+                  scroller = TRUE,
+                  buttons = list(
+                    list(
+                      extend = "colvis",
+                      text = as.character(tags$a("Columns", style = "font-size:70%"))
+                    )
+                  )
+                )
+      )
     })
   }
   

@@ -64,9 +64,15 @@ clean_string <- function(x){
 }
 
 string_signature <- function(x){
+  empt <- tibble(name_signature = character(0), original_name = character(0), 
+                 trim_name = character(0))
   x <- x[!is.na(x)] %>% 
     unique() %>% 
     as.character()
+  
+  if(length(x) == 0) {
+    return(empt)
+  }
   
   dx <- tibble(original_name = x)
   
@@ -77,6 +83,10 @@ string_signature <- function(x){
   
   dx <- dx %>% 
     filter(nchar(name_signature)>0)
+  
+  if(nrow(dx) == 0) {
+    return(empt)
+  }
   
   dx %>% 
     group_by(name_signature) %>% 
@@ -148,3 +158,11 @@ name_fix_for_list <- function(xl, name_tag = "Node", sep="_"){
 }
 
 
+# statistical mode
+stat_mode <- function(x){
+  m1 <- table(x) %>% which.max() %>% names()
+  if(is.numeric(x)){
+    m1 <- as.numeric(m1) %>% mean()
+  }
+  m1[1]
+}
