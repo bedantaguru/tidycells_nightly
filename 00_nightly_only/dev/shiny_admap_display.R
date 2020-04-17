@@ -192,7 +192,7 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
       updateSelectizeInput(
         session, "filter_by_mapped_value", 
         label = "Values of Filter Column:", 
-        choices = unique(admap0[[input$filter_by_mapped]]), 
+        choices = unique(admap0[[input$filter_by_mapped]]) %>% sort(), 
         selected = unique(admap0[[input$filter_by_mapped]]))
     })
     
@@ -203,7 +203,7 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
       updateSelectizeInput(
         session, "filter_by_value", 
         label = "Values of Filter Column:", 
-        choices = unique(admap0[[input$filter_by]]))
+        choices = unique(admap0[[input$filter_by]]) %>% sort())
     })
     
     observe({
@@ -215,11 +215,11 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
         
         updateSelectizeInput(session,
                              "filter_by", "Filter AD map by:", 
-                             choices = colnames(admap0), selected = f2)
+                             choices = colnames(admap0) %>% sort(), selected = f2)
         
         updateSelectizeInput(session,
                              "filter_by_mapped", "Further Filter AD map by:", 
-                             choices = colnames(admap0), selected = f1)
+                             choices = colnames(admap0) %>% sort(), selected = f1)
         last_value_for_swap_filter_by_cols <<- input$swap_filter_by_cols
       }
     })

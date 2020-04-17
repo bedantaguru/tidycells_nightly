@@ -144,7 +144,7 @@ gid_map_link_tune <- function(gid_map){
     }
     
   }else{
-    return(tibble())
+    return(tibble(gid = character(0), new_gid = character(0)))
   }
   
   grps %>% map_df(~{

@@ -130,13 +130,15 @@ relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids){
   chk <- (length(seqt1[seqt1>1 & seqt1 < length(seq1)]) > 0) | (length(seqt2[seqt2>1 & seqt2 < length(seq2)]) > 0)
   if(chk){
     # it is by default additive (old informations are preserved)
-    # "stale" is used in sense that if d_dat changes or data_gid changes
+    # it may be termed "stale" which is used in sense that if d_dat changes or data_gid changes
     # then this will be meaningless or has to be tackled in specific ways
+    bds <- unique(out$data_gid)
+    
     common_knowledge(
-      stale_non_joinable_data_gid = tibble(
-        id = paste0("by_attr_id_", out$attr_gid[1]), 
-        data_gid = unique(out$data_gid)
-      )
+      non_joinable_data_gid = expand.grid(
+        gid1 = bds, 
+        gid2 = bds, stringsAsFactors = F
+      ) %>% filter(gid1!=gid2)
     )
   }
   

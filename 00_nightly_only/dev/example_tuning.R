@@ -46,3 +46,14 @@ ca <- analyse_cells(absd)
 d0 <- compose_cells(ca)
 
 
+# > microbenchmark::microbenchmark(ca <- analyze_cells(tf0), times = 1)
+# Unit: seconds
+# expr      min       lq     mean   median       uq      max neval
+# ca <- analyze_cells(tf0) 6.904038 6.904038 6.904038 6.904038 6.904038 6.904038     1
+
+
+# > microbenchmark::microbenchmark(ca <- analyze_cells(tf0), times = 1)
+# Unit: seconds
+# expr     min      lq    mean  median      uq     max neval
+# ca <- analyze_cells(tf0) 13.3713 13.3713 13.3713 13.3713 13.3713 13.3713     1
+# >

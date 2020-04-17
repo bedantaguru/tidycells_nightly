@@ -238,9 +238,18 @@ ai_main_part_phase_5_post_process <- function(d_dat, d_att, admap, admap_cell_wi
   this_cells <- get_cells_from_admap(admap, d_dat, d_att)
   
   # natural gid for easier user selection
-  gid_ngid <- d_dat %>%
-    distinct(gid) %>%
-    mutate(natural_gid = gid %>% as.factor() %>% as.numeric() %>% paste0("d",.))
+  # non-seqential variant: 
+  # gid_ngid <- d_dat %>%
+  #   distinct(gid) %>%
+  #   mutate(natural_gid = gid %>% as.factor() %>% as.numeric() %>% paste0("d",.)) 
+  
+  gid_ngid <- d_dat %>% 
+    group_by(gid) %>% 
+    summarise(row = round(mean(row)), col = round(mean(col))) %>% 
+    arrange(col, row) %>% 
+    mutate(natural_gid = seq_along(gid) %>% paste0("d",.)) %>% 
+    select(gid, natural_gid)
+  
   
   # attach natural gid
   this_cells <- this_cells %>%
