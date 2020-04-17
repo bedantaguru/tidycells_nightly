@@ -49,18 +49,20 @@ get_group_id <- function(dat, allow_corner = FALSE, gid_tag) {
       mutate(gid = min(gid)) %>%
       ungroup() -> drc_id
     
-    if (n_gid > (drc_id %>% summarise(n_distinct(gid)) %>% pull(1))) {
-      n_gid <- drc_id %>%
-        summarise(n_distinct(gid)) %>%
-        pull(1)
+    n_gid_now <- drc_id %>%
+      summarise(n_distinct(gid)) %>%
+      pull(1)
+    
+    if (n_gid > n_gid_now) {
+      n_gid <- n_gid_now
     } else {
       break()
     }
   })
   
-  if(missing(gid_tag)){
-    drc_id <- drc_id %>% mutate(gid = as.character(gid))
-  }else{
+
+  drc_id <- drc_id %>% mutate(gid = as_character(gid))
+  if(!missing(gid_tag)){
     drc_id <- drc_id %>% mutate(gid = paste0(gid_tag, gid))
   }
   
@@ -77,7 +79,6 @@ get_group_id <- function(dat, allow_corner = FALSE, gid_tag) {
     
   }
   
-  # @Dev major change only group ids returned df no list
   drc_id
 }
 
@@ -132,7 +133,7 @@ gid_map_link_tune <- function(gid_map){
       
       seq(2, nrow(gid_map)) %>% 
         purrr::walk(~{
-          tl <- gid_map[.x, ] %>% as.character()
+          tl <- gid_map[.x, ] %>% as_character()
           mch <- grps %>% map_lgl(~(length(.x %>% intersect(tl)) >0))
           if(any(mch)){
             grps[[which(mch)[1]]] <<- c(grps[[which(mch)[1]]], tl)

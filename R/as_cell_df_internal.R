@@ -109,7 +109,7 @@ as_cell_df_internal.default <- function(d,
   }
 
   if (conv_done) {
-    d_out$value <- as.character(d_out$value)
+    d_out$value <- as_character(d_out$value)
     new_cell_df(d_out)
   } else {
     abort("unknown error occurred")
@@ -122,7 +122,7 @@ as_cell_df_internal.generic_type <- function(d, ...){
   colnames(d)[which(colnames(d)==dtype)] <- "data_type"
   rest_cols <- colnames(d) %>% setdiff(c("row","col", "data_type"))
   char_try <- d %>% select(-row, -col, -data_type) %>% map(~{
-    ct <- try(as.character(.x), silent = T)
+    ct <- try(as_character(.x), silent = T)
     if(inherits(ct, "try-error")){
       ct <- rep(NA, length(.x))
       msg_once("<generic_type> cell_df conversion may be incomplete.")
@@ -169,10 +169,10 @@ as_cell_df_internal.tidyxl <- function(d, ...) {
   d_out <- d %>%
     filter(!is_blank) %>%
     mutate(value = case_when(
-      data_type == "numeric" ~ as.character(numeric),
-      data_type == "logical" ~ as.character(logical),
-      data_type == "date" ~ as.character(date),
-      data_type == "character" ~ as.character(character),
+      data_type == "numeric" ~ as_character(numeric),
+      data_type == "logical" ~ as_character(logical),
+      data_type == "date" ~ as_character(date),
+      data_type == "character" ~ as_character(character),
       TRUE ~ NA_character_
     )) %>%
     mutate(data_type = ifelse(data_type == "numeric", "numeric", "character")) %>%
@@ -213,15 +213,15 @@ as_cell_df_internal.unpivotr <- function(d, ...) {
 
   d_out <- d %>%
     mutate(value = case_when(
-      data_type == "chr" ~ as.character(chr),
-      data_type == "cplx" ~ as.character(cplx),
-      data_type == "fct" ~ (fct %>% map(as.character) %>% map_chr(~ ifelse(length(.x), .x, NA_character_))),
-      data_type == "dbl" ~ as.character(dbl),
-      data_type == "int" ~ as.character(int),
-      data_type == "lgl" ~ as.character(lgl),
-      data_type == "ord" ~ (ord %>% map(as.character) %>% map_chr(~ ifelse(length(.x), .x, NA_character_))),
-      data_type == "date" ~ as.character(date),
-      data_type == "dttm" ~ as.character(dttm),
+      data_type == "chr" ~ as_character(chr),
+      data_type == "cplx" ~ as_character(cplx),
+      data_type == "fct" ~ (fct %>% map(as_character) %>% map_chr(~ ifelse(length(.x), .x, NA_character_))),
+      data_type == "dbl" ~ as_character(dbl),
+      data_type == "int" ~ as_character(int),
+      data_type == "lgl" ~ as_character(lgl),
+      data_type == "ord" ~ (ord %>% map(as_character) %>% map_chr(~ ifelse(length(.x), .x, NA_character_))),
+      data_type == "date" ~ as_character(date),
+      data_type == "dttm" ~ as_character(dttm),
       TRUE ~ NA_character_
     )) %>%
     mutate(data_type = ifelse(data_type %in% c("cplx", "dbl", "int"), "numeric", "character")) %>%

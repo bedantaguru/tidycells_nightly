@@ -14,10 +14,10 @@ read_excel_whole_part_readxl <- function(fn, sheet = 1L, possible_date_range = c
     )
   })
 
-  possible_date_range <- as.character(possible_date_range)
+  possible_date_range <- as_character(possible_date_range)
 
-  d0f <- as.matrix(d0) %>% as.character()
-  d1f <- as.matrix(d1) %>% as.character()
+  d0f <- as.matrix(d0) %>% as_character()
+  d1f <- as.matrix(d1) %>% as_character()
   d1f <- ifelse(d1f <= max(possible_date_range) & d1f >= min(possible_date_range), d1f, NA_character_)
 
   df <- ifelse(is.na(d1f), d0f, d1f)

@@ -68,7 +68,7 @@ string_signature <- function(x){
                  trim_name = character(0))
   x <- x[!is.na(x)] %>% 
     unique() %>% 
-    as.character()
+    as_character()
   
   if(length(x) == 0) {
     return(empt)
@@ -111,7 +111,7 @@ formalize_state <- function(sa){
   if(is.null(sa)){
     ""
   }else{
-    sa <- as.character(sa) %>% unique()
+    sa <- as_character(sa) %>% unique()
     sa <- sa[!is.na(sa)]
     sa <- sa[nchar(sa)>0]
     if(length(sa)==0) sa <- ""
@@ -165,4 +165,16 @@ stat_mode <- function(x){
     m1 <- as.numeric(m1) %>% mean()
   }
   m1[1]
+}
+
+# for consistent number to char conversion
+as_character <- function(x){
+  # temp option change
+  osp <- getOption("scipen")
+  # 10^100 is big enough !
+  options(scipen = 100)
+  ch <- as.character(x)
+  # revert back
+  options(scipen = osp)
+  ch
 }

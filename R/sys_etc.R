@@ -6,14 +6,14 @@
 
 df_footprint <- function(df, only_content = F){
   if(only_content){
-    colnames(df) <- df %>% map_chr(~.x %>% as.character %>% sort %>% digest::digest())
+    colnames(df) <- df %>% map_chr(~.x %>% as_character %>% sort %>% digest::digest())
   }
   df <- df[sort(colnames(df))]
   df <- df %>% arrange(!!! rlang::syms(colnames(df)))
   if(only_content){
-    df %>% as.matrix() %>% as.character() %>% paste0(collapse = "+")
+    df %>% as.matrix() %>% as_character() %>% paste0(collapse = "+")
   }else{
-    df %>% as.matrix() %>% as.character() %>% paste0(collapse = "+") %>% paste0("__",paste0(colnames(df), collapse = "_"))
+    df %>% as.matrix() %>% as_character() %>% paste0(collapse = "+") %>% paste0("__",paste0(colnames(df), collapse = "_"))
   }
   
 }

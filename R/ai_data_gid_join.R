@@ -1,22 +1,9 @@
 ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
   
+  
+  refresh_stale_info_non_joinable_data_gid(d_dat)
+  
   done <- F
-  
-  # @Dev push this inside checks or handle differently
-  # if any non_joinable information is present
-  if(is_common_knowledge("non_joinable")){
-    non_joinable_info <- common_knowledge("non_joinable") 
-  }else{
-    non_joinable_info <- tibble()
-  }
-  
-  if(nrow(non_joinable_info)>0){
-    non_joinable_info <- non_joinable_info %>% 
-      inner_join(d_dat, by=c("data_gid"="gid")) %>% 
-      group_by(id, data_gid) %>% 
-      summarise(row = row[1], col = col[1]) %>% 
-      ungroup()
-  }
   
   repeat({
     
@@ -24,37 +11,6 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
     
     data_gid_comb <- d_dat %>% approx_intra_block_dist()
     
-    #@Dev
-    # need to check performance 
-    #  may introduce center dist
-    # data_gid_comb <- d_dat$gid %>%
-    #   unique() %>%
-    #   utils::combn(2) %>%
-    #   as.data.frame(stringsAsFactors = FALSE)
-    
-    
-    
-    if(is_common_knowledge("non_joinable")){
-      if(nrow(non_joinable_info)>0){
-        browser()
-        # @Dev
-        # remove it it not required
-        # nj_chk <- data_gid_comb %>% 
-        #   apply(MARGIN = 2, 
-        #         function(.x){non_joinable_info %>% filter(data_gid %in% .x) %>% pull(id) %>% unique() %>% length()})
-        # 
-        #  this is also bad start with initial block list from outside this loop
-        
-        nj_chk <- data_gid_comb %>% 
-          map_lgl(~{
-            rc_gd1 <- d_dat %>% filter(gid == .x[1]) %>% inner_join(non_joinable_info, by = c("row","col"))
-            rc_gd2 <- d_dat %>% filter(gid == .x[2]) %>% inner_join(non_joinable_info, by = c("row","col"))
-            (nrow(rc_gd1)>0 & nrow(rc_gd2)>0)
-          })
-        
-        data_gid_comb <- data_gid_comb[!nj_chk]
-      }
-    }
     
     #  @Dev need further tuning
     
