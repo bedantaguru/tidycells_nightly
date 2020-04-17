@@ -89,6 +89,7 @@ approx_intra_block_dist <- function(cd){
   gids[-length(gids)] %>% map_df(approx_intra_block_dist_part1_get_upper_dist, bdrs)
 }
 
+
 ### this is a real dist as per def of it for any cell df with gid
 # can be used in another module too
 get_intra_block_dist <- function(gid1, gid2, cd){

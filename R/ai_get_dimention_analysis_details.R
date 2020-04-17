@@ -65,8 +65,9 @@ ai_get_dimention_analysis_details <- function(basic_map, d_dat, d_att, major_dir
 }
 
 
-# helpers
-# @Dev this may be kept in different file
+###########
+# helpers #
+###########
 
 get_data_attr_cell_wise_map_raw <- function(map, d_dat, d_att){
   map %>%

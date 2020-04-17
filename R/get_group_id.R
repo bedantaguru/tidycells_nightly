@@ -153,9 +153,11 @@ gid_map_link_tune <- function(gid_map){
 }
 
 
-get_group_id_join_gids <- function(old_group_id_info, gid_map) {
+get_group_id_join_gids <- function(old_group_id_info, gid_map, no_need_to_tune = FALSE) {
   
-  gid_map <- gid_map_link_tune(gid_map)
+  if(!no_need_to_tune){
+    gid_map <- gid_map_link_tune(gid_map)
+  }
   
   old_group_id_info <- old_group_id_info %>%
     left_join(gid_map, by = "gid") %>%

@@ -62,7 +62,9 @@ ai_get_information_blocks <- function(admap, d_dat, d_att){
   
 }
 
-# helpers
+###########
+# helpers #
+###########
 
 is_attachable_as_info_block <- function(gid1, gid2, major_admap){
   

@@ -12,7 +12,11 @@ compact_gid_maps <- function(d_att, admap) {
 
   chk <- foot_prints %>% count(fp) %>% filter(n>1)
   
+  done <- F
+  
   if(nrow(chk)>0){
+    
+    done <- T
     
     # split overlap is present
     ngmap <- foot_prints %>%
@@ -41,5 +45,5 @@ compact_gid_maps <- function(d_att, admap) {
   }
   
 
-  list(d_att = d_att, admap = admap)
+  list(done = done, d_att = d_att, admap = admap)
 }

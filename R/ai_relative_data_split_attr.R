@@ -30,7 +30,6 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     # information kept for missing link detection
     # mbc : missed_block_connections
     mbc <- chk %>% distinct(attr_gid, data_gid)
-    attr(d_att, "missed_block_connections") <- mbc
     
     common_knowledge(missed_block_connections = mbc)
     

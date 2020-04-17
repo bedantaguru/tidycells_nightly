@@ -8,6 +8,14 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
   library(DT)
   
   if(missing(cd)){
+    if(!(hasName(admap, "row_d") & hasName(admap, "row_a"))){
+      if(missing(d_dat) | missing(d_att)){
+        stop("Either admap has to be cell wise or d_dat and d_att has to be specified in order to populate cd", call. = F)
+      }
+      
+      admap <- get_data_attr_cell_wise_map_raw(admap, d_dat, d_att)
+      
+    }
     cd <- (admap %>% distinct(row = row_d, col = col_d, value = data_gid)) %>% 
       bind_rows(admap %>% distinct(row = row_a, col = col_a, value = attr_gid))
     cd <- cd %>% group_by(row, col) %>% summarise(value = paste0(value, " + ")) %>% 

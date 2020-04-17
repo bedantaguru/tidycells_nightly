@@ -4,8 +4,8 @@ is_attachable <- function(gid1, gid2, d_dat, d_att, data_attr_map, whole_data) {
   ########## logic #########
   #### should have similar major sides (of attributes)
   if (!identical(
-    data_attr_map %>% filter(attr_group == "major", data_gid == gid1) %>% pull(direction) %>% sort(),
-    data_attr_map %>% filter(attr_group == "major", data_gid == gid2) %>% pull(direction) %>% sort()
+    data_attr_map %>% filter(attr_group == "major", data_gid == gid1) %>% pull(direction) %>% unique() %>% sort(),
+    data_attr_map %>% filter(attr_group == "major", data_gid == gid2) %>% pull(direction) %>% unique() %>% sort()
   )) {
     return(FALSE)
   }

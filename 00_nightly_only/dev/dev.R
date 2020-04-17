@@ -2,15 +2,33 @@
 ##################################################################
 ##################################################################
 
-1  7 13
-
-
-dam %>% 
-  group_by(data_gid, attr_var_sync_name) %>% 
-  count()
 
 
 ###############################################################
+
+# very crude
+approx_intra_block_radial_dist <- function(cd){
+  gcs <- cd %>% 
+    group_by(gid) %>% 
+    summarise(mr = mean(row), mc = mean(col), 
+              r = (max(abs(row-mr)) + max(abs(col-mc)))/2 )
+  
+  upper_to_this <- sort(gcs$gid)[-1] %>% 
+    map_df(~{
+      gcs_this <-  gcs %>%  filter(gid == .x)
+      gcs %>% 
+        filter(gid>.x) %>% 
+        rename(gid2 = gid) %>% 
+        mutate(gid1 = gcs_this$gid) %>% 
+        mutate(d0 = sqrt((mr - gcs_this$mr)^2+(mc - gcs_this$mc)^2),
+               d = pmax(d0 - r - gcs_this$r, 0)) %>% 
+        select(gid1, gid2, d)
+    })
+  
+  upper_to_this
+}
+
+
 
 # this kind of orientation detection is not so robust
 

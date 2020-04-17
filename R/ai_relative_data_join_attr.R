@@ -2,7 +2,6 @@
 
 ai_relative_data_join_attr <- function(admap_main, d_att) {
   chk <- admap_main %>%
-    distinct(attr_gid, data_gid, direction, attr_group) %>%
     group_by(data_gid, direction, attr_group) %>%
     mutate(n_att = n_distinct(attr_gid)) %>%
     ungroup() %>%
@@ -15,54 +14,49 @@ ai_relative_data_join_attr <- function(admap_main, d_att) {
     done <- TRUE
 
     rel_gids <- chk %>%
-      select(-n_att) %>%
-      inner_join(admap_main$raw_map, by = c("attr_gid", "data_gid", "direction", "attr_group"))
+      select(-n_att) 
 
-    d_att_dat_map_raw_rest <- admap_main$raw_map %>%
+    admap_main_rest <- admap_main %>%
       anti_join(chk, by = c("attr_gid", "data_gid", "direction", "attr_group"))
 
-    rel_gids_att <- rel_gids %>%
-      distinct(attr_gid, data_gid, direction, attr_group, row = row_a, col = col_a) %>%
+    rel_gids <- rel_gids %>%
       group_by(data_gid, direction, attr_group) %>%
       mutate(new_attr_gid = paste(min(attr_gid), data_gid, direction, sep = "_")) %>%
       ungroup()
 
-    rel_gids <- rel_gids %>% inner_join(rel_gids_att %>% distinct(attr_gid, new_attr_gid), by = "attr_gid")
-
     rel_gids <- rel_gids %>%
       group_by(new_attr_gid, data_gid) %>%
       mutate(
-        # this is possibly not required anymore as attr_group is in grouping vars
+        # this is possibly not required anymore as attr_group was in grouping vars
         new_attr_group = ifelse(any(attr_group == "major"), "major", "minor"),
         new_dist = min(dist)
       ) %>%
       ungroup()
 
-    admap_main$raw_map <- rel_gids %>%
+    admap_main <- rel_gids %>%
       select(-attr_group, -attr_gid, -dist) %>%
       rename(attr_gid = new_attr_gid, attr_group = new_attr_group, dist = new_dist) %>%
-      bind_rows(d_att_dat_map_raw_rest)
+      distinct() %>% 
+      bind_rows(admap_main_rest) %>% 
+      distinct()
 
-    admap_main$map <- admap_main$raw_map %>%
-      distinct(attr_gid, data_gid, direction, direction_group, dist, attr_group)
+    
+    new_part_of_d_att <- rel_gids %>% 
+      distinct(gid = attr_gid, new_attr_gid) %>% 
+      left_join(d_att, by = "gid") %>% 
+      select(-gid) %>% 
+      rename(gid = new_attr_gid)
 
-    # dimesion analysis is not kept
+    # update d_att 
+    # (addition as potentilly these aids can get connected to others where duplicate has not arrived)
+    
+    d_att <- d_att %>%
+      bind_rows(new_part_of_d_att)
+    
+    chk_this <- chk %>% distinct(attr_gid, data_gid)
 
-    # update d_att
-    d_att$group_id_map <- d_att$group_id_map %>%
-      bind_rows(rel_gids_att %>%
-        select(gid = new_attr_gid, row, col))
-    d_att$group_id_boundary <- get_group_id_boundary(d_att$group_id_map)
-
-    chk_this <- chk %>% distinct(gid = attr_gid, data_gid)
-
-    if (is.null(d_att$missed_blocks)) {
-      d_att$missed_blocks <- chk_this
-    } else {
-      d_att$missed_blocks <- chk_this %>%
-        bind_rows(d_att$missed_blocks) %>%
-        unique()
-    }
+    common_knowledge(missed_block_connections = chk_this)
+    
   }
 
   list(done = done, d_att = d_att, admap = admap_main)

@@ -7,14 +7,19 @@ options(lifecycle_verbosity = "warning")
 tf0 <- read_cells("00_nightly_only/dev/example_tuning_check_points/master_pattern.xlsx")[[1]]
 tf0 <- tf0 %>% detect_table_block()
 tf0 %>% filter(Row = 1, Col = 1, keep= 5) -> xx
+
+tf0 %>% filter(col>12, row<100) ->xx
+
+tf0 %>%  filter(row>95) -> xx
 # xx %>% mutate(gid_29 = gid_29+gid_13, gid_13 = gid_14+gid_13) %>% plot()
 
 xx <- xx %>% numeric_values_classifier()
 
+
+
 ca <- analyze_cells(xx)
 
 d0 <- compose_cells(ca)
-
 d1 <- collate_columns(d0)
 
 # name suggest will come here
@@ -39,5 +44,6 @@ rm(d_abs,f)
 ca <- analyse_cells(absd)
 
 d0 <- compose_cells(ca)
+
 
 
