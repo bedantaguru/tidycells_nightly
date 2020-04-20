@@ -9,9 +9,7 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
     
     if (length(unique(d_dat$gid)) < 2) break()
     
-    
-    # only dist based approach : 
-    #data_gid_comb <- d_dat %>% approx_intra_block_dist()
+    # nearer data_gids already gets priority
     data_gid_comb <- d_dat %>% get_possible_data_gid_mergeable()
     
     data_gid_comb <- data_gid_comb %>% anti_join(njdg, by = c("gid1", "gid2"))
@@ -19,14 +17,6 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
     #  @Dev need further tuning
     
     if(nrow(data_gid_comb)>0){
-      
-      if(nrow(data_gid_comb)>50){
-        # @Dev
-        # very far apart dist will not be tackled here
-        # so above data_gid_comb <- d_dat %>% approx_intra_block_dist() is not good
-        data_gid_comb <- data_gid_comb %>% arrange(d)
-        data_gid_comb <- data_gid_comb[seq(20),]
-      }
       
       data_gid_comb <- data_gid_comb %>%
         dplyr::rowwise() %>% 
