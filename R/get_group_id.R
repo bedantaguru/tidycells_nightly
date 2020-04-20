@@ -85,10 +85,22 @@ get_group_id <- function(dat, allow_corner = FALSE, gid_tag) {
 
 # get boundary of group_id
 # @Dev this possibly can be merged to intra block dist approx_intra_block_dist
-get_group_id_boundary <- function(drc_id) {
-  drc_id %>%
+get_group_id_boundary <- function(drc_id, flatten_it = F, need_both = F) {
+  dout <- drc_id %>%
     group_by(gid) %>%
     summarise(r_min = min(row), c_min = min(col), r_max = max(row), c_max = max(col))
+  if(flatten_it | need_both){
+    xp1 <- dout[-1] %>% t() %>% as.data.frame() %>% map_df(~.x %>% matrix(nrow = 2, byrow = T) %>% as.data.frame() %>% expand.grid())
+    xp2 <- dout$gid %>% rep(each =4)
+    xp <- cbind(xp2, xp1)
+    colnames(xp) <- c("gid","row","col")
+    xp <- as_tibble(xp)
+    if(need_both){
+      return(list(normal = dout, flat = xp))
+    }
+    return(xp)
+  }
+  return(dout)
 }
 
 # for corner cells this algo may be tuned

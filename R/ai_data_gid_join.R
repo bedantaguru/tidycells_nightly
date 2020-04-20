@@ -9,7 +9,10 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
     
     if (length(unique(d_dat$gid)) < 2) break()
     
-    data_gid_comb <- d_dat %>% approx_intra_block_dist()
+    
+    # only dist based approach : 
+    #data_gid_comb <- d_dat %>% approx_intra_block_dist()
+    data_gid_comb <- d_dat %>% get_possible_data_gid_mergeable()
     
     data_gid_comb <- data_gid_comb %>% anti_join(njdg, by = c("gid1", "gid2"))
     
@@ -18,6 +21,9 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
     if(nrow(data_gid_comb)>0){
       
       if(nrow(data_gid_comb)>50){
+        # @Dev
+        # very far apart dist will not be tackled here
+        # so above data_gid_comb <- d_dat %>% approx_intra_block_dist() is not good
         data_gid_comb <- data_gid_comb %>% arrange(d)
         data_gid_comb <- data_gid_comb[seq(20),]
       }
@@ -90,5 +96,15 @@ update_non_joinable_data_gid <- function(njdg, link_tuned_gid_map){
 }
 
 
+get_possible_data_gid_mergeable <- function(d_dat){
+  
+  dg_sides <- ai_get_data_attr_map(get_group_id_boundary(d_dat), d_dat)$map
+  
+  dg_sides <- dg_sides %>%  rename(g1 = data_gid, g2 =attr_gid) %>% filter(g1!=g2)
+  
+  dg_sides <- dg_sides %>% mutate(gid1 = pmin(g1, g2), gid2 = pmax(g1, g2))
+  
+  dg_sides %>% group_by(gid1, gid2) %>% summarise(d = mean(dist)) %>% ungroup()
+}
 
 
