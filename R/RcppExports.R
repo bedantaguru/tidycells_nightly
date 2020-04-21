@@ -11,10 +11,6 @@ LCS <- function(ss) {
     .Call(`_tidycells_LCS`, ss)
 }
 
-get_group_id_boundary_cpp <- function(drc_id) {
-    .Call(`_tidycells_get_group_id_boundary_cpp`, drc_id)
-}
-
 #' is_attachable for multiple rows of gid1 gid2 composition
 #'
 #' @param g1g2df a df having 'gid1' 'gid2' columns

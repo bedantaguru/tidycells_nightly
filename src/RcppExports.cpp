@@ -16,17 +16,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// get_group_id_boundary_cpp
-DataFrame get_group_id_boundary_cpp(DataFrame drc_id);
-RcppExport SEXP _tidycells_get_group_id_boundary_cpp(SEXP drc_idSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type drc_id(drc_idSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_group_id_boundary_cpp(drc_id));
-    return rcpp_result_gen;
-END_RCPP
-}
 // is_attachable_multiple
 LogicalVector is_attachable_multiple(DataFrame g1g2df, DataFrame d_dat, DataFrame d_att, DataFrame data_attr_map, DataFrame whole_data);
 RcppExport SEXP _tidycells_is_attachable_multiple(SEXP g1g2dfSEXP, SEXP d_datSEXP, SEXP d_attSEXP, SEXP data_attr_mapSEXP, SEXP whole_dataSEXP) {
@@ -45,7 +34,6 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_tidycells_LCS", (DL_FUNC) &_tidycells_LCS, 1},
-    {"_tidycells_get_group_id_boundary_cpp", (DL_FUNC) &_tidycells_get_group_id_boundary_cpp, 1},
     {"_tidycells_is_attachable_multiple", (DL_FUNC) &_tidycells_is_attachable_multiple, 5},
     {NULL, NULL, 0}
 };

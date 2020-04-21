@@ -2,42 +2,23 @@
 
 using namespace Rcpp;
 
-// [[Rcpp::export]]
+// minimal implementation
 DataFrame get_group_id_boundary_cpp(DataFrame drc_id){
   
-  CharacterVector drc_id_gid = drc_id["gid"];
-  int nr = drc_id_gid.length();
-  CharacterVector drc_id_gid_uniq = unique(drc_id_gid);
-  int nr_out = drc_id_gid_uniq.length();
   NumericVector drc_id_row= drc_id["row"];
   NumericVector drc_id_col= drc_id["col"];
-  NumericVector drc_id_row_grp_min = no_init(nr_out);
-  NumericVector drc_id_row_grp_max = no_init(nr_out);
-  NumericVector drc_id_col_grp_min = no_init(nr_out);
-  NumericVector drc_id_col_grp_max = no_init(nr_out);
+  NumericVector drc_id_row_grp_min = {min(drc_id_row)};
+  NumericVector drc_id_row_grp_max = {max(drc_id_row)};
+  NumericVector drc_id_col_grp_min = {min(drc_id_col)};
+  NumericVector drc_id_col_grp_max = {max(drc_id_col)};
   
-  for(int i = 0; i < nr_out; i++){
-    CharacterVector gid_sel = {drc_id_gid_uniq[i]};
-    LogicalVector sel = (drc_id_gid == rep(gid_sel, nr));
-    NumericVector drc_id_row_sel = drc_id_row[sel];
-    NumericVector drc_id_col_sel = drc_id_col[sel];
-    
-    drc_id_row_grp_min[i] = min(drc_id_row_sel);
-    drc_id_row_grp_max[i] = max(drc_id_row_sel);
-    
-    drc_id_col_grp_min[i] = min(drc_id_col_sel);
-    drc_id_col_grp_max[i] = max(drc_id_col_sel);
-  }
   
-  //    summarise(r_min = min(row), c_min = min(col), r_max = max(row), c_max = max(col))
-  DataFrame dfo = DataFrame::create(_("gid") = drc_id_gid_uniq,
-                                    _("r_min") = drc_id_row_grp_min,
+  DataFrame dfo = DataFrame::create(_("r_min") = drc_id_row_grp_min,
                                     _("r_max") = drc_id_row_grp_max,
                                     _("c_min") = drc_id_col_grp_min,
                                     _("c_max") = drc_id_col_grp_max);
   
-  // CharacterVector tblcls = {"tbl_df",  "tbl", "data.frame"};
-  // dfo.attr("class") = tblcls;
+  
   return dfo;
 }
 
@@ -63,12 +44,11 @@ T rbind_local_part(String cn,DataFrame a, DataFrame b){
 
 DataFrame rbind_local(DataFrame a, DataFrame b){
   
-  CharacterVector gid = rbind_local_part<CharacterVector>("gid", a, b);
   NumericVector row = rbind_local_part<NumericVector>("row", a, b);
   NumericVector col = rbind_local_part<NumericVector>("col", a, b);
   
   
-  DataFrame df = DataFrame::create(_("gid")=gid, _("row")=row, _("col")=col);
+  DataFrame df = DataFrame::create(_("row")=row, _("col")=col);
   return df;
 }
 
@@ -83,6 +63,7 @@ bool is_attachable_single_logic_2_sub(DataFrame d_com, DataFrame whole_data){
   NumericVector gbd_c_min = gbd["c_min"];
   NumericVector gbd_c_max = gbd["c_max"];
   
+  // @Dev whole_data can be ripped
   NumericVector whole_data_row = whole_data["row"];
   NumericVector whole_data_col = whole_data["col"];
   int nr_whole_data = whole_data_row.length();
@@ -107,50 +88,39 @@ bool is_attachable_single_logic_2_sub(DataFrame d_com, DataFrame whole_data){
   return true;
 }
 
-bool is_attachable_single_logic_3_sub(CharacterVector this_dir, DataFrame data_attr_map_this){
+bool is_attachable_single_logic_3_sub(CharacterVector this_dir,
+                                      NumericVector d_dat_row_filt, NumericVector d_dat_col_filt,
+                                      DataFrame d_att,
+                                      CharacterVector  direction, CharacterVector  attr_gid,
+                                      DataFrame whole_data){
   
   
-  //  chks <- c("N","E","W","S") %>% map_lgl(~{
-  CharacterVector  direction =   data_attr_map_this["direction"];
-  CharacterVector  attr_gid =   data_attr_map_this["attr_gid"];
-  LogicalVector sel_dm = direction==rep(this_dir,direction.length());
+
+  int dl = direction.length();  
+  LogicalVector sel_dm = (direction == rep(this_dir, dl));
   if(is_true(any(sel_dm))){
-    
+
     CharacterVector  attr_gid_sel =  attr_gid[sel_dm];
-    
-    
+    CharacterVector d_att_gid = d_att["gid"];
+    NumericVector d_att_row = d_att["row"];
+    NumericVector d_att_col = d_att["col"];
+    LogicalVector d_att_rows = in(d_att_gid, attr_gid_sel);
+
+    NumericVector d_att_row_sel = d_att_row[d_att_rows];
+    NumericVector d_att_col_sel = d_att_col[d_att_rows];
+
+    DataFrame d_comb = rbind_local(DataFrame::create(_("row") = d_att_row_sel, _("col")= d_att_col_sel),
+                                   DataFrame::create(_("row") = d_dat_row_filt, _("col")= d_dat_col_filt));
+
+
+    bool chk_out = is_attachable_single_logic_2_sub(d_comb, whole_data);
+    return chk_out;
+
   }
-  
+
   return true;
   
-  //
-  //    dm0 <- data_attr_map_this %>% filter(direction == .x)
-  //
-  //    if(nrow(dm0)>0){
-  //      this_group_info <- d_dat %>% filter(gid %in% c(gid1, gid2)) %>%
-  //        bind_rows(
-  //          # attached attributes to these data_gids
-  //          d_att %>% filter(gid %in% (dm0 %>% pull(attr_gid)))
-  //        )
-  //      this_group_info <- this_group_info %>% distinct(row, col) %>% mutate(gid = "dummy")
-  //      combined_boundary <- get_group_id_boundary(this_group_info)
-  //      this_region_data <- whole_data %>%
-  //        filter(type!="empty") %>%
-  //        filter(
-  //          row <= combined_boundary$r_max,
-  //          row >= combined_boundary$r_min,
-  //          col <= combined_boundary$c_max,
-  //          col >= combined_boundary$c_min
-  //        )
-  //      this_region_data_rest <- this_region_data %>%
-  //        anti_join(this_group_info, by = c("row", "col")) %>%
-  //        filter(type %in% c("value", "attribute"))
-  //
-  //      if (nrow(this_region_data_rest) > 0) {
-  //        return(FALSE)
-  //      }
-  //
-  //    }
+  
   
 }
 
@@ -197,13 +167,9 @@ bool is_attachable_single(std::string gid1, std::string gid2,
   LogicalVector d_dat_row_sel = (d_dat_gid == rep(gid1r, nr_d_dat)) | (d_dat_gid == rep(gid2r, nr_d_dat));
   NumericVector d_dat_row_filt = d_dat_row[d_dat_row_sel];
   NumericVector d_dat_col_filt = d_dat_col[d_dat_row_sel];
-  CharacterVector d_dat_gid_filt = rep(gid1r, d_dat_row_filt.length());
   
   DataFrame d_com = DataFrame::create(_("row") = d_dat_row_filt,
-                                      _("col") = d_dat_col_filt,
-                                      _("gid")= d_dat_gid_filt);
-  
-  
+                                      _("col") = d_dat_col_filt);
   
   if(!is_attachable_single_logic_2_sub(d_com, whole_data)){
     return false;
@@ -213,14 +179,28 @@ bool is_attachable_single(std::string gid1, std::string gid2,
   //  ########## logic #########
   //  #### should have no other entry within the enclosed combined boundary (direction-wise)
   //  #### should have no other entry (non empty) within the enclosed combined boundary attaching major attributes (direction-wise)
-  //
-  //  data_attr_map_this <- data_attr_map %>% filter(data_gid %in% c(gid1, gid2))
-  //
   
-  //
-  //  if(any(!chks)){
-  //    return(FALSE)
-  //  }
+  
+  LogicalVector data_attr_map_sel_rows_3 = ((data_gid == rep(gid1r, nr_data_attr_map)) | (data_gid == rep(gid2r, nr_data_attr_map)));
+  CharacterVector attr_gid = data_attr_map["attr_gid"];
+  
+  CharacterVector direction_this = direction[data_attr_map_sel_rows_3];
+  CharacterVector attr_gid_this = attr_gid[data_attr_map_sel_rows_3];
+  
+  CharacterVector dirs = {"N","E","W","S"};
+  LogicalVector chks = no_init(4);
+  for(int i =0; i <4; i++){
+    //chks[i] = is_attachable_single_logic_3_sub(CharacterVector::create({dirs[i]}), d_dat_row_filt, d_dat_col_filt, d_att, direction_this, attr_gid_this);
+    CharacterVector td = {dirs[i]};
+    //chks[i] = false;
+    chks[i] = is_attachable_single_logic_3_sub(td, d_dat_row_filt, d_dat_col_filt, d_att, direction_this, attr_gid_this, whole_data);
+  }
+  
+  
+  if(is_true(any(!chks))){
+    return false;
+  }
+  
   
   
   return true;
