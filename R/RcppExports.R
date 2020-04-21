@@ -15,7 +15,7 @@ LCS <- function(ss) {
 #'
 #' @param g1g2df a df having 'gid1' 'gid2' columns
 #' @keywords internal
-is_attachable_multiple <- function(g1g2df, d_dat, d_att, data_attr_map, whole_data) {
-    .Call(`_tidycells_is_attachable_multiple`, g1g2df, d_dat, d_att, data_attr_map, whole_data)
+is_attachable_multiple_cpp <- function(g1g2df, d_dat, d_att, data_attr_map, whole_data) {
+    .Call(`_tidycells_is_attachable_multiple_cpp`, g1g2df, d_dat, d_att, data_attr_map, whole_data)
 }
 

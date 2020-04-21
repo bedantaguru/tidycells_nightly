@@ -16,9 +16,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// is_attachable_multiple
-LogicalVector is_attachable_multiple(DataFrame g1g2df, DataFrame d_dat, DataFrame d_att, DataFrame data_attr_map, DataFrame whole_data);
-RcppExport SEXP _tidycells_is_attachable_multiple(SEXP g1g2dfSEXP, SEXP d_datSEXP, SEXP d_attSEXP, SEXP data_attr_mapSEXP, SEXP whole_dataSEXP) {
+// is_attachable_multiple_cpp
+LogicalVector is_attachable_multiple_cpp(DataFrame g1g2df, DataFrame d_dat, DataFrame d_att, DataFrame data_attr_map, DataFrame whole_data);
+RcppExport SEXP _tidycells_is_attachable_multiple_cpp(SEXP g1g2dfSEXP, SEXP d_datSEXP, SEXP d_attSEXP, SEXP data_attr_mapSEXP, SEXP whole_dataSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -27,14 +27,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< DataFrame >::type d_att(d_attSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type data_attr_map(data_attr_mapSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type whole_data(whole_dataSEXP);
-    rcpp_result_gen = Rcpp::wrap(is_attachable_multiple(g1g2df, d_dat, d_att, data_attr_map, whole_data));
+    rcpp_result_gen = Rcpp::wrap(is_attachable_multiple_cpp(g1g2df, d_dat, d_att, data_attr_map, whole_data));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_tidycells_LCS", (DL_FUNC) &_tidycells_LCS, 1},
-    {"_tidycells_is_attachable_multiple", (DL_FUNC) &_tidycells_is_attachable_multiple, 5},
+    {"_tidycells_is_attachable_multiple_cpp", (DL_FUNC) &_tidycells_is_attachable_multiple_cpp, 5},
     {NULL, NULL, 0}
 };
 

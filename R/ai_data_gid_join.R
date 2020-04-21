@@ -18,14 +18,31 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
     
     if(nrow(data_gid_comb)>0){
       
-      data_gid_comb <- data_gid_comb %>%
-        dplyr::rowwise() %>% 
-        mutate(is_attachable_gids = is_attachable(
-          gid1, gid2,
-          d_dat, d_att, data_attr_map,
-          whole_data = full_data
-        )) %>% 
-        ungroup()
+      
+      # @Dev
+      # clean this mess after testing
+      if(isTRUE(getOption("useRcpp"))){
+        data_gid_comb <-  data_gid_comb %>%
+          mutate(is_attachable_gids = is_attachable_multiple_cpp(
+            data_gid_comb,
+            d_dat, d_att, data_attr_map,
+            full_data
+          ))
+      }else{
+        data_gid_comb <- data_gid_comb %>%
+          dplyr::rowwise() %>% 
+          mutate(is_attachable_gids = is_attachable(
+            gid1, gid2,
+            d_dat, d_att, data_attr_map,
+            whole_data = full_data
+          )) %>% 
+          ungroup()
+      }
+      
+      
+      
+      
+      
       
       if (any(data_gid_comb$is_attachable_gids)) {
         data_gid_joins <- data_gid_comb %>% 
