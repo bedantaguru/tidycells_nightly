@@ -1,5 +1,16 @@
+# note full_data has to be without empty types
 ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
   
+  # fd <- full_data %>% filter(type != "empty") <<-  this filter is not required as earlier ensured
+  
+  fd <- full_data %>% 
+    select(row,col) %>% 
+    # rc for avoiding anti_join
+    mutate(rc = row+1i*col)
+  
+  # d_att is not giong out from here
+  d_att <- d_att %>% 
+    mutate(rc = row+1i*col)
   
   done <- F
   
@@ -9,39 +20,29 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
     
     if (length(unique(d_dat$gid)) < 2) break()
     
+    # prune (discard) all possible data_gid joins
+    
     # nearer data_gids already gets priority
     data_gid_comb <- d_dat %>% get_possible_data_gid_mergeable()
     
     data_gid_comb <- data_gid_comb %>% anti_join(njdg, by = c("gid1", "gid2"))
     
+    data_gid_comb <- is_attachable_prune_vectorized_logic_1(data_gid_comb, data_attr_map)
+    
     #  @Dev need further tuning
     
     if(nrow(data_gid_comb)>0){
       
+      d_dat0 <- d_dat %>% mutate(rc = row+1i*col)
       
-      # @Dev
-      # clean this mess after testing
-      if(isTRUE(getOption("useRcpp"))){
-        data_gid_comb <-  data_gid_comb %>%
-          mutate(is_attachable_gids = is_attachable_multiple_cpp(
-            data_gid_comb,
-            d_dat, d_att, data_attr_map,
-            full_data
-          ))
-      }else{
-        data_gid_comb <- data_gid_comb %>%
-          dplyr::rowwise() %>% 
-          mutate(is_attachable_gids = is_attachable(
-            gid1, gid2,
-            d_dat, d_att, data_attr_map,
-            whole_data = full_data
-          )) %>% 
-          ungroup()
-      }
-      
-      
-      
-      
+      data_gid_comb <- data_gid_comb %>%
+        dplyr::rowwise() %>% 
+        mutate(is_attachable_gids = is_attachable(
+          gid1, gid2,
+          d_dat0, d_att, data_attr_map,
+          whole_data = fd
+        )) %>% 
+        ungroup()
       
       
       if (any(data_gid_comb$is_attachable_gids)) {
@@ -82,7 +83,11 @@ ai_update_admap_after_data_gid_join <- function(admap, link_tuned_gid_map){
     select(-data_gid) %>%
     rename(data_gid = new_gid) %>% 
     group_by(attr_gid, data_gid) %>% 
-    dplyr::summarise_all(stat_mode) %>% 
+    summarise(dist = min(dist), 
+              attr_group = attr_group[1], 
+              mapping_strength = min(mapping_strength), 
+              direction = direction[1], 
+              direction_group = direction_group[1]) %>% 
     ungroup()
   
 }
@@ -111,7 +116,9 @@ get_possible_data_gid_mergeable <- function(d_dat){
   
   dg_sides <- dg_sides %>% mutate(gid1 = pmin(g1, g2), gid2 = pmax(g1, g2))
   
-  dg_sides %>% group_by(gid1, gid2) %>% summarise(d = mean(dist)) %>% ungroup()
+  dg_sides %>% group_by(gid1, gid2) %>% 
+    summarise(d = mean(dist), direction = direction[1]) %>% 
+    ungroup()
 }
 
 

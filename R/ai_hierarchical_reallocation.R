@@ -86,9 +86,14 @@ ai_attr_micro_gid_HR_for_a_layer_inside_a_info_block <- function(lamg, dgids){
   prop1 <- unique(lamg$attr_micro_gid) %>% 
     map_df(~claim_region_for_attr_micro_gid_HR(.x, lamg, dgids))
   # check of dual map for a data_gid
-  chk <- prop1 %>% group_by(data_gid) %>% 
-    mutate(namg = n_distinct(attr_micro_gid)) %>% ungroup()
-  if(nrow(chk %>% filter(namg>1))>0){
+  chk <- prop1 %>% 
+    filter(is_expanded) %>% 
+    group_by(data_gid) %>% 
+    mutate(n_amg = n_distinct(attr_micro_gid)) %>% 
+    ungroup() %>% 
+    filter(n_amg>1)
+  
+  if(nrow(chk)>0){
     # duplicate resolution required
     # @Dev
     browser()
@@ -110,7 +115,9 @@ claim_region_for_attr_micro_gid_HR <- function(this_attr_micro_gid, lamg, dgids)
     split(.$direction_basic) %>% 
     map_df(~{
       
-      # N - S 
+      is_expnd <- FALSE
+      
+      # W-E 
       if(stringr::str_detect(.x$direction_basic[1],"W")){
         # all dgids that are east to this_attr_micro_gid - related dgid
         this_mc <- min(dgids$col_d[dgids$data_gid %in% .x$data_gid])
@@ -119,7 +126,10 @@ claim_region_for_attr_micro_gid_HR <- function(this_attr_micro_gid, lamg, dgids)
         rest_mc <- rest_dgids %>% filter(col_d >= this_mc) %>% 
           pull(col_d) %>% c(Inf) %>% min()
         chk <- claim_region_dgids %>% filter(col_d < rest_mc)
-        if(nrow(chk)>0) claim_region_dgids <- chk
+        if(nrow(chk)>0){
+          claim_region_dgids <- chk
+          is_expnd <- TRUE
+        }
       }else{
         if(stringr::str_detect(.x$direction_basic[1],"E")){
           # all dgids that are west to this_attr_micro_gid - related dgid
@@ -131,11 +141,14 @@ claim_region_for_attr_micro_gid_HR <- function(this_attr_micro_gid, lamg, dgids)
             pull(col_d) %>% c(-Inf) %>% max()
           
           chk <- claim_region_dgids %>% filter(col_d > rest_Mc)
-          if(nrow(chk)>0) claim_region_dgids <- chk
+          if(nrow(chk)>0) {
+            claim_region_dgids <- chk
+            is_expnd <- TRUE
+          }
         }
       }
       
-      # W - E 
+      # N-S
       if(stringr::str_detect(.x$direction_basic[1],"N")){
         # all dgids that are south to this_attr_micro_gid - related dgid
         this_mr <- min(dgids$row_d[dgids$data_gid %in% .x$data_gid])
@@ -145,7 +158,10 @@ claim_region_for_attr_micro_gid_HR <- function(this_attr_micro_gid, lamg, dgids)
           pull(row_d) %>% c(Inf) %>% min()
         
         chk <- claim_region_dgids %>% filter(row_d < rest_mr)
-        if(nrow(chk)>0) claim_region_dgids <- chk
+        if(nrow(chk)>0) {
+          claim_region_dgids <- chk
+          is_expnd <- TRUE
+        }
         
       }else{
         if(stringr::str_detect(.x$direction_basic[1],"S")){
@@ -157,7 +173,10 @@ claim_region_for_attr_micro_gid_HR <- function(this_attr_micro_gid, lamg, dgids)
             pull(row_d) %>% c(-Inf) %>% max()
           
           chk <- claim_region_dgids %>% filter(row_d > rest_Mr)
-          if(nrow(chk)>0) claim_region_dgids <- chk
+          if(nrow(chk)>0) {
+            claim_region_dgids <- chk
+            is_expnd <- TRUE
+          }
           
         }
       }
@@ -165,7 +184,8 @@ claim_region_for_attr_micro_gid_HR <- function(this_attr_micro_gid, lamg, dgids)
       claim_region_dgids %>% 
         distinct(info_gid, data_gid) %>% 
         mutate(attr_micro_gid = .x$attr_micro_gid[1], 
-               dist_order = .x$dist_order)
+               dist_order = .x$dist_order, 
+               is_expanded = is_expnd)
     })
   
   

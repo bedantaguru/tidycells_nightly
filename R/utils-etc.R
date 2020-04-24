@@ -158,7 +158,11 @@ name_fix_for_list <- function(xl, name_tag = "Node", sep="_"){
 }
 
 
+# @Dev
 # statistical mode
+# while stat_mode may be accurate it is slow
+# it is kept for reference 
+# may be a quality param added
 stat_mode <- function(x){
   m1 <- table(x) %>% which.max() %>% names()
   if(is.numeric(x)){
@@ -178,3 +182,20 @@ as_character <- function(x){
   options(scipen = osp)
   ch
 }
+
+# like expand.grid 
+# it is operating on two df
+expand_df <- function(d1, d2){
+  
+  n1 <- nrow(d1)
+  n2 <- nrow(d2)
+  expnd <- expand.grid(r1 = seq(n1), r2 = seq(n2), KEEP.OUT.ATTRS = F, stringsAsFactors = F)
+  dexp1 <- d1[expnd$r1,]
+  dexp2 <- d2[expnd$r2,]
+  # cbind is faster than dplyr:bind_cols
+  out <- cbind(dexp1, dexp2)
+  
+  class(out) <- c("tbl_df", "tbl", "data.frame")
+  out
+}
+

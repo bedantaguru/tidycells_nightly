@@ -5,7 +5,7 @@
 #'
 #' @description for a data block boundary this provides relative location of each attribute cells. 
 #' 
-#' @param dp single data group boundary information
+#' @param dp data group boundary information (can be multiple)
 #' @param allow_inside enables option for attributes which are inside the data block boundary
 #' @param datt attribute data (including attribute group id)
 #'
@@ -13,129 +13,133 @@
 #' @keywords internal
 #' @return Directional Orientation for Attributes
 #'
-get_direction_df <- function(dp, datt, allow_inside = FALSE) {
-  directions <- list()
+get_direction_df <- function(dp, d_att, allow_inside = FALSE){
+  out <- NULL
+  d <- dp %>% rename(data_gid = gid)
+  
+  # nn : non normalized
+  adnn <- expand_df(d_att, d)
+  
+  get_direction_df_nn(adnn, allow_inside)
+}
 
-  directions$N <- datt %>%
+get_direction_df_nn <- function(adnn, allow_inside = FALSE) {
+  directions <- list()
+  
+  directions$N <- adnn %>%
     filter(
-      row < dp$r_min,
-      col >= dp$c_min,
-      col <= dp$c_max
+      row < r_min,
+      col >= c_min,
+      col <= c_max
     ) %>%
-    mutate(dist = (dp$r_min - row)) %>%
+    mutate(dist = (r_min - row)) %>%
     mutate(
       direction = "N",
-      direction_group = "NS",
-      data_gid = dp$gid
+      direction_group = "NS"
     )
-
-  directions$S <- datt %>%
+  
+  directions$S <- adnn %>%
     filter(
-      row > dp$r_max,
-      col >= dp$c_min,
-      col <= dp$c_max
+      row > r_max,
+      col >= c_min,
+      col <= c_max
     ) %>%
-    mutate(dist = (row - dp$r_max)) %>%
+    mutate(dist = (row - r_max)) %>%
     mutate(
       direction = "S",
-      direction_group = "NS",
-      data_gid = dp$gid
+      direction_group = "NS"
     )
-
-  directions$W <- datt %>%
+  
+  directions$W <- adnn %>%
     filter(
-      col < dp$c_min,
-      row >= dp$r_min,
-      row <= dp$r_max
+      col < c_min,
+      row >= r_min,
+      row <= r_max
     ) %>%
-    mutate(dist = (dp$c_min - col)) %>%
+    mutate(dist = (c_min - col)) %>%
     mutate(
       direction = "W",
-      direction_group = "WE",
-      data_gid = dp$gid
+      direction_group = "WE"
     )
-
-  directions$E <- datt %>%
+  
+  directions$E <- adnn %>%
     filter(
-      col > dp$c_max,
-      row >= dp$r_min,
-      row <= dp$r_max
+      col > c_max,
+      row >= r_min,
+      row <= r_max
     ) %>%
-    mutate(dist = (col - dp$c_max)) %>%
+    mutate(dist = (col - c_max)) %>%
     mutate(
       direction = "E",
-      direction_group = "WE",
-      data_gid = dp$gid
+      direction_group = "WE"
     )
-
+  
   # corner directions
-
-  directions$NW <- datt %>%
+  
+  directions$NW <- adnn %>%
     filter(
-      row < dp$r_min,
-      col < dp$c_min
+      row < r_min,
+      col < c_min
     ) %>%
-    mutate(dist = sqrt((dp$r_min - row)^2 + (dp$c_min - col)^2)) %>%
+    mutate(dist = sqrt((r_min - row)^2 + (c_min - col)^2)) %>%
     mutate(
       direction = "NW",
-      direction_group = "corner",
-      data_gid = dp$gid
+      direction_group = "corner"
     )
-
-  directions$NE <- datt %>%
+  
+  directions$NE <- adnn %>%
     filter(
-      row < dp$r_min,
-      col > dp$c_max
+      row < r_min,
+      col > c_max
     ) %>%
-    mutate(dist = sqrt((dp$r_min - row)^2 + (dp$c_max - col)^2)) %>%
+    mutate(dist = sqrt((r_min - row)^2 + (c_max - col)^2)) %>%
     mutate(
       direction = "NE",
-      direction_group = "corner",
-      data_gid = dp$gid
+      direction_group = "corner"
     )
-
-  directions$SE <- datt %>%
+  
+  directions$SE <- adnn %>%
     filter(
-      row > dp$r_max,
-      col > dp$c_max
+      row > r_max,
+      col > c_max
     ) %>%
-    mutate(dist = sqrt((dp$r_max - row)^2 + (dp$c_max - col)^2)) %>%
+    mutate(dist = sqrt((r_max - row)^2 + (c_max - col)^2)) %>%
     mutate(
       direction = "SE",
-      direction_group = "corner",
-      data_gid = dp$gid
+      direction_group = "corner"
     )
-
-  directions$SW <- datt %>%
+  
+  directions$SW <- adnn %>%
     filter(
-      row > dp$r_max,
-      col < dp$c_min
+      row > r_max,
+      col < c_min
     ) %>%
-    mutate(dist = sqrt((dp$r_max - row)^2 + (dp$c_min - col)^2)) %>%
+    mutate(dist = sqrt((r_max - row)^2 + (c_min - col)^2)) %>%
     mutate(
       direction = "SW",
-      direction_group = "corner",
-      data_gid = dp$gid
+      direction_group = "corner"
     )
-
+  
   if (allow_inside) {
-    directions$INSIDE <- datt %>%
+    directions$INSIDE <- adnn %>%
       filter(
-        row >= dp$r_min,
-        row <= dp$r_max,
-        col >= dp$c_min,
-        col <= dp$c_max
+        row >= r_min,
+        row <= r_max,
+        col >= c_min,
+        col <= c_max
       ) %>%
       mutate(dist = 0) %>%
       mutate(
         direction = "INSIDE",
-        direction_group = "inside",
-        data_gid = dp$gid
+        direction_group = "inside"
       )
   }
-
-
+  
+  
   direction_df <- directions %>% bind_rows()
-
+  
+  direction_df <- direction_df %>% select( -r_min, -r_max, -c_min, -c_max)
+  
   direction_df
 }
+

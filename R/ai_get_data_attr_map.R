@@ -18,9 +18,8 @@ ai_get_data_attr_map <- function(dat_boundary,
 get_raw_map_for_ai_get_data_attr_map  <- function(dat_boundary,
                                                   att_gid_map,
                                                   leave_inside = FALSE){
-  d_att_map <- dat_boundary %>%
-    split(.$gid) %>%
-    map_df(~ get_direction_df(.x, datt = att_gid_map, allow_inside = leave_inside)) %>%
+  d_att_map <- get_direction_df(dat_boundary, d_att = att_gid_map, allow_inside = leave_inside)
+  d_att_map <- d_att_map %>%
     rename(attr_gid = gid) %>% 
     mutate(mapping_strength = 0)
   d_att_map

@@ -4,6 +4,9 @@ options(lifecycle_verbosity = "warning")
 #  it has to be added as test
 
 #non uniformity  among different reader
+tf0 <- read_cells("00_nightly_only/dev/ABSSelfExplore/Test.xlsx")[[1]]
+
+
 tf0 <- read_cells("00_nightly_only/dev/example_tuning_check_points/master_pattern.xlsx")[[1]]
 tf0 <- tf0 %>% numeric_values_classifier()
 tf0 <- tf0 %>% detect_table_block()
@@ -36,6 +39,9 @@ d_abs <- d_abs %>% as_cell_df(take_col_names = F)
 d_abs <- d_abs %>% numeric_values_classifier(orientation_based_attribute_recovery = T)
 
 absd <- d_abs %>% filter(row < 108)
+
+
+d_abs %>% filter(row>=137, col <5, row <146)  -> dx
 
 rm(d_abs,f)
 # 

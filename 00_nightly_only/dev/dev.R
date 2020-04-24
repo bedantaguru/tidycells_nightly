@@ -1,6 +1,193 @@
 ##################################################################
 ##################################################################
 ##################################################################
+
+rm(list = setdiff(ls(), "tf0"))
+
+tictoc::tic()
+analyze_cells(tf0)
+tictoc::toc()
+
+
+admap %>%
+  left_join(link_tuned_gid_map, by = c("data_gid" = "gid")) %>%
+  mutate(new_gid = ifelse(is.na(new_gid), data_gid, new_gid)) %>%
+  select(-data_gid) %>%
+  rename(data_gid = new_gid) %>% 
+  group_by(attr_gid, data_gid) %>% 
+  # @Dev please check logic
+  # here stat_mode was there
+  dplyr::summarise_all(min) %>% 
+  ungroup()
+
+
+###############################################################
+##################################################################
+##################################################################
+
+
+
+
+
+
+
+sync_name_map2 <- admap_split %>% 
+  map_df(~{
+    dg <- .x %>% distinct(gid = data_gid, row = row_d, col = col_d)
+    ag <- .x %>% distinct(gid = attr_micro_gid, row = row_a, col = col_a)
+    dag <- get_direction_df(get_group_id_boundary(dg), ag)
+    
+    dagmap <- dag %>% 
+      group_by(gid) %>% 
+      summarise(dist = min(dist), direction = direction[1], data_gid = data_gid[1])
+    
+    # @Dev
+    # check dist_order
+    # it should not create problems later
+    dagmap %>% 
+      group_by(direction) %>% 
+      mutate(dist_ord = dist %>% as.factor() %>% as.numeric(),
+             attr_var_sync_name = paste0(direction, "_",dist_ord)) %>% 
+      ungroup() %>% 
+      distinct(attr_micro_gid = gid, data_gid, dist_order = dist_ord, attr_var_sync_name) 
+    
+  })
+
+
+
+
+
+microbenchmark::microbenchmark("e"=admap %>%
+                                 left_join(link_tuned_gid_map, by = c("data_gid" = "gid")) %>%
+                                 mutate(new_gid = ifelse(is.na(new_gid), data_gid, new_gid)) %>%
+                                 select(-data_gid) %>%
+                                 rename(data_gid = new_gid) %>% 
+                                 group_by(attr_gid, data_gid) %>% 
+                                 dplyr::summarise_all(stat_mode) %>% 
+                                 ungroup(),
+                               "e2"=admap %>%
+                                 left_join(link_tuned_gid_map, by = c("data_gid" = "gid")) %>%
+                                 mutate(new_gid = ifelse(is.na(new_gid), data_gid, new_gid)) %>%
+                                 select(-data_gid) %>%
+                                 rename(data_gid = new_gid) %>% 
+                                 group_by(attr_gid, data_gid) %>% 
+                                 dplyr::summarise_all(min) %>% 
+                                 ungroup(), times = 1
+)
+
+
+
+# type = 2 is fast
+expand_df <- function(d1, d2, type = 1){
+  out <- NULL
+  
+  if(type == 1){
+    d1 <- d1 %>% mutate(dummy = 1)
+    d2 <- d2 %>% mutate(dummy = 1)
+    out <- inner_join(d1, d2, by = "dummy") %>% select(-dummy)
+  }
+  
+  if(type > 1){
+    
+    n1 <- nrow(d1)
+    n2 <- nrow(d2)
+    if(type==3){
+      expnd <- list(r1 = rep(seq(n1), times = n2), r2 = rep(seq(n2), each = n1))
+    }else{
+      expnd <- expand.grid(r1 = seq(n1), r2 = seq(n2), KEEP.OUT.ATTRS = F, stringsAsFactors = F)
+    }
+    dexp1 <- d1[expnd$r1,]
+    dexp2 <- d2[expnd$r2,]
+    # cbind is faster than dplyr:bind_cols
+    out <- cbind(dexp1, dexp2)
+  }
+  
+  
+  class(out) <- c("tbl_df", "tbl", "data.frame")
+  out
+}
+
+expand_df2 <- function(d1, d2){
+  
+  n1 <- nrow(d1)
+  n2 <- nrow(d2)
+  expnd <- expand.grid(r1 = seq(n1), r2 = seq(n2), KEEP.OUT.ATTRS = F, stringsAsFactors = F)
+  dexp1 <- d1[expnd$r1,]
+  dexp2 <- d2[expnd$r2,]
+  # cbind is faster than dplyr:bind_cols
+  out <- cbind(dexp1, dexp2)
+  
+  class(out) <- c("tbl_df", "tbl", "data.frame")
+  out
+}
+
+
+inner_join(a, d, by = "dummy") %>% select(-dummy)
+# this is faster
+all_comb_df(a, d) 
+all_comb_df <- function(a, d){
+  expnd <- expand.grid(ar = seq(nrow(a)), dr = seq(nrow(d)), KEEP.OUT.ATTRS = F, stringsAsFactors = F)
+  aexp <- a[expnd$ar,]
+  dexp <- d[expnd$dr,]
+  # cbind is faster than dplyr:bind_cols
+  cbind(aexp, dexp)
+}
+
+
+options(browser_dev_use_new = T)
+ca1 <- analyze_cells(tf0)
+
+options(browser_dev_use_new = F)
+ca2 <- analyze_cells(tf0)
+
+
+
+
+
+
+nn <- get_direction_df(dat_boundary, datt = att_gid_map, allow_inside = leave_inside)
+
+d <- dat_boundary %>% rename(data_gid = gid) %>% mutate(dummy = 1)
+a <- d_att %>% mutate(dummy = 1)
+# nn : non normalized
+adnn <- inner_join(a, d, by = "dummy")
+
+
+
+
+
+microbenchmark::microbenchmark(
+  "n" = dat_boundary %>%
+    split(.$gid) %>%
+    map_df(~ get_direction_df(.x, datt = att_gid_map, allow_inside = leave_inside)) %>%
+    rename(attr_gid = gid) %>% 
+    mutate(mapping_strength = 0),
+  "nn" = get_direction_df_nn(adnn), times = 5
+)
+
+
+n2 %>% anti_join(n1)
+
+
+
+ca <- analyze_cells(tf0)
+
+# complex type is faster
+d_com <- d_com %>% mutate(rc = row+1i*col)
+cells_in <- cells_in %>% mutate(rc = row+1i*col)
+cells_in %>% anti_join(d_com, by = c("row", "col"))
+cells_in %>% filter(!(rc %in% d_com$rc)) <- fast
+
+bench::mark(cells_in %>% anti_join(d_com, by = c("row", "col")),
+            cells_in %>% filter(!(rc %in% d_com$rc)),
+            cells_in[!(cells_in$rc %in% d_com$rc),],
+            setdiff( cells_in$rc, d_com$rc), check = F
+)
+
+
+d_com %>% mutate(rc = row+1i*col)
+
+
 library(tictoc)
 
 tic()
@@ -16,11 +203,6 @@ analyze_cells(tf0)
 toc()
 
 # 9.73 sec elapsed
-###############################################################
-
-
-
-
 d <- tibble(x= 10^3, y = rnorm(10^3))
 
 microbenchmark::microbenchmark(rbind(d, d), bind_rows(d, d), rbind_local(d ,d))
