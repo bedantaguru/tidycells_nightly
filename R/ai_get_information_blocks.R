@@ -51,3 +51,33 @@ ai_get_information_blocks <- function(admap, d_dat, d_att){
   list(map = admap, d_inf = d_inf)
   
 }
+
+
+# @Dev may need file arrengments
+# actually this is a help to ai_main_part_phase_3_rest_map
+# ai_get_information_blocks is also a helper to ai_main_part_phase_3_rest_map
+
+
+admap_for_rest_dir_fix <- function(d_dat, d_att, admap_fr){
+  
+  this_dgid <- d_dat %>% filter(gid %in% admap_fr$data_gid) 
+  this_agid <- d_att %>% filter(gid %in% admap_fr$attr_gid) %>% rename(attr_gid = gid)
+  this_dgid_bd <- get_group_id_boundary(this_dgid) %>% rename(data_gid = gid)
+  
+  this_rawmap <- admap_fr %>% distinct(attr_gid, data_gid) %>% 
+    inner_join(this_agid, by = "attr_gid") %>% 
+    inner_join(this_dgid_bd, by = "data_gid")
+  
+  this_rawmap <- get_direction_df_nn(this_rawmap)
+  
+  this_ref <- this_rawmap %>% 
+    group_by(attr_gid, data_gid) %>% 
+    filter(dist == min(dist)) %>% 
+    summarise(dist = dist [1], direction =direction[1], direction_group = direction_group[1]) %>% 
+    ungroup()
+  
+  admap_fr %>% 
+    select(-dist, -direction, -direction_group) %>% 
+    inner_join(this_ref, by = c("attr_gid", "data_gid"))
+}
+

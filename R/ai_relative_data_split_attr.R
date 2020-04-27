@@ -23,6 +23,8 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     
     d_att <- rel_gids %>%
       select(row, col, gid = new_attr_gid) %>%
+      # in case there is any non_linked_block of d_att
+      bind_rows(common_knowledge("non_linked_block_d_att")) %>% 
       bind_rows(d_att) %>% 
       unique()
     
@@ -61,9 +63,13 @@ relative_gid_map_pattern_fix <- function(rel_gids){
 
 relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids){
   
+  # explained later why missed_block_of_d_att is required
+  missed_block_of_d_att <- F
+  
   allocations <- list()
   
-  dirs <- c("N","E","W","S")
+  # rev is required for convention handling
+  dirs <- c("N","E","W","S") %>% rev()
   
   allocations <- dirs %>% map(~{
     if(any(stringr::str_detect(rel_gids$direction,.x))){
@@ -100,6 +106,8 @@ relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids){
   if(any(al_checks1)){
     allocations <- allocations[al_checks1]
   }else{
+    # full dimension did not capture so missing block need to be kept for further joins if possible
+    missed_block_of_d_att <- T
     # duplicacy discouraged  and will be alloted only if no other options is present
     al_checks2 <- allocations %>% 
       map_lgl(~is_conforms_to_rcdf(.x))
@@ -119,7 +127,31 @@ relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids){
     
   }
   
-  out <- allocations[[1]]
+  
+  is_there_possibly_a_bha <- !isTRUE(getOption("tidycells.analyze_cells_options")[["no_bidirectional_hierarchical_attributes"]])
+  
+  if(is_there_possibly_a_bha & missed_block_of_d_att & length(allocations)>1){
+    # this will try to recover non_linked_block_d_att
+    out <- allocations %>% 
+      reduce(fj, 
+             join_by = c("attr_gid",   "row",   "col" ), 
+             ensure_unique = T)
+  }else{
+    out <- allocations[[1]]
+  }
+  
+  
+  
+  if(missed_block_of_d_att){
+    # update info so that d_att can be made informative and complete
+    chk <- rel_gids %>% 
+      anti_join(out, by = c("row", "col"))
+    if(nrow(chk)>0){
+      common_knowledge(non_linked_block_d_att = chk %>% 
+                         group_by(row, col) %>% 
+                         summarise(gid = paste0("NL_", min(new_attr_gid))) %>% ungroup())
+    }
+  }
   
   # update in common knowledge about non-join possibilities of data-gids
   # if <corner> present in between in <row, col> or <col, row> seq then underlying block as non joinable

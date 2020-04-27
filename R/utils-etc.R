@@ -162,7 +162,7 @@ name_fix_for_list <- function(xl, name_tag = "Node", sep="_"){
 # statistical mode
 # while stat_mode may be accurate it is slow
 # it is kept for reference 
-# may be a quality param added
+# may be a quality param needed
 stat_mode <- function(x){
   m1 <- table(x) %>% which.max() %>% names()
   if(is.numeric(x)){
@@ -198,4 +198,5 @@ expand_df <- function(d1, d2){
   class(out) <- c("tbl_df", "tbl", "data.frame")
   out
 }
+
 

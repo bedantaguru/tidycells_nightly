@@ -23,6 +23,5 @@
 #' @keywords internal
 NULL
 
-# @Dev
 exploration_findings_class <- c("exploration_findings", "tbl_df", "tbl", "data.frame")
 setOldClass(exploration_findings_class)

@@ -9,6 +9,42 @@ analyze_cells(tf0)
 tictoc::toc()
 
 
+# bha: bidirectional_hierarchical_attributes
+
+join_by = c("data_gid", "attr_gid",   "row",   "col" )
+
+# https://stackoverflow.com/questions/34487641/dplyr-groupby-on-multiple-columns-using-variable-names
+
+
+x %>% group_by(!!!rlang::syms(join_by))
+
+
+
+###############################################################
+##################################################################
+##################################################################
+
+
+
+stat_mode <- function(x){
+  m1 <- table(x) %>% which.max() %>% names()
+  if(is.numeric(x)){
+    m1 <- as.numeric(m1) %>% mean()
+  }
+  m1[1]
+}
+
+stat_mode2 <- function(x){
+  m1 <- tibble(inputx = x)
+  m1 <- m1 %>% group_by(inputx) %>% count() %>% ungroup() %>% filter(n==max(n))
+  out <- m1$inputx
+  if(is.numeric(out)){
+    out <- mean(out)
+  }
+  out[1]
+}
+
+
 admap %>%
   left_join(link_tuned_gid_map, by = c("data_gid" = "gid")) %>%
   mutate(new_gid = ifelse(is.na(new_gid), data_gid, new_gid)) %>%
@@ -19,13 +55,6 @@ admap %>%
   # here stat_mode was there
   dplyr::summarise_all(min) %>% 
   ungroup()
-
-
-###############################################################
-##################################################################
-##################################################################
-
-
 
 
 

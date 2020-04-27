@@ -165,6 +165,8 @@ ai_main_part_phase_3_rest_map <- function(d_dat, d_att, admap){
     # 
     setdiff(common_knowledge("missed_block_connections")$attr_gid)
   
+  admap_fr1 <- NULL
+  
   if(length(unmapped_attr_gids)>0){
     
     # attach unmapped_attr_gids to info_blocks
@@ -186,6 +188,8 @@ ai_main_part_phase_3_rest_map <- function(d_dat, d_att, admap){
       # data_gid has to be added to make it comparable to admap
       inner_join(admap %>% distinct(data_gid, info_gid), by = "info_gid")
     
+    #@Dev new addition
+    admap_fr1 <- admap_for_rest_dir_fix(d_dat, d_att, admap_fr1)
     
     unmapped_attr_gids <-
       admap$attr_gid %>%

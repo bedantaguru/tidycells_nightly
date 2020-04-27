@@ -5,7 +5,7 @@
 common_knowledge <- function(..., clean = FALSE, add = TRUE, is = FALSE, simplify = TRUE){
   if(clean){
     tidycells_pkg_env$common_knowledge <- NULL
-    return(invisible(0))
+    return(invisible(NULL))
   }
   dots <- list(...)
   nds <- names(dots)
@@ -65,7 +65,7 @@ common_knowledge <- function(..., clean = FALSE, add = TRUE, is = FALSE, simplif
     return(xo)
     
   }
-  return(invisible(0))
+  return(invisible(NULL))
 }
 
 is_common_knowledge <- function(...){

@@ -1,6 +1,9 @@
 # note full_data has to be without empty types
 ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
   
+  
+  do_data_gid_join <- !isTRUE(getOption("tidycells.analyze_cells_options")[["no_data_gid_join"]])
+  
   # fd <- full_data %>% filter(type != "empty") <<-  this filter is not required as earlier ensured
   
   fd <- full_data %>% 
@@ -15,21 +18,24 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
   done <- F
   
   njdg <- common_knowledge("non_joinable_data_gid")
+  if(!is.data.frame(njdg)){
+    njdg <- tibble()
+  }
   
   repeat({
     
-    if (length(unique(d_dat$gid)) < 2) break()
+    if (length(unique(d_dat$gid)) < 2 | !do_data_gid_join) break()
     
     # prune (discard) all possible data_gid joins
     
     # nearer data_gids already gets priority
     data_gid_comb <- d_dat %>% get_possible_data_gid_mergeable()
     
-    data_gid_comb <- data_gid_comb %>% anti_join(njdg, by = c("gid1", "gid2"))
+    if(nrow(njdg)>0){
+      data_gid_comb <- data_gid_comb %>% anti_join(njdg, by = c("gid1", "gid2"))
+    }
     
     data_gid_comb <- is_attachable_prune_vectorized_logic_1(data_gid_comb, data_attr_map)
-    
-    #  @Dev need further tuning
     
     if(nrow(data_gid_comb)>0){
       
@@ -54,7 +60,9 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
         
         d_dat <- get_group_id_join_gids(d_dat, gid_map = data_gid_joins, no_need_to_tune = T)
         data_attr_map <- ai_update_admap_after_data_gid_join(data_attr_map, link_tuned_gid_map = data_gid_joins)
-        njdg <- update_non_joinable_data_gid(njdg, link_tuned_gid_map = data_gid_joins)
+        if(nrow(njdg)>0){
+          njdg <- update_non_joinable_data_gid(njdg, link_tuned_gid_map = data_gid_joins)
+        }
         done <-  T
       } else {
         break()

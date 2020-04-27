@@ -469,6 +469,8 @@ numeric_values_raw <- function(d, allow_chars, verbose = FALSE,
 
   d0 <- d0 %>% select(row, col, data_type, value, type = new_type)
   
+  # @Dev
+  # make it part of all
   if(orientation_based_attribute_recovery){
     dr <- d0 %>% group_by(row) %>% summarise(ar_score = sum(type=="attribute")/n())
     dc <- d0 %>% group_by(col) %>% summarise(ac_score = sum(type=="attribute")/n())
