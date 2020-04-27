@@ -633,7 +633,9 @@ sps_part_orientation_modification <- function(input, output, session, plot_now, 
 
 
           if (n_dg == 1) {
-            all_dirs <- get_valid_direction_names()
+            #@Dev get_valid_direction_names changed to 
+            # change nomenclature
+            all_dirs <- get_valid_header_orientation_tags()
 
             all_dirs_mains <- all_dirs[c("N", "E", "W", "S")]
 

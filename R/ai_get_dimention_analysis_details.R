@@ -1,20 +1,35 @@
 
 # dimention analysis and raw maps
-ai_get_dimention_analysis_details <- function(basic_map, d_dat, d_att, major_direction_relax = TRUE) {
+ai_get_dimention_analysis_details <- function(basic_map, d_dat, d_att, major_direction_relax = TRUE, 
+                                              admap_cellwise_raw_asp = NULL, raw_mode = FALSE) {
   dimension_analysis <- list()
 
-  dimension_analysis$data_gid_dim <- d_dat %>%
-    group_by(gid) %>%
-    summarise(
-      r_dim_data = n_distinct(row),
-      c_dim_data = n_distinct(col)
-    ) %>% 
-    rename(data_gid = gid)
+  if(raw_mode){
+    dimension_analysis$data_gid_dim <- admap_cellwise_raw_asp %>%
+      group_by(data_gid) %>%
+      summarise(
+        r_dim_data = n_distinct(row_d),
+        c_dim_data = n_distinct(col_d)
+      )
+  }else{
+    dimension_analysis$data_gid_dim <- d_dat %>%
+      group_by(gid) %>%
+      summarise(
+        r_dim_data = n_distinct(row),
+        c_dim_data = n_distinct(col)
+      ) %>% 
+      rename(data_gid = gid)
+  }
+  
 
-
-  d_att_dat_map <- basic_map
-
-  d_att_dat_map_raw <- get_data_attr_cell_wise_map_raw(basic_map, d_dat, d_att)
+  if(raw_mode){
+    d_att_dat_map_raw <- admap_cellwise_raw_asp %>% select(-attr_gid) %>% rename(attr_gid = attr_micro_gid)
+  }else{
+    d_att_dat_map <- basic_map
+    
+    d_att_dat_map_raw <- get_data_attr_cell_wise_map_raw(basic_map, d_dat, d_att)
+  }
+  
 
   # attach dimension
   dimension_analysis$attr_data_dim <- d_att_dat_map_raw %>%
@@ -54,14 +69,25 @@ ai_get_dimention_analysis_details <- function(basic_map, d_dat, d_att, major_dir
 
   # fix major minor
 
-  d_att_dat_map <- dimension_analysis$attr_data_dim %>%
-    distinct(attr_gid, data_gid, full_dim) %>%
-    right_join(d_att_dat_map, by = c("attr_gid", "data_gid")) %>%
-    mutate(attr_group = ifelse(full_dim, "major", "minor")) %>%
-    select(-full_dim)
-
-
-  list(map = d_att_dat_map, dimension_analysis = dimension_analysis)
+  if(raw_mode){
+    
+    out <- dimension_analysis$attr_data_dim %>%
+      distinct(attr_micro_gid = attr_gid, data_gid, attr_micro_gid_is_full_dim = full_dim) %>% 
+      right_join(admap_cellwise_raw_asp, by = c("attr_micro_gid", "data_gid"))
+    
+    return(out)
+    
+  }else{
+    d_att_dat_map <- dimension_analysis$attr_data_dim %>%
+      distinct(attr_gid, data_gid, full_dim) %>%
+      right_join(d_att_dat_map, by = c("attr_gid", "data_gid")) %>%
+      mutate(attr_group = ifelse(full_dim, "major", "minor")) %>%
+      select(-full_dim)
+    
+    
+    return(list(map = d_att_dat_map, dimension_analysis = dimension_analysis))
+  }
+  
 }
 
 

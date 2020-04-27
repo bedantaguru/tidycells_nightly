@@ -10,7 +10,7 @@ ai_hierarchical_reallocation <- function(admap_cellwise_raw_asp){
   # take minor and corner micro gids
   minor_attr_micro_gid <- admap_cellwise_raw_asp %>% 
     filter(attr_group=="minor" | direction_group == "corner", dist_order>1) %>% 
-    distinct(info_gid, data_gid, attr_micro_gid, dist_order, direction_basic, direction_group)
+    distinct(info_gid, data_gid, attr_micro_gid, dist_order, direction, direction_group)
   
   # leave attr_micro_gid within each info block which 
   #  has connectivity to all data_gid in that info block
@@ -113,7 +113,7 @@ claim_region_for_attr_micro_gid_HR <- function(this_attr_micro_gid, lamg, dgids)
   
   # split for each direction
   proposed_new_map <- this_lamg %>% 
-    split(.$direction_basic) %>% 
+    split(.$direction) %>% 
     map_df(~claim_region_for_attr_micro_gid_HR_for_a_dir(.x, this_lamg, rest_dgids, dgids))
   
   
@@ -126,7 +126,7 @@ claim_region_for_attr_micro_gid_HR_for_a_dir <- function(.x, this_lamg, rest_dgi
   is_expnd <- FALSE
   
   # W-E 
-  if(stringr::str_detect(.x$direction_basic[1],"W")){
+  if(stringr::str_detect(.x$direction[1],"W")){
     # all dgids that are east to this_attr_micro_gid - related dgid
     this_mc <- min(dgids$col_d[dgids$data_gid %in% .x$data_gid])
     
@@ -139,7 +139,7 @@ claim_region_for_attr_micro_gid_HR_for_a_dir <- function(.x, this_lamg, rest_dgi
       is_expnd <- TRUE
     }
   }else{
-    if(stringr::str_detect(.x$direction_basic[1],"E")){
+    if(stringr::str_detect(.x$direction[1],"E")){
       # all dgids that are west to this_attr_micro_gid - related dgid
       this_mc <- max(dgids$col_d[dgids$data_gid %in% .x$data_gid])
       
@@ -157,7 +157,7 @@ claim_region_for_attr_micro_gid_HR_for_a_dir <- function(.x, this_lamg, rest_dgi
   }
   
   # N-S
-  if(stringr::str_detect(.x$direction_basic[1],"N")){
+  if(stringr::str_detect(.x$direction[1],"N")){
     # all dgids that are south to this_attr_micro_gid - related dgid
     this_mr <- min(dgids$row_d[dgids$data_gid %in% .x$data_gid])
     claim_region_dgids <- dgids %>% filter(row_d >= this_mr)
@@ -172,7 +172,7 @@ claim_region_for_attr_micro_gid_HR_for_a_dir <- function(.x, this_lamg, rest_dgi
     }
     
   }else{
-    if(stringr::str_detect(.x$direction_basic[1],"S")){
+    if(stringr::str_detect(.x$direction[1],"S")){
       # all dgids that are north to this_attr_micro_gid - related dgid
       this_mr <- max(dgids$row_d[dgids$data_gid %in% .x$data_gid])
       claim_region_dgids <- dgids %>% filter(row_d <= this_mr)

@@ -5,10 +5,45 @@
 rm(list = setdiff(ls(), "tf0"))
 
 tictoc::tic()
-analyze_cells(tf0)
+#analyze_cells(tf0)
+compose_cells(ca)
 tictoc::toc()
 
 
+microbenchmark::microbenchmark(analyze_cells(tf0), times = 1)
+
+out %>% filter(header_orientation_tag=="direct")
+
+out %>% filter(header_orientation_tag=="vl")
+
+
+
+###############################################################
+##################################################################
+##################################################################
+
+microbenchmark::microbenchmark(data_gid_representative(d0), data_gid_representative(d0, type = "mrc"))
+
+data_gid_representative <- function(d_dat_single, type = "fill"){
+  
+  if(type == "fill"){
+    d0s <- d_dat_single %>% summarise(mnr = min(row), mxr = max(row), mnc = min(col), mxc = max(col))
+    
+    dout <- tibble(row = seq(from = d0s$mnr, to = d0s$mxr, by = 1), col = d0s$mnc) %>%
+      bind_rows(
+        tibble(col = seq(from = d0s$mnc, to = d0s$mxc, by = 1), row = d0s$mnr)
+      ) %>%
+      mutate(data_gid = d_dat_single$data_gid[1]) %>%
+      unique()
+    
+  }else{
+    dout <-d_dat_single %>% group_by(row, data_gid) %>% summarise(col = min(col)) %>% 
+      bind_rows(
+        d_dat_single %>% group_by(col, data_gid) %>% summarise(row = min(row))
+      ) %>% ungroup()
+  }
+  dout
+}
 # bha: bidirectional_hierarchical_attributes
 
 join_by = c("data_gid", "attr_gid",   "row",   "col" )
@@ -17,12 +52,6 @@ join_by = c("data_gid", "attr_gid",   "row",   "col" )
 
 
 x %>% group_by(!!!rlang::syms(join_by))
-
-
-
-###############################################################
-##################################################################
-##################################################################
 
 
 

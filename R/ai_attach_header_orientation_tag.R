@@ -1,6 +1,6 @@
 
 
-ai_attach_direction <- function(admap_cellwise_raw) {
+ai_attach_header_orientation_tag <- function(admap_cellwise_raw) {
   
   # asp: attr split
   admap_cellwise_raw_asp <- ai_attr_gid_micro_splits(admap_cellwise_raw)
@@ -12,22 +12,46 @@ ai_attach_direction <- function(admap_cellwise_raw) {
     admap_cellwise_raw_asp <- ai_attr_var_sync_name_fix(admap_cellwise_raw_asp)
   }
   
-  admap_cellwise_raw_asp %>%
-    group_by(data_gid, attr_micro_gid) %>%
-    group_split() %>%
-    map_df(~ .x %>% mutate(direction = get_direction(.x)))
+  # remove n_rc later
+  admap_cellwise_raw_asp <- admap_cellwise_raw_asp %>% 
+    group_by(attr_micro_gid) %>% 
+    mutate(n_rc = n_distinct(row_a, col_a)) %>% 
+    ungroup()
+  
+  out1 <- admap_cellwise_raw_asp %>% 
+    filter(n_rc == 1) %>% 
+    mutate(header_orientation_tag = "direct")
+  
+  out2_part1 <- admap_cellwise_raw_asp %>% 
+    filter(n_rc != 1) 
+  
+  out2_part2 <- ai_get_dimention_analysis_details(
+    admap_cellwise_raw_asp = out2_part1, 
+    raw_mode = T, 
+    major_direction_relax = F)
+  
+  out2 <- get_header_orientation_tag(out2_part2)
+  
+  out <- out1 %>% bind_rows(out2)
+  
+  out <- out %>% 
+    select(-n_rc) %>% 
+    mutate(attr_micro_gid_is_full_dim = ifelse(
+      is.na(attr_micro_gid_is_full_dim), FALSE, attr_micro_gid_is_full_dim))
+  
+  out
+  
 }
 
 # helpers
 ai_attr_gid_micro_splits <- function(admap_cellwise_raw){
   # asp: attr split
   admap_cellwise_raw_asp <- admap_cellwise_raw %>%
-    # kept for tracking
-    mutate(direction_basic = direction) %>%
-    mutate(attr_gid_split = ifelse(direction_group == "NS", paste0(row_a,":0"),
-                                   ifelse(direction_group == "WE", paste0("0:", col_a), 
-                                          ifelse(direction_group == "corner", paste0(row_a, ":", col_a), 0))
-    ))
+    mutate(attr_gid_split = 
+             ifelse(direction_group == "NS", paste0(row_a,":0"),
+                    ifelse(direction_group == "WE", paste0("0:", col_a), 
+                           ifelse(direction_group == "corner", paste0(row_a, ":", col_a), 0))
+             ))
   
   ai_get_sync_names_for_attr_gid_splits(admap_cellwise_raw_asp)
   

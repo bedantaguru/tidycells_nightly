@@ -221,12 +221,12 @@ ai_main_part_phase_3_rest_map <- function(d_dat, d_att, admap){
 
 
 # phase 4
-# - get direction or header orientation (ho) tag
+# - get direction or header orientation (ho) tag (HOT)
 # - sync name etc.
 ai_main_part_phase_4_header_orientation <- function(d_dat, d_att, admap){
   # attach directions to it
   admap_with_dir <- get_data_attr_cell_wise_map_raw(admap, d_dat, d_att) %>% 
-    ai_attach_direction()
+    ai_attach_header_orientation_tag()
   list(admap_cell_wise = admap_with_dir)
 }
 
@@ -259,7 +259,7 @@ ai_main_part_phase_5_post_process <- function(d_dat, d_att, admap, admap_cell_wi
   this_cells <- this_cells %>%
     left_join(gid_ngid, by = "gid")
   
-  # this need to be added after ai_attach_direction
+  # this need to be added after ai_attach_header_orientation_tag
   admap_cell_wise <- admap_cell_wise %>%
     left_join(gid_ngid, by = c("data_gid"="gid"))
   

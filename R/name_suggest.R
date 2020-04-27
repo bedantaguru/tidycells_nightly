@@ -147,7 +147,7 @@ name_suggest_part_2 <- function(for_attr_micro_gid,
   
   dir_ranks <- dam %>% 
     filter(info_gid %in% this_attrs$info_gid) %>% 
-    distinct(attr_micro_gid, direction = direction_basic, data_gid) %>% 
+    distinct(attr_micro_gid, direction, data_gid) %>% 
     group_by(direction) %>% 
     summarise(n_dir_in_dam = n()) %>% 
     mutate(n_dir_in_dam = n_dir_in_dam/(max(n_dir_in_dam)+0.00001)*4)

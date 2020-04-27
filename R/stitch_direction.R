@@ -17,7 +17,7 @@ stitch_direction <- function(d_part, dat, attr_name, trace_it = FALSE) {
     unique() %>%
     length()
 
-  chkdir <- d_part$direction %>%
+  chkdir <- d_part$header_orientation_tag %>%
     unique() %>%
     length()
 
@@ -42,7 +42,7 @@ stitch_direction <- function(d_part, dat, attr_name, trace_it = FALSE) {
 
 
 
-  direction <- d_part$direction[1]
+  direction <- d_part$header_orientation_tag[1]
 
   d0 <- d0 %>%
     select(-data_gid) %>%

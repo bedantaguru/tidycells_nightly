@@ -11,7 +11,7 @@ bind_header <- function(data_cell_df, header_cell_df, direction,
     # special case
     colnames(header_cell_df) %>% 
       setdiff(c("row","col")) %>% 
-      map(~{data_cell_df[[.x]] <<- header_cell_df[[.x]]})
+      purrr::walk(~{data_cell_df[[.x]] <<- header_cell_df[[.x]]})
     
     # exit early
     return(data_cell_df)
@@ -31,13 +31,13 @@ bind_header <- function(data_cell_df, header_cell_df, direction,
 }
 
 
-#' get direction names compatible to tidycells
+#' get header_orientation_tag names compatible to tidycells
 #'
-#' @details Kept for compatibility. Used internally by get_direction function.
+#' @details Kept for compatibility. Used internally by get_header_orientation_tag function.
 #' @keywords internal
 #' @return directions as used in [`bind_header`][bind_header()] applicant (_like unpivotr package_) with directional grouping
 #'
-get_valid_direction_names <- function(header_binder = getOption("tidycells.header_binder")) {
+get_valid_header_orientation_tags <- function(header_binder = getOption("tidycells.header_binder")) {
   
   if(header_binder == "unpivotr"){
     
@@ -99,48 +99,91 @@ translate_from_tidycells_direction <- function(tidycells_direction_name){
 
 
 
-#' get optimal direction 
+#' get optimal header_orientation_tag (HOT) 
 #'
 #' @param d_part parts of `data_attr_map_raw`
 #' @details Used internally
 #' @keywords internal
-#' @return a string value denoting direction
+#' @return a string value denoting header_orientation_tag
 #'
 
-get_direction <- function(d_part) {
-  directions <- get_valid_direction_names()
+get_header_orientation_tag <- function(admap_cellwise_raw_asp_with_dim) {
+  directions <- get_valid_header_orientation_tags()
+  
+  out_full_dim <- admap_cellwise_raw_asp_with_dim %>% 
+    filter(attr_micro_gid_is_full_dim, direction_group %in% c("NS", "WE"))
+  
+  out_rest <- admap_cellwise_raw_asp_with_dim %>% 
+    anti_join(out_full_dim, by = c("data_gid","attr_micro_gid"))
+  
+  directions_f4 <- directions[c("N","W","S","E")] %>% map_chr(1)
+  
+  out_full_dim$header_orientation_tag <- directions_f4[out_full_dim$direction]
+  
+  # push first case to most undesirable case
+  directions_mod <- directions %>% map(~{
+    if(length(.x)>1){
+      c(.x[-1], .x[1])
+    }else{
+      .x
+    }
+  })
+  
+  d_reps <- data_gid_representative(
+    admap_cellwise_raw_asp_with_dim %>% 
+      filter(data_gid %in% unique(out_rest$data_gid)) %>% 
+      distinct(data_gid, row = row_d, col = col_d)
+  ) %>% split(.$data_gid)
+  # it is not actualy representative, it is actual
+  a_reps <- out_rest %>% distinct(attr_micro_gid, row = row_a, col = col_a) %>% 
+    split(.$attr_micro_gid)
+  
+  out_rest <- out_rest %>% 
+    group_by(data_gid, attr_micro_gid) %>%
+    group_split() %>%
+    map_df(~{
+      .x %>% 
+        mutate(
+          header_orientation_tag = get_header_orientation_tag_part(
+            .x, d_reps, a_reps, directions_mod
+          )
+        )
+    })
+  
+  out <- out_full_dim %>% 
+    bind_rows(out_rest)
+  
+  out
+  
+}
+
+
+# helpers
+
+get_header_orientation_tag_part <- function(d_part, d_reps, a_reps, directions) {
   
   if (d_part$direction[1] %in% names(directions)) {
     dirs <- directions[[d_part$direction[1]]]
     
-    a1 <- d_part %>%
-      distinct(attr_gid, row = row_a, col = col_a)
+    a1 <- a_reps[[d_part$attr_micro_gid[1]]]
     
     if(nrow(a1)==1){
-      # special case where
-      # @Dev need to sort out definition
+      # special case 
       dirs <- "direct"
     }
     
     if (length(dirs) > 1) {
-      d0 <- d_part %>%
-        distinct(data_gid, row = row_d, col = col_d)
       
-      d0s <- d0 %>% summarise(mnr = min(row), mxr = max(row), mnc = min(col), mxc = max(col))
-      
-      d1 <- tibble(row = seq(from = d0s$mnr, to = d0s$mxr, by = 1), col = d0s$mnc) %>%
-        bind_rows(
-          tibble(col = seq(from = d0s$mnc, to = d0s$mxc, by = 1), row = d0s$mnr)
-        ) %>%
-        mutate(data_gid = d0$data_gid[1]) %>%
-        unique()
+      d1 <- d_reps[[d_part$data_gid[1]]]
       
       dmd <- tibble()
+      
       for (dir in dirs) {
-        dm_now <- get_direction_metric(d1, a1, dir)
+        dm_now <- get_HOT_metric(d1, a1, dir)
         dmd <- dmd %>% bind_rows(tibble(dm = dm_now, dir = dir))
         if (dm_now == 1) break()
       }
+      
       dmd$dir[which.max(dmd$dm)]
     } else {
       dirs[1]
@@ -150,24 +193,33 @@ get_direction <- function(d_part) {
   }
 }
 
+data_gid_representative <- function(d_dat){
+  
+  dout <- d_dat %>% 
+    group_by(row, data_gid) %>% 
+    summarise(col = min(col)) %>% 
+    bind_rows(
+      d_dat %>% 
+        group_by(col, data_gid) %>% 
+        summarise(row = min(row))
+    ) %>% ungroup()
+  
+  dout
+}
 
-# helpers
-
-
-
-#' get direction metric
+#' get HOT (header_orientation_tag) metric
 #'
 #' @param d1 part of d_part with data_gid
 #' @param a1 part of d_part with attr_gid
 #' @param direction direction name 
-#' should be one of [`get_valid_direction_names`][get_valid_direction_names()]
+#' should be one of [`get_valid_header_orientation_tags`][get_valid_header_orientation_tags()]
 #'
-#' @details Used internally by [`get_direction`][get_direction()] function
+#' @details Used internally by [`get_header_orientation_tag`][get_header_orientation_tag()] function
 #' @keywords internal
 #' @return a scaled fraction denoting coverage (1 means full coverage) for the supplied direction.
 #'
-get_direction_metric <- function(d1, a1, direction) {
-  l1 <- try(get_direction_metric_part_raw(d1, a1, direction), silent = TRUE)
+get_HOT_metric <- function(d1, a1, direction) {
+  l1 <- try(get_HOT_metric_part_raw(d1, a1, direction), silent = TRUE)
   
   if (inherits(l1, "try-error")) l1 <- 0
   if (length(l1) != 1) l1 <- 0
@@ -176,7 +228,7 @@ get_direction_metric <- function(d1, a1, direction) {
   l1 / nrow(d1)
 }
 
-get_direction_metric_part_raw <- function(d1, a1, direction) {
+get_HOT_metric_part_raw <- function(d1, a1, direction) {
   # suppressWarnings should be removed once unpivotr::enhead chages
   # this is happening as "All elements of `...` must be named." warning in tidyr
   # ref: https://github.com/tidyverse/tidyr/issues/714
@@ -184,8 +236,8 @@ get_direction_metric_part_raw <- function(d1, a1, direction) {
   suppressWarnings({
     d1 %>%
       bind_header(a1, direction) %>%
-      filter(!is.na(attr_gid)) %>%
-      pull(attr_gid) %>%
+      filter(!is.na(attr_micro_gid)) %>%
+      pull(attr_micro_gid) %>%
       length()
   })
 }
