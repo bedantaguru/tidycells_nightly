@@ -7,7 +7,11 @@ plot_cell_df_DT <- function(d,
                             in_shiny = FALSE, 
                             shrink = TRUE, 
                             shrink_length = 20, 
-                            no_plot = FALSE, ...){
+                            no_plot = FALSE,
+                            zoomPct = 100,
+                            lineHeightPct = zoomPct,
+                            letterSpacingPct = zoomPct,
+                            fontSizePct = zoomPct, ...){
   
   if (missing(fill)) {
     if(hasName(d, "type")){
@@ -32,10 +36,10 @@ plot_cell_df_DT <- function(d,
     nshtG <- asNamespace("htmltools")
     if(fill == "data_type"){
       inf <- list(nshtG$tags$a("character", style = "color:#F8766D"), 
-           nshtG$tags$a("numeric", style = "color:#00BFC4"))
+                  nshtG$tags$a("numeric", style = "color:#00BFC4"))
     }else{
       inf <- list(nshtG$tags$a("attribute", style = "color:#F8766D"), 
-           nshtG$tags$a("value", style = "color:#00BFC4"))
+                  nshtG$tags$a("value", style = "color:#00BFC4"))
     }
   }else{
     inf <- ""
@@ -44,7 +48,11 @@ plot_cell_df_DT <- function(d,
   
   dt <- make_DT_this_df(ldd$cdd, ldd$cdt, 
                         in_shiny = in_shiny, shrink = shrink, shrink_length = shrink_length,
-                        info = inf, safeMode = isTRUE(getOption("tidycells.safemode")))
+                        info = inf, safeMode = isTRUE(getOption("tidycells.safemode")),
+                        zoomPct = zoomPct,
+                        lineHeightPct = lineHeightPct,
+                        letterSpacingPct = letterSpacingPct,
+                        fontSizePct = fontSizePct)
   if(!no_plot){
     print(dt)
   }
@@ -53,7 +61,18 @@ plot_cell_df_DT <- function(d,
   
 }
 
-make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_length = 20, info = "info", safeMode = FALSE){
+make_DT_this_df <- function(
+  cdd, cdt, 
+  in_shiny = FALSE, 
+  shrink = T, shrink_length = 20, 
+  info = "info", safeMode = FALSE,
+  zoomPct = 100,
+  lineHeightPct = zoomPct,
+  letterSpacingPct = zoomPct,
+  fontSizePct = zoomPct, 
+  style_levels = c(1,2,3,4),
+  style_color_codes = c("#F8766D","#00BFC4","#FACE6EE9","#A3A3A31F")
+){
   cdd <- na_replace_this_df(cdd)
   cdt <- style_num_this_df(cdt)
   
@@ -178,35 +197,38 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
                     ))
   }else{
     dt <- DT::datatable(fd,
-                    callback = nshw$JS(callback),
-                    escape = FALSE,
-                    rownames = TRUE,
-                    #style = "bootstrap4",
-                    style = ifelse(in_shiny, "bootstrap", "default"),
-                    container = this_dt_table_container,
-                    fillContainer = TRUE,
-                    class = "cell-border stripe",
-                    extensions = c("KeyTable", "Scroller","Select"),
-                    selection = "none",
-                    #editable = TRUE,
-                    options = list(
-                      rowCallback = nshw$JS(rowCallback),
-                      columnDefs = cdfs,
-                      pageLength = 10,
-                      keys = TRUE,
-                      sDom = '<"top">lrt<"bottom">pB',
-                      deferRender = TRUE,
-                      #scrollX = TRUE,
-                      scrollX= 400,
-                      scrollY = 500,
-                      scroller = TRUE,
-                      scrollCollapse = TRUE,
-                      select = list(style = "os", selector = "td:not(.notselectable)", items = "cell"),
-                      ordering = FALSE,
-                      fixedColumns = TRUE,
-                      fixedHeader = TRUE
-                    ))
+                        callback = nshw$JS(callback),
+                        escape = FALSE,
+                        rownames = TRUE,
+                        #style = "bootstrap4",
+                        style = ifelse(in_shiny, "bootstrap", "default"),
+                        container = this_dt_table_container,
+                        fillContainer = TRUE,
+                        class = "cell-border stripe",
+                        extensions = c("KeyTable", "Scroller","Select"),
+                        selection = "none",
+                        #editable = TRUE,
+                        options = list(
+                          rowCallback = nshw$JS(rowCallback),
+                          columnDefs = cdfs,
+                          pageLength = 10,
+                          keys = TRUE,
+                          sDom = '<"top">lrt<"bottom">pB',
+                          deferRender = TRUE,
+                          #scrollX = TRUE,
+                          scrollX= 400,
+                          scrollY = 500,
+                          scroller = TRUE,
+                          scrollCollapse = TRUE,
+                          select = list(style = "os", selector = "td:not(.notselectable)", items = "cell"),
+                          ordering = FALSE,
+                          fixedColumns = TRUE,
+                          fixedHeader = TRUE
+                        ))
   }
+  
+  
+  row_wd <- min(max(round(1/(ncol(cdd)+1)*5, 2),0.01),1)
   
   # look for styles 
   # here https://rstudio.github.io/DT/010-style.html
@@ -216,13 +238,21 @@ make_DT_this_df <- function(cdd, cdt, in_shiny = FALSE, shrink = T, shrink_lengt
       valueColumns = colnames(cdt),
       target = "cell",
       backgroundColor = DT::styleEqual(
-        levels = c(1,2,3,4),
-        values = c("#F8766D","#00BFC4","#FACE6EE9","#A3A3A31F"))) %>% 
+        levels = style_levels,
+        values = style_color_codes
+      ),
+      lineHeight = paste0(lineHeightPct,"%"),
+      letterSpacing = paste0(letterSpacingPct,"%"),
+      fontSize = paste0(fontSizePct,"%")) %>% 
     DT::formatStyle(0, 0, 
-                target = "cell", 
-                backgroundColor = "#cde6fa63", 
-                fontFamily = "Monospace", 
-                textAlign = "center")
+                    target = "cell", 
+                    backgroundColor = "#cde6fa63", 
+                    fontFamily = "Monospace", 
+                    textAlign = "center",
+                    width = paste0(row_wd,"%"),
+                    lineHeight = paste0(lineHeightPct,"%"),
+                    letterSpacing = paste0(letterSpacingPct,"%"),
+                    fontSize = paste0(fontSizePct,"%"))
   
 }
 
