@@ -3,6 +3,15 @@ options(lifecycle_verbosity = "warning")
 
 #  it has to be added as test
 
+
+
+tf0 <- read_cells("00_nightly_only/dev/ABSSelfExplore/test.xlsx")[[1]]
+tf0 <- tf0 %>% numeric_values_classifier()
+tf0 %>% mutate(type = ifelse(row<6, "attribute", type)) ->tf0
+
+ee <-  explore_it("00_nightly_only/dev/ABSSelfExplore/")
+ee <- ee %>% read_it()
+
 #non uniformity  among different reader
 tf0 <- read_cells("00_nightly_only/dev/ABSSelfExplore/Test.xlsx")[[1]]
 

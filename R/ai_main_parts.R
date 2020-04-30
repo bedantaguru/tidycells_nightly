@@ -136,6 +136,14 @@ ai_main_part_phase_2_gid_joins <- function(d_dat, d_att, admap, d){
     admap <- rel_chk$admap
   }
   
+  cmp <- compact_gid_maps(d_att, admap)
+  
+  if(cmp$done){
+    d_att <- cmp$d_att
+    admap <- cmp$admap
+  }
+  
+  
   list(admap = admap, d_dat = d_dat, d_att = d_att)
   
 }
@@ -205,11 +213,6 @@ ai_main_part_phase_3_rest_map <- function(d_dat, d_att, admap){
   admap <- admap %>% bind_rows(admap_fr1)
   
   cmp <- compact_gid_maps(d_att, admap)
-  # @Dev
-  # test and del it later
-  if(cmp$done){
-    stop("@Dev this is required")
-  }
   
   d_att <- cmp$d_att
   admap <- cmp$admap

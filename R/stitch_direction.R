@@ -10,9 +10,11 @@ stitch_direction <- function(d_part, dat, attr_name, trace_it = FALSE) {
   chkd <- d0$data_gid %>%
     unique() %>%
     length()
+  
   chka <- a0$attr_gid %>%
     unique() %>%
     length()
+  
   chkatsp <- d_part$attr_gid_split %>%
     unique() %>%
     length()

@@ -12,14 +12,28 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     # relative split required
     done <- TRUE
     
-    rel_gids <- chk %>%
-      select(-n_dirs) %>%
-      inner_join(basic_map$raw, by = c("data_gid", "attr_gid"))
+    data_gids_those_are_ever_connected <- basic_map$map$data_gid[basic_map$map$attr_gid %in% chk$attr_gid] %>% unique()
+    
+    rel_gids_revisited <- basic_map$raw %>% 
+      filter(attr_gid %in% chk$attr_gid, data_gid %in% data_gids_those_are_ever_connected)
+    
+    rel_gids_revisited_remap <- connect_data_and_attr_groups_from_raw_map(rel_gids_revisited)
+    
+    # information kept for missing link detection
+    # mbc : missed_block_connections
+    # used later
+    mbc <- rel_gids_revisited_remap$map %>% distinct(attr_gid, data_gid)
+    
+    rel_gids_revisited_revised <- rel_gids_revisited %>% 
+      inner_join(mbc,
+                 by = c("attr_gid", "data_gid"))
+    
+    rel_gids <- rel_gids_revisited_revised
     rel_gids <- rel_gids %>%
       mutate(new_attr_gid = paste(attr_gid, data_gid, direction, sep = "_"))
     
     # mapping strength is higher
-    rel_gids <- relative_gid_map_pattern_fix(rel_gids)
+    rel_gids <- relative_gid_map_pattern_fix(rel_gids, basic_map$map)
     
     d_att <- rel_gids %>%
       select(row, col, gid = new_attr_gid) %>%
@@ -31,7 +45,7 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
     
     # information kept for missing link detection
     # mbc : missed_block_connections
-    mbc <- chk %>% distinct(attr_gid, data_gid)
+    # defined earlier
     
     common_knowledge(missed_block_connections = mbc)
     
@@ -57,14 +71,40 @@ ai_relative_data_split_attr <- function(basic_map, d_att) {
 # helpers
 
 
-relative_gid_map_pattern_fix <- function(rel_gids){
-  rel_gids %>% split(.$attr_gid) %>% map_df(relative_gid_map_pattern_fix_for_a_attr_gid)
+relative_gid_map_pattern_fix <- function(rel_gids, admap){
+  rel_gids %>% split(.$attr_gid) %>% map_df(relative_gid_map_pattern_fix_for_a_attr_gid, admap = admap)
 }
 
-relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids){
+relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids, admap){
+  
+  
+  rel_gids_attr_major_dir_grp <- stat_mode(rel_gids$direction_group[rel_gids$direction_group!="corner"])
+  
+  opp_rel_gids_attr_major_dir_grp <- ifelse(rel_gids_attr_major_dir_grp=="WE", "NS", "WE")
+  
+  # group by opposite side attr_gid for segregated splits
+  data_gid_opp_grp <- admap %>% 
+    filter(data_gid %in% rel_gids$data_gid, 
+           direction_group == opp_rel_gids_attr_major_dir_grp) %>% 
+    distinct(data_gid, opp_grp = attr_gid)
+  
+  rel_gids <- rel_gids %>% inner_join(data_gid_opp_grp, by = "data_gid")
+  
+  
+  out <- rel_gids %>% split(.$opp_grp) %>% map_df(relative_gid_map_pattern_fix_for_a_attr_gid_in_opp_grp)
+  
+  out$opp_grp <- NULL
+  
+  return(out)
+  
+}
+
+relative_gid_map_pattern_fix_for_a_attr_gid_in_opp_grp <- function(rel_gids){
+
   
   # explained later why missed_block_of_d_att is required
   missed_block_of_d_att <- F
+  
   
   allocations <- list()
   

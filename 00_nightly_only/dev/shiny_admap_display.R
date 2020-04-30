@@ -86,17 +86,20 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
                          sliderInput("col_range", label = "Col Range", 
                                      min = min(cd$col), max = max(cd$col), 
                                      value = range(cd$col), step = 1L),
-                         checkboxInput("no_txt", label = "No text", value = F),
+                         checkboxInput("no_txt", label = "No text", value = T),
                          sliderInput("txt_size", "Text Size", min = 1, max = 8, value = 4, step = 0.5),
                          sliderInput("txt_angle", "Text Angle", min = 0, max = 90, value = 0, step = 15),
-                         checkboxInput("zoom", label = "Zoom", value = T)),
+                         checkboxInput("zoom", label = "Zoom", value = F)),
                      
                      div(style = "float: left; margin: 5px;",
                          selectizeInput("filter_by", "Filter AD map by:", 
                                         choices = colnames(admap), selected = "data_gid"),
                          selectizeInput("filter_by_value", "Values of Filter Column:", 
                                         choices = unique(admap$data_gid) ),
-                         radioButtons("filter_by_rc","Row Col", choices = c("A","D"))),
+                         radioButtons("filter_by_rc","Row Col", choices = c("A","D")),
+                         actionButton("traverse_filter_by_value", "Traverse", icon = icon("play")),
+                         br(),
+                         sliderInput("traverse_filter_by_value_delay", label = "Delay", min = 1, max = 10, value = 2, step = 1)),
                      
                      div(style = "float: left; margin: 5px;",
                          rep(list(br()), 5),
@@ -169,7 +172,39 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
     cdf <- reactiveVal(cd)
     admap_filtered <- reactiveVal(admap)
     admap_filtered_by_mapped <- reactiveVal(admap)
+    traverse_filter_by_value_now <- reactiveVal(F)
+    traverse_filter_by_value_i <- reactiveVal(1)
     
+    observeEvent(input$traverse_filter_by_value,{
+      play_now <- F
+      if(input$traverse_filter_by_value%%2 == 1){
+        play_now <- T
+        updateActionButton(session, inputId = "traverse_filter_by_value", label = "Pause", icon = icon("pause"))
+      }else{
+        updateActionButton(session, inputId = "traverse_filter_by_value", label = "Traverse", icon = icon("play"))
+      }
+      traverse_filter_by_value_now(play_now)
+    })
+    
+    observe({
+      if(traverse_filter_by_value_now()){
+        invalidateLater(1000*as.numeric(input$traverse_filter_by_value_delay))
+        isolate({
+          # admap_filtered(admap)
+          # admap0 <- admap
+          x <- unique(admap[[input$filter_by]]) %>% sort()
+          if(traverse_filter_by_value_i()>length(x)){
+            traverse_filter_by_value_i(1)
+          }
+          updateSelectizeInput(
+            session, "filter_by_value", 
+            label = "Values of Filter Column:", 
+            choices = x, 
+            selected = x[traverse_filter_by_value_i()])
+          traverse_filter_by_value_i(traverse_filter_by_value_i()+1)
+        })
+      }
+    })
     
     
     observe({
@@ -215,7 +250,7 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
         
         updateSelectizeInput(session,
                              "filter_by", "Filter AD map by:", 
-                             choices = colnames(admap0) %>% sort(), selected = f2)
+                             choices = colnames(admap0) %>% sort(), selected = f2[1])
         
         updateSelectizeInput(session,
                              "filter_by_mapped", "Further Filter AD map by:", 

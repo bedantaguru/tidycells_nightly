@@ -12,11 +12,159 @@ tictoc::toc()
 
 microbenchmark::microbenchmark(analyze_cells(tf0), times = 1)
 
-out %>% filter(header_orientation_tag=="direct")
-
-out %>% filter(header_orientation_tag=="vl")
 
 
+
+
+get_group_id_enclosure <- function(drc_id, drc_bd, enclosure_direction = c("row","col")){
+  
+  enclosure_direction <- match.arg(enclosure_direction)
+  
+  if(missing(drc_bd)){
+    drc_bd<- get_group_id_boundary(drc_id)
+  }
+  
+  # group id enclosure (row or col wise)
+  
+  if(enclosure_direction=="row"){
+    drc_id_bd <- drc_bd %>% 
+      # er:enclosed_range
+      mutate(er_min = r_min, er_max = r_max) %>% 
+      select(gid, er_min, er_max)
+  }else{
+    drc_id_bd <- drc_bd %>% 
+      # er:enclosed_range
+      mutate(er_min = c_min, er_max = c_max) %>% 
+      select(gid, er_min, er_max)
+  }
+  
+  
+  drc_id_bd$is_changed <- F
+  
+  if(nrow(drc_id_bd)>1){
+    
+    repeat({
+      
+      drc_id_bd$er_len <- drc_id_bd$er_max- drc_id_bd$er_min+1
+      drc_id_bd <- drc_id_bd[order(drc_id_bd$er_len, decreasing = T),]
+      
+      updated_row <- rep(F, nrow(drc_id_bd))
+      
+      for(i in 1:nrow(drc_id_bd)){
+        if(!drc_id_bd$is_changed[i]){
+          er_expnd <- gid_enclosure_expander(drc_id_bd$er_min, drc_id_bd$er_max, 
+                                             drc_id_bd$er_min[i], drc_id_bd$er_max[i])
+          updated_row[i] <- er_expnd$updated
+          if(er_expnd$updated){
+            drc_id_bd$er_min <- er_expnd$er_min
+            drc_id_bd$er_max <- er_expnd$er_max
+            drc_id_bd$is_changed <- drc_id_bd$is_changed | er_expnd$is_changed
+          }
+        }
+      }
+      
+      if(!any(updated_row)) break()
+      
+    })
+    
+  }
+  
+  drc_id_bd <- drc_id_bd %>% mutate(enclosure = paste0(enclosure_direction, "_", er_min,"_", er_max))
+  
+  drc_id_bd %>% distinct(gid, enclosure)
+  
+}
+
+
+gid_enclosure_expander <- function(er_min, er_max, aim_er_min, aim_er_max){
+  er_min_out <- er_min
+  er_max_out <- er_max
+  updated <- F
+  rel_loc <- rep(0, length(er_min_out))
+  # 5 cases for range intersecions to be updated in rel_loc
+  # **||  # *|*|  # |**|  # |*|*  # ||**
+  tt <- rel_loc==0
+  if(any(tt)){
+    # **||
+    rel_loc[tt] <- ifelse(er_max[tt]<aim_er_min, 
+                          1, rel_loc[tt])
+  }
+  
+  tt <- rel_loc==0
+  if(any(tt)){
+    # *|*| and *||*
+    rel_loc[tt] <- ifelse(er_min[tt]<aim_er_min & er_max[tt]>=aim_er_min, 
+                          2, rel_loc[tt])
+  }
+  
+  tt <- rel_loc==0
+  if(any(tt)){
+    # |**|
+    rel_loc[tt] <- ifelse(er_min[tt]>=aim_er_min & er_max[tt]<=aim_er_max, 
+                          3, rel_loc[tt])
+  }
+  
+  tt <- rel_loc==0
+  if(any(tt)){
+    # |*|* and *||* 
+    # (*||* : this will be already be taken by 2)
+    rel_loc[tt] <- ifelse(er_min[tt]<=aim_er_max & er_max[tt]>aim_er_max, 
+                          4, rel_loc[tt])
+  }
+  
+  tt <- rel_loc==0
+  if(any(tt)){
+    # ||**
+    rel_loc[tt] <- ifelse(er_min[tt]>aim_er_max, 
+                          5, rel_loc[tt])
+  }
+  
+  # extension cases : 2 or 4
+  chtt <- (rel_loc %in% c(2, 4))
+  aim_er_max_final <- max(
+    aim_er_max,
+    er_max[chtt]
+  )
+  aim_er_min_final <- min(
+    aim_er_min,
+    er_min[chtt]
+  )
+  
+  # change cases : 2, 3, 4
+  chtt <- (rel_loc %in% c(2, 3, 4))
+  er_max_out[chtt] <- aim_er_max_final
+  er_min_out[chtt] <- aim_er_min_final
+  
+  is_changed_row <- chtt
+  
+  updated <- any(chtt)
+  
+  list(updated = updated, er_max = er_max_out, er_min = er_min_out, is_changed_row = is_changed_row)
+}
+
+
+d_dat <- dval %>% get_group_id(gid_tag = "d")
+dgids_bd <- get_group_id_boundary(d_dat)
+
+
+#Concept of NA cells
+
+
+xabs <- LibreOffice_convert_to_xlsx_and_read("00_nightly_only/dev/ABSSelfExplore/20490do001_2016.xls")
+xabs$Table_1.1-> tf1
+
+tf2 <- tf1 %>% mutate(is_missing  = stringr::str_detect(comment, "not available"))
+tf2 <- tf2 %>% mutate(is_missing = ifelse(is.na(is_missing), F, is_missing))
+tf2 <- tf2 %>% mutate(is_blank =ifelse(is_missing & is_blank, F, is_blank ),
+                      data_type = ifelse(is_missing & (data_type=="blank"), "numeric", data_type ),
+                      numeric = ifelse(is_missing & (data_type=="numeric"), -1, numeric ))
+tf3 <- as_cell_df(tf2)
+
+# tf2 <- tf2 %>% left_join(tf1 %>% select(row, col, missing), by = c("row", "col"))
+# tf2 <- tf2 %>% mutate(missing = ifelse(is.na(missing), F, missing))
+
+tf3 <- tf3 %>% numeric_values_classifier()
+tf3 %>% mutate(type = ifelse(row<6, "attribute", type)) ->tf3
 
 ###############################################################
 ##################################################################
@@ -54,14 +202,6 @@ join_by = c("data_gid", "attr_gid",   "row",   "col" )
 x %>% group_by(!!!rlang::syms(join_by))
 
 
-
-stat_mode <- function(x){
-  m1 <- table(x) %>% which.max() %>% names()
-  if(is.numeric(x)){
-    m1 <- as.numeric(m1) %>% mean()
-  }
-  m1[1]
-}
 
 stat_mode2 <- function(x){
   m1 <- tibble(inputx = x)

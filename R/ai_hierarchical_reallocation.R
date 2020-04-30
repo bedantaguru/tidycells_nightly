@@ -192,6 +192,6 @@ claim_region_for_attr_micro_gid_HR_for_a_dir <- function(.x, this_lamg, rest_dgi
   claim_region_dgids %>% 
     distinct(info_gid, data_gid) %>% 
     mutate(attr_micro_gid = .x$attr_micro_gid[1], 
-           dist_order = .x$dist_order, 
+           dist_order = .x$dist_order[1], 
            is_expanded = is_expnd)
 }

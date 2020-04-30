@@ -31,8 +31,8 @@ is_attachable <- function(gid1, gid2, d_dat, d_att, data_attr_map, whole_data) {
   
   
   ########## logic #########
-  #### should have no other entry within the enclosed combined boundary (direction-wise)
-  #### should have no other entry (non empty) within the enclosed combined boundary attaching major attributes (direction-wise)
+  #### should have no other attribute entry within the enclosed combined boundary (direction-wise)
+  #### should have no other attribute entry (non empty) within the enclosed combined boundary attaching major attributes (direction-wise)
   
   data_attr_map_this <- data_attr_map %>% filter(data_gid %in% c(gid1, gid2))
   
@@ -46,7 +46,9 @@ is_attachable <- function(gid1, gid2, d_dat, d_att, data_attr_map, whole_data) {
           # attached attributes to these data_gids
           d_att %>% filter(gid %in% dm0$attr_gid)
         )
-      chk <- is_attachable_logic_2_sub(this_group_info, whole_data)
+      # @Dev
+      # whole_data[whole_data$type == "attribute",] newly added check consistency
+      chk <- is_attachable_logic_2_sub(this_group_info, whole_data[whole_data$type == "attribute",])
       if (isFALSE(chk)) {
         return(FALSE)
       }

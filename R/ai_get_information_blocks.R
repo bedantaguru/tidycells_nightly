@@ -1,6 +1,7 @@
 
 #@Dev
 # add doc
+# any common attribute cell in major type 
 
 ai_get_information_blocks <- function(admap, d_dat, d_att){
   
@@ -9,10 +10,12 @@ ai_get_information_blocks <- function(admap, d_dat, d_att){
   
   repeat({
     
-    admap_majors <- admap %>% filter(attr_group=="major")
+    admap_majors_attr_cell_wise <- admap %>% 
+      filter(attr_group=="major") %>% 
+      inner_join(d_att %>% select(attr_gid = gid, row_a = row, col_a = col), by = "attr_gid")
     
-    inf_gid_map <- admap_majors %>% 
-      group_by(attr_gid) %>% 
+    inf_gid_map <- admap_majors_attr_cell_wise %>% 
+      group_by(row_a, col_a) %>% 
       mutate(info_gid_new = min(info_gid)) %>% 
       ungroup() %>% 
       filter(info_gid!=info_gid_new) %>% 

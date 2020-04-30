@@ -164,6 +164,10 @@ name_fix_for_list <- function(xl, name_tag = "Node", sep="_"){
 # it is kept for reference 
 # may be a quality param needed
 stat_mode <- function(x){
+  ux <- unique(x)
+  if(length(ux)==1){
+    return(ux)
+  }
   m1 <- table(x) %>% which.max() %>% names()
   if(is.numeric(x)){
     m1 <- as.numeric(m1) %>% mean()

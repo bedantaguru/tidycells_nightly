@@ -7,7 +7,7 @@ ai_data_gid_join <- function(d_dat, d_att, data_attr_map, full_data) {
   # fd <- full_data %>% filter(type != "empty") <<-  this filter is not required as earlier ensured
   
   fd <- full_data %>% 
-    select(row,col) %>% 
+    select(row, col, type) %>% 
     # rc for avoiding anti_join
     mutate(rc = row+1i*col)
   
