@@ -158,10 +158,15 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
                  ))
       
       
-    )
+    ),
     ############## 
     # Data Panel #
     ##############
+    
+    # no fade during re calc
+    tags$style(type="text/css",
+               ".recalculating {opacity: 1.0;}"
+    )
     
   )
   

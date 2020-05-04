@@ -3,7 +3,7 @@
 intra_block_dist <- function(cd, method = c("hybrid", "real", "approx"), nearby_threshold = 5){
   method <- match.arg(method)
   
-  if(state(cd)!="with_table_blocks"){
+  if("with_table_blocks" %in% state(cd)){
     cd <- detect_table_block(cd)
   }
   

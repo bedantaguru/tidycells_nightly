@@ -6,7 +6,11 @@ plot_cell_df_ggplot2 <- function(d,
                                  adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, txt_angle = 0,
                                  no_plot = FALSE,
                                  fill_alpha = 1,
-                                 background = NULL, ...) {
+                                 background = NULL,
+                                 shrink = TRUE, 
+                                 shrink_length = 20, 
+                                 draw_grid = T,
+                                 numeric_cols = F, ...) {
   
   if (missing(fill)) {
     if(hasName(d, "type")){
@@ -29,6 +33,14 @@ plot_cell_df_ggplot2 <- function(d,
     abort(paste0(fill, " is not present in supplied cell_df"))
   }
   
+  if(shrink){
+    d <- d %>% 
+      mutate(value = ifelse(
+        nchar(value)>shrink_length,
+        paste0(substr(value, 1, shrink_length-1), "~"), 
+        value)
+      )
+  }
   
   
   if (adaptive_txt_size) {
@@ -105,6 +117,41 @@ plot_cell_df_ggplot2 <- function(d,
     } else {
       g <- g + ggplot2::geom_text(size = txt_size, alpha = txt_alpha, na.rm = TRUE, angle = txt_angle)
     }
+  }
+  
+  if(draw_grid){
+    if(!is.null(background)){
+      d_r <- c(d$row, background$row) %>% range()
+      d_c <- c(d$col, background$col) %>% range()
+    }else{
+      d_r <- d$row %>% range()
+      d_c <- d$col %>% range()
+    }
+    
+    d_r <- seq(from = d_r[1], to = d_r[2], by = 1)
+    d_c <- seq(from = d_c[1], to = d_c[2], by = 1)
+    d_rm <- -(c(d_r[1]- 0.5, d_r + .5))
+    d_cm <-  (c(d_c[1]- 0.5, d_c + .5))
+    
+    if(numeric_cols){
+      c_AA_names <- as.character(d_c)
+    }else{
+      c_AA_names <- seq_of_AA(max(d_c))[d_c]
+    }
+    
+    
+    drcname <- tibble(txt = c_AA_names, col = d_c, row = d_r[1]-1) %>% 
+      bind_rows(
+        tibble(txt = as.character(d_r), col = d_c[1]-1, row = d_r)
+      )
+    
+    g <- g + 
+      ggplot2::geom_vline(xintercept = d_cm, color = "#42706D40", lwd = 0.5) +
+      ggplot2::geom_hline(yintercept = d_rm, color = "#42706D20", lwd = 0.5) +
+      ggplot2::geom_text(data = drcname, 
+                         mapping = ggplot2::aes(col, -row, label = txt), 
+                         color = "#11752EA0", size = 2,
+                         inherit.aes = F)
   }
   
   if (!no_plot) {

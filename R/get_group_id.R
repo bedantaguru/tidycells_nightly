@@ -60,7 +60,7 @@ get_group_id <- function(dat, allow_corner = FALSE, gid_tag) {
     }
   })
   
-
+  
   drc_id <- drc_id %>% mutate(gid = as_character(gid))
   if(!missing(gid_tag)){
     drc_id <- drc_id %>% mutate(gid = paste0(gid_tag, gid))
@@ -186,7 +186,7 @@ get_group_id_join_gids <- function(old_group_id_info, gid_map, no_need_to_tune =
 
 
 
-get_group_id_enclosure <- function(drc_id, drc_bd, enclosure_direction = c("row","col")){
+get_group_id_enclosure <- function(drc_id, drc_bd, enclosure_direction = c("row","col"), details = F){
   
   enclosure_direction <- match.arg(enclosure_direction)
   
@@ -239,9 +239,40 @@ get_group_id_enclosure <- function(drc_id, drc_bd, enclosure_direction = c("row"
     
   }
   
-  drc_id_bd <- drc_id_bd %>% mutate(enclosure = paste0(enclosure_direction, "_", er_min,"_", er_max))
+  drc_id_bd <- drc_id_bd %>% 
+    mutate(enclosure = paste0(enclosure_direction, "_", er_min,"_", er_max)) %>% 
+    select(-is_changed)
   
-  drc_id_bd %>% distinct(gid, enclosure)
+  encl <- drc_id_bd %>% distinct(gid, enclosure)
+  
+  if(!details){
+    out <- encl
+  }else{
+    drc_bd_with_encl <- drc_bd %>% inner_join(drc_id_bd, by = "gid")
+    drc_bd_with_encl <- drc_bd_with_encl %>% 
+      group_by(enclosure) %>% 
+      mutate(new_gid = paste0("e", substr(enclosure_direction, 1, 1), min(gid))) %>% 
+      ungroup()
+    # though both case can be clubbed into one expression
+    if(enclosure_direction == "row"){
+      encl_induced_gid <- drc_bd_with_encl %>% 
+        group_by(gid = new_gid) %>% 
+        summarise(r_min=er_min[1], r_max = er_max[1], c_min = min(c_min), c_max = max(c_max))
+    }else{
+      encl_induced_gid <- drc_bd_with_encl %>% 
+        group_by(gid = new_gid) %>% 
+        summarise(r_min= min(r_min), r_max = max(r_max), c_min = er_min[1], c_max = er_max[1])
+    }
+    
+    encl_gid_map <- drc_bd_with_encl %>% distinct(gid, encl_gid = new_gid)
+    
+    out <- list(enclosure = encl,
+                enclosure_induced_gid_boundary = encl_induced_gid,
+                enclosure_gid_map = encl_gid_map)
+    
+  }
+  
+  return(out)
   
 }
 

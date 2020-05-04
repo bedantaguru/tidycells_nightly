@@ -57,15 +57,16 @@ ai_main_part_phase_0_pre_process <- function(d){
 # - dimention_analysis
 ai_main_part_phase_1_admap <- function(d_dat, d_att) {
 
+  d_dat_bd <- get_group_id_boundary(d_dat)
   #  start with simple attr data map
   admap0 <- ai_get_data_attr_map(
-    dat_boundary = get_group_id_boundary(d_dat),
+    dat_boundary = d_dat_bd,
     att_gid_map = d_att
   )
 
 
   # split attr gid relative to data_gid
-  rel_chk <- ai_relative_data_split_attr(basic_map = admap0, d_att = d_att)
+  rel_chk <- ai_relative_data_split_attr(basic_map = admap0, d_att = d_att, d_dat_bd = d_dat_bd)
   if (rel_chk$done) {
     d_att <- rel_chk$d_att
     admap0 <- rel_chk$admap
@@ -73,7 +74,7 @@ ai_main_part_phase_1_admap <- function(d_dat, d_att) {
     # following step is required for: 
     # diffrent split resulted in same attr_gid
     # these will be compacted to single group
-    cmp <- compact_gid_maps(d_att, admap0)
+    cmp <- compact_attr_gid_maps(d_att, admap0)
     
     if(cmp$done){
       d_att <- cmp$d_att
@@ -96,6 +97,23 @@ ai_main_part_phase_1_admap <- function(d_dat, d_att) {
     filter(dist == min(dist)) %>%
     ungroup()
 
+  
+  # here the potential corner_WE and corner_NS needs to be changed back
+  # before that 
+  # @Dev figure out best way to transfer this info
+  corner_micro <- admap_out %>% 
+    filter(direction_group=="corner_WE" | direction_group=="corner_NS") %>% 
+    get_data_attr_cell_wise_map_raw(d_dat, d_att)
+  
+  common_knowledge(corner_micro = corner_micro)
+  
+  admap_out <- admap_out %>% 
+    mutate(
+      direction_group =ifelse(
+        stringr::str_detect(direction_group, "corner"), 
+        "corner", 
+        direction_group)
+    )
   ##########################
   
   
@@ -136,7 +154,7 @@ ai_main_part_phase_2_gid_joins <- function(d_dat, d_att, admap, d){
     admap <- rel_chk$admap
   }
   
-  cmp <- compact_gid_maps(d_att, admap)
+  cmp <- compact_attr_gid_maps(d_att, admap)
   
   if(cmp$done){
     d_att <- cmp$d_att
@@ -212,7 +230,7 @@ ai_main_part_phase_3_rest_map <- function(d_dat, d_att, admap){
   # merge two maps
   admap <- admap %>% bind_rows(admap_fr1)
   
-  cmp <- compact_gid_maps(d_att, admap)
+  cmp <- compact_attr_gid_maps(d_att, admap)
   
   d_att <- cmp$d_att
   admap <- cmp$admap
@@ -230,6 +248,7 @@ ai_main_part_phase_4_header_orientation <- function(d_dat, d_att, admap){
   # attach directions to it
   admap_with_dir <- get_data_attr_cell_wise_map_raw(admap, d_dat, d_att) %>% 
     ai_attach_header_orientation_tag()
+  
   list(admap_cell_wise = admap_with_dir)
 }
 
@@ -254,7 +273,8 @@ ai_main_part_phase_5_post_process <- function(d_dat, d_att, admap, admap_cell_wi
     group_by(gid) %>% 
     summarise(row = round(mean(row)), col = round(mean(col))) %>% 
     arrange(col, row) %>% 
-    mutate(natural_gid = seq_along(gid) %>% paste0("d",.)) %>% 
+    mutate(natural_gid = paste0("d",format(seq_along(gid), justify = "left")) %>% 
+             stringr::str_replace_all(" ","0")) %>% 
     select(gid, natural_gid)
   
   

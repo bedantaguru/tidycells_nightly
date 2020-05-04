@@ -9,8 +9,11 @@ ai_attach_header_orientation_tag <- function(admap_cellwise_raw) {
   
   if(do_hierarchical_reallocation){
     admap_cellwise_raw_asp <- ai_hierarchical_reallocation(admap_cellwise_raw_asp)
+    admap_cellwise_raw_asp <- compact_attr_micro_gid_maps(admap_cellwise_raw_asp)
     admap_cellwise_raw_asp <- ai_attr_var_sync_name_fix(admap_cellwise_raw_asp)
   }
+  
+  admap_cellwise_raw_asp <- distinct(admap_cellwise_raw_asp)
   
   # remove n_rc later
   admap_cellwise_raw_asp <- admap_cellwise_raw_asp %>% 
@@ -45,13 +48,46 @@ ai_attach_header_orientation_tag <- function(admap_cellwise_raw) {
 
 # helpers
 ai_attr_gid_micro_splits <- function(admap_cellwise_raw){
+  admap_cellwise_raw <- distinct(admap_cellwise_raw)
   # asp: attr split
   admap_cellwise_raw_asp <- admap_cellwise_raw %>%
     mutate(attr_gid_split = 
              ifelse(direction_group == "NS", paste0(row_a,":0"),
                     ifelse(direction_group == "WE", paste0("0:", col_a), 
                            ifelse(direction_group == "corner", paste0(row_a, ":", col_a), 0))
-             ))
+             )) %>% 
+    mutate(attr_micro_gid = paste(attr_gid, direction, attr_gid_split, sep = "_"))
+  
+  # fix for potential corner micro cases
+  # when both sided attr split happened earlier
+  
+  #######
+  ####### attachment of corner mod start
+  
+  corner_micro <- tidycells_pkg_env$common_knowledge$corner_micro
+  
+  if(is.data.frame(corner_micro)){
+    if(nrow(corner_micro)>0){
+      admap_cellwise_raw_asp <- corner_micro %>% 
+        distinct(row_d, col_d, row_a, col_a, corner_mod = direction_group) %>% 
+        right_join(admap_cellwise_raw_asp, by = c("row_d", "col_d", "row_a", "col_a"))
+      admap_cellwise_raw_asp <- admap_cellwise_raw_asp %>% 
+        mutate(corner_mod = ifelse(is.na(corner_mod),"", corner_mod))
+      admap_cellwise_raw_asp <- admap_cellwise_raw_asp %>% 
+        group_by(attr_micro_gid) %>% 
+        mutate(corner_mod = stat_mode(corner_mod)) %>% 
+        ungroup()
+    }
+  }
+  
+  if(!hasName(admap_cellwise_raw_asp,"corner_mod")){
+    admap_cellwise_raw_asp$corner_mod <- ""
+  }
+  
+  admap_cellwise_raw_asp$corner_mod <- stringr::str_replace(admap_cellwise_raw_asp$corner_mod,"corner_","")
+  
+  ##### attachment of corner mod end
+  #####
   
   ai_get_sync_names_for_attr_gid_splits(admap_cellwise_raw_asp)
   
@@ -65,15 +101,22 @@ ai_get_sync_names_for_attr_gid_splits <- function(admap_cellwise_raw){
   # @Dev
   # this can be avoided in case of single data block
   
-  admap_cellwise_raw <- admap_cellwise_raw %>% 
-    mutate(attr_micro_gid = paste(attr_gid, direction, attr_gid_split, sep = "_"))
-  
   dg <- admap_cellwise_raw %>% distinct(gid = data_gid, row = row_d, col = col_d)
   ag <- admap_cellwise_raw %>% distinct(attr_micro_gid, row = row_a, col = col_a, data_gid)
   
   dgb <- get_group_id_boundary(dg)
   ag <- ag %>% left_join(dgb, by = c("data_gid"="gid"))
   dag <- get_direction_df_nn(ag)
+  
+  ## this is potential fix for both sided header split case
+  corner_micro <- admap_cellwise_raw %>% distinct(attr_micro_gid, data_gid, corner_mod)
+  dag <- dag %>% inner_join(corner_micro, by = c("attr_micro_gid", "data_gid"))
+  dag <- dag %>% 
+    mutate(direction = ifelse(
+      nchar(corner_mod)>0,
+      paste0(direction, "_",corner_mod),
+      direction
+    ))
   
   dagmap <- dag %>% 
     group_by(attr_micro_gid, data_gid, direction) %>% 

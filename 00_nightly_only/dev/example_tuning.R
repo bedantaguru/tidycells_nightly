@@ -21,6 +21,8 @@ tf0 <- tf0 %>% numeric_values_classifier()
 tf0 <- tf0 %>% detect_table_block()
 tf0 %>% filter(Row = 1, Col = 1, keep= 5) -> xx
 
+tf0 %>% filter(Row = 46, Col = 3, keep= 5) -> xx
+
 tf0 %>% filter(col>12, row<100) ->xx
 
 tf0 %>%  filter(row>95) -> xx
