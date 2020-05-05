@@ -12,16 +12,12 @@ tictoc::toc()
 
 microbenchmark::microbenchmark(analyze_cells(tf0), times = 1)
 
+analyze_cells(tf0)->ca
 
 
 
 
 
-
-
-
-
-do_unknown_missing_values_adjustments <- !isTRUE(getOption("tidycells.analyze_cells_options")[["no_unknown_missing_values_adjustments"]])
 
 
 

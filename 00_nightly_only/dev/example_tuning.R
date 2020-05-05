@@ -43,6 +43,8 @@ name_suggest(d1, ca)
 
 f <- "00_nightly_only/dev/ABSSelfExplore/20490do001_2016.xls"
 
+d_abs <- readxl::read_excel(f, sheet = "Table_1.2", col_names = F, col_types = "text")
+
 d_abs <- readxl::read_excel(f, sheet = "Table_1.4", col_names = F, col_types = "text")
 
 d_abs <- d_abs %>% as_cell_df(take_col_names = F)
