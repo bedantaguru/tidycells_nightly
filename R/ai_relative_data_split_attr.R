@@ -13,24 +13,22 @@ ai_relative_data_split_attr <- function(basic_map, d_att, d_dat_bd) {
     done <- TRUE
     
     # in earlier stage : d_dat_bd <- get_group_id_boundary(d_dat)
+    # this is kept for specific case (see example file 20490do001_2016.xls@Table_1.1 with NA filled)
+    # the example (similar) included in master pattern
     
-    data_gids_those_are_ever_connected <- basic_map$map$data_gid[basic_map$map$attr_gid %in% chk$attr_gid] %>% unique()
+    data_gids_those_are_ever_connected <- 
+      basic_map$map[basic_map$map$attr_gid %in% chk$attr_gid, c("attr_gid","data_gid")] %>% 
+      distinct()
     
     rel_gids_revisited <- basic_map$raw %>% 
-      filter(attr_gid %in% chk$attr_gid, data_gid %in% data_gids_those_are_ever_connected)
-    
-    rel_gids_revisited_remap <- connect_data_and_attr_groups_from_raw_map(rel_gids_revisited)
+      inner_join(data_gids_those_are_ever_connected, by = c("attr_gid", "data_gid"))
     
     # information kept for missing link detection
     # mbc : missed_block_connections
     # used later
-    mbc <- rel_gids_revisited_remap$map %>% distinct(attr_gid, data_gid)
+    mbc <- data_gids_those_are_ever_connected %>% distinct(attr_gid, data_gid)
     
-    rel_gids_revisited_revised <- rel_gids_revisited %>% 
-      inner_join(mbc,
-                 by = c("attr_gid", "data_gid"))
-    
-    rel_gids <- rel_gids_revisited_revised
+    rel_gids <- rel_gids_revisited
     rel_gids <- rel_gids %>%
       mutate(new_attr_gid = paste(attr_gid, data_gid, direction, sep = "_"))
     
@@ -79,9 +77,12 @@ relative_gid_map_pattern_fix <- function(rel_gids, admap, d_dat_bd){
 
 relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids, admap, d_dat_bd){
   # When a single attr_gid is in both major direction group (in NS and WE)
-  # first split them into NS and WE type (both should include corners in same range as duplicate)
+  # first split them into NS and WE type 
+  # (both should include corners in same range as duplicate) 
+  # *** (but this duplicate is not serving any good) Hence
+  # duplicate part is absorbed into either direction (with rel_gids_WE)
   # if any_corner is left which is out of same range will be mapped as corner
- 
+  
   chk <- rel_gids$direction_group %>% unique()
   chk <- ("NS" %in% chk) & ("WE" %in% chk)
   out_done <- F
@@ -108,10 +109,24 @@ relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids, admap, d_dat_b
         d_att_dgs_WE, enclosure_direction = "col", details = T
       )$enclosure_induced_gid_boundary
       
-      rel_gids_NS <- rel_gids %>% 
-        filter(row <= d_att_dgs_NS_encl$r_max, row >= d_att_dgs_NS_encl$r_min)
+      
       rel_gids_WE <- rel_gids %>% 
         filter(col <= d_att_dgs_WE_encl$c_max, col >= d_att_dgs_WE_encl$c_min)
+      
+      rel_gids_NS <- rel_gids %>% 
+        filter(row <= d_att_dgs_NS_encl$r_max, row >= d_att_dgs_NS_encl$r_min) %>% 
+        anti_join(rel_gids_WE, by = c("row", "col"))
+      
+      common_knowledge(
+        attr_ori_pre_tag = rel_gids_NS %>% 
+          distinct(attr_gid, row_a = row, col_a = col, ori_pre_tag = "NS") %>% 
+          bind_rows(
+            rel_gids_WE %>% 
+              distinct(attr_gid, row_a = row, col_a = col, ori_pre_tag = "WE")
+          )
+      )
+      
+      
       
       rel_gids_rest <- rel_gids %>% 
         anti_join(rel_gids_NS, by = c("row","col")) %>% 
@@ -124,8 +139,14 @@ relative_gid_map_pattern_fix_for_a_attr_gid <- function(rel_gids, admap, d_dat_b
                            ungroup())
       }
       
-      out_NS <- relative_gid_map_pattern_fix_for_a_attr_gid_in_dirgrp(rel_gids_NS, admap, d_dat_bd)
-      out_WE <- relative_gid_map_pattern_fix_for_a_attr_gid_in_dirgrp(rel_gids_WE, admap, d_dat_bd)
+      out_NS <- out_WE <- NULL
+      if(nrow(rel_gids_NS)>0){
+        out_NS <- relative_gid_map_pattern_fix_for_a_attr_gid_in_dirgrp(rel_gids_NS, admap, d_dat_bd)
+      }
+      
+      if(nrow(rel_gids_WE)>0){
+        out_WE <- relative_gid_map_pattern_fix_for_a_attr_gid_in_dirgrp(rel_gids_WE, admap, d_dat_bd)
+      }
       out <- out_NS %>% bind_rows(out_WE) %>% distinct()
       out_done <- T
     }

@@ -9,8 +9,9 @@ plot_cell_df_ggplot2 <- function(d,
                                  background = NULL,
                                  shrink = TRUE, 
                                  shrink_length = 20, 
-                                 draw_grid = T,
-                                 numeric_cols = F, ...) {
+                                 draw_grid = F,
+                                 numeric_cols = F, 
+                                 no_legend = F, ...) {
   
   if (missing(fill)) {
     if(hasName(d, "type")){
@@ -123,10 +124,12 @@ plot_cell_df_ggplot2 <- function(d,
     if(!is.null(background)){
       d_r <- c(d$row, background$row) %>% range()
       d_c <- c(d$col, background$col) %>% range()
+      
     }else{
       d_r <- d$row %>% range()
       d_c <- d$col %>% range()
     }
+    
     
     d_r <- seq(from = d_r[1], to = d_r[2], by = 1)
     d_c <- seq(from = d_c[1], to = d_c[2], by = 1)
@@ -140,18 +143,26 @@ plot_cell_df_ggplot2 <- function(d,
     }
     
     
-    drcname <- tibble(txt = c_AA_names, col = d_c, row = d_r[1]-1) %>% 
+    drcname <- tibble(txt = c_AA_names, col = d_c, row = d_r[1]-1.3) %>% 
       bind_rows(
-        tibble(txt = as.character(d_r), col = d_c[1]-1, row = d_r)
+        tibble(txt = as.character(d_r), col = d_c[1]-0.7, row = d_r)
       )
     
+    
+    
     g <- g + 
-      ggplot2::geom_vline(xintercept = d_cm, color = "#42706D40", lwd = 0.5) +
-      ggplot2::geom_hline(yintercept = d_rm, color = "#42706D20", lwd = 0.5) +
+      ggplot2::geom_vline(xintercept = c(0.1,d_cm), color = "#42706D40", lwd = 0.5) +
+      ggplot2::geom_hline(yintercept = c(1,d_rm), color = "#42706D20", lwd = 0.5) +
       ggplot2::geom_text(data = drcname, 
                          mapping = ggplot2::aes(col, -row, label = txt), 
-                         color = "#11752EA0", size = 2,
-                         inherit.aes = F)
+                         color = "#11752EA0", size = 3,
+                         inherit.aes = F)+
+      ggplot2::scale_y_continuous(limits = range(c(1,d_rm)), expand = c(0, 0)) +
+      ggplot2::scale_x_continuous(limits = range(c(0.1,d_cm)), expand = c(0, 0))
+  }
+  
+  if(no_legend){
+    g <- g + ggplot2::theme(legend.position = "none")
   }
   
   if (!no_plot) {
