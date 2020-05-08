@@ -1,6 +1,10 @@
 
 
-intra_block_dist <- function(cd, method = c("hybrid", "real", "approx"), nearby_threshold = 5){
+intra_block_dist <- function(
+  cd, 
+  method = c("hybrid", "real", "approx", "joinable_only"), 
+  nearby_threshold = 5
+){
   method <- match.arg(method)
   
   if("with_table_blocks" %in% state(cd)){
@@ -25,6 +29,7 @@ intra_block_dist <- function(cd, method = c("hybrid", "real", "approx"), nearby_
 # helper function to approx_intra_block_dist_part1_get_upper_dist
 # a generic concept similar to this
 # https://stackoverflow.com/a/26178015/2694407
+# this can be slower as it is not vectorised
 rect_dist <- function(r1m, c1m, r1M, c1M, r2m, c2m, r2M, c2M){
   
   left <- c2M < c1m
@@ -134,3 +139,26 @@ hybrid_intra_block_dist <- function(cd, nearby_threshold = 5){
   da_rest <- da %>% filter(d>nearby_threshold)
   bind_rows(da_rest,dr)
 }
+
+
+### this approach does not look for all possible
+joinable_only_intra_block_dist <- function(cd){
+  cd <- cd %>% as_tibble()
+  dr <- get_raw_map_for_ai_get_data_attr_map(
+    get_group_id_boundary(cd),
+    cd
+  )
+  drm <- dr %>% 
+    group_by(g1 = attr_gid, g2 = data_gid) %>% 
+    summarise(d = min(dist)) %>% 
+    ungroup()
+  
+  drm <- drm %>% 
+    mutate(gid1 = pmin(g1, g2), gid2 = pmax(g1, g2)) %>% 
+    group_by(gid1, gid2) %>% 
+    summarise(d = min(d)) %>% 
+    ungroup()
+  
+  drm
+}
+
