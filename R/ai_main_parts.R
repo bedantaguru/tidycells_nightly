@@ -42,24 +42,30 @@ ai_main_part_phase_0_pre_process <- function(d){
     abort("No `attribute` cells found")
   }
   
+  
+  # clean common knowledge
+  common_knowledge(clean = T)
+  
   # Check for angular_sides_stats
   
+  #@Dev
+  # link with overview
   ass <- angular_sides_stats(d)
   if(!ass$well_sided){
     if(!("with_table_blocks" %in% state(d))){
-      message(paste("Looks like there are multiple tables / attributes in varied directions",
+      msg_once(paste("Looks like there are multiple tables / attributes in varied directions",
                     "Check if everything looks ok. You may use detect_table_block", sep = "\n"))
       # @Dev make this adjustment optional by options
-      d <- d %>% detect_table_block() %>%  mutate(join = 5)
+      d <- d %>% detect_table_block() %>% mutate(join = 5)
+      common_knowledge(dummy_gid = F)
     }
   }
   
   if(!hasName(d,"gid")){
     d$gid <- "dummy"
+    common_knowledge(dummy_gid = T)
   }
   
-  # clean common knowledge
-  common_knowledge(clean = T)
   common_knowledge(this_cell_df = d)
   
   
@@ -75,11 +81,16 @@ ai_main_part_phase_0_pre_process <- function(d){
 # - dimention_analysis
 ai_main_part_phase_1_admap <- function(d_dat, d_att) {
 
+  
+  possible_table_gid_interaction(d_dat, d_att)
+  
   d_dat_bd <- get_group_id_boundary(d_dat)
+  
   #  start with simple attr data map
   admap0 <- ai_get_data_attr_map(
     dat_boundary = d_dat_bd,
-    att_gid_map = d_att
+    att_gid_map = d_att,
+    tune_for_table_gid_interaction = T
   )
 
 

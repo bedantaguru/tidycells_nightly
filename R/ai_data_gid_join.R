@@ -118,7 +118,12 @@ update_non_joinable_data_gid <- function(njdg, link_tuned_gid_map){
 
 get_possible_data_gid_mergeable <- function(d_dat){
   
-  dg_sides <- ai_get_data_attr_map(get_group_id_boundary(d_dat), d_dat)$map
+  dg_sides <- ai_get_data_attr_map(
+    dat_boundary = get_group_id_boundary(d_dat), 
+    # used for connection only
+    att_gid_map = d_dat, 
+    tune_for_table_gid_interaction = T, 
+    tune_for_table_gid_interaction_mode = "data_mask")$map
   
   dg_sides <- dg_sides %>%  rename(g1 = data_gid, g2 =attr_gid) %>% filter(g1!=g2)
   

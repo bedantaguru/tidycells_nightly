@@ -3,12 +3,23 @@
 ai_get_data_attr_map <- function(dat_boundary,
                                  att_gid_map,
                                  attr_to_near_data = FALSE, 
-                                 leave_inside = FALSE, ...) {
+                                 leave_inside = FALSE, 
+                                 tune_for_table_gid_interaction = F,
+                                 tune_for_table_gid_interaction_mode = c("normal","data_mask"), ...) {
 
+  tune_for_table_gid_interaction_mode <-  match.arg(tune_for_table_gid_interaction_mode)
   # check relative location of each attr_gid (gid) wrt each data_gid
   d_att_map <- get_raw_map_for_ai_get_data_attr_map(dat_boundary, att_gid_map, leave_inside)
 
-
+  if(tune_for_table_gid_interaction){
+    if(tune_for_table_gid_interaction_mode=="data_mask"){
+      # this is to be used inside data_gid joins only
+      # att_gid_map is actually data_gid in that case
+      possible_table_gid_interaction(att_gid_map, att_gid_map)
+    }
+    d_att_map <- tune_admap_for_possible_table_gid_interaction(d_att_map)
+  }
+  
   #  connect data and attr gids based on above raw map
   connect_data_and_attr_groups_from_raw_map(d_att_map, 
                                             attr_to_near_data = attr_to_near_data, 
