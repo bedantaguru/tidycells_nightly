@@ -105,8 +105,10 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
                                      value = range(cd$col), step = 1L),
                          checkboxInput("no_txt", label = "No text", value = T),
                          checkboxInput("no_legend", label = "No Legend", value = F),
-                         sliderInput("txt_size", "Text Size", min = 1, max = 8, value = 4, step = 0.5),
-                         sliderInput("txt_angle", "Text Angle", min = 0, max = 90, value = 0, step = 15),
+                         checkboxInput("draw_grid", label = "Draw Grid", value = F),
+                         conditionalPanel("input.no_txt == false",
+                                          sliderInput("txt_size", "Text Size", min = 1, max = 8, value = 4, step = 0.5),
+                                          sliderInput("txt_angle", "Text Angle", min = 0, max = 90, value = 0, step = 15)),
                          checkboxInput("zoom", label = "Zoom", value = F)),
                      
                      div(style = "float: left; margin: 5px;",
@@ -427,6 +429,30 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
         cr <- range(cd0$col)
       }
       
+      isolate(admapf0 <- admap_filtered())
+      admapf0 <- admapf0 %>% distinct(row = row_a, col =col_a) %>% 
+        bind_rows(
+          admapf0 %>% distinct(row = row_d, col =col_d)
+        )
+      
+      bg_fixed <- plot_cell_df_ggplot2(background = cd %>% 
+                                         filter(row <= rr[2], row >= rr[1],
+                                                col <= cr[2], col >= cr[1]), 
+                                       background_only = T, 
+                                       background_color = "black", background_alpha = 0.001,
+                                       background_line_type = 2)
+      
+      bg1 <- plot_cell_df_ggplot2(background = admap_flat %>%  
+                                    filter(row <= rr[2], row >= rr[1],
+                                           col <= cr[2], col >= cr[1]), background_only = T, 
+                                  background_color = "yellow", background_alpha = 0.08)
+      
+      bg2 <- plot_cell_df_ggplot2(background = admapf0 %>% 
+                                    filter(row <= rr[2], row >= rr[1],
+                                           col <= cr[2], col >= cr[1]), background_only = T, 
+                                  background_color = "green", background_alpha = 0.05)
+      
+      
       cd0 %>% 
         filter(row <= rr[2], row >= rr[1],
                col <= cr[2], col >= cr[1]) %>% 
@@ -434,9 +460,8 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
                              txt_size = input$txt_size,
                              txt_angle = input$txt_angle,
                              no_legend = isTRUE(input$no_legend),
-                             background = cd %>% 
-                               filter(row <= rr[2], row >= rr[1],
-                                      col <= cr[2], col >= cr[1]), 
+                             draw_grid = input$draw_grid,
+                             background = list(bg_fixed, bg1, bg2), 
                              no_plot = T) -> g
       g
     })
@@ -456,12 +481,17 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
         }
       }
       
+      dt <- dt %>% dplyr::mutate_if(is.character, as.factor)
+      
       datatable(dt,
                 selection = "none",
                 escape = FALSE,
                 rownames = FALSE,
                 style = "bootstrap",
                 class = "cell-border stripe",
+                filter = list(
+                  position = 'top', clear = TRUE
+                ),
                 extensions = c("KeyTable", "Scroller", "Buttons"),
                 options = list(
                   pageLength = 5,

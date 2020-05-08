@@ -3,15 +3,61 @@
 plot_cell_df_ggplot2 <- function(d, 
                                  fill,
                                  no_fill = FALSE,
-                                 adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, txt_angle = 0,
+                                 adaptive_txt_size = TRUE, 
+                                 txt_size = 3, txt_alpha = 1, no_txt = NULL, txt_angle = 0,
                                  no_plot = FALSE,
                                  fill_alpha = 1,
                                  background = NULL,
+                                 background_only = F, 
+                                 background_color = "black",
+                                 background_alpha = 0.1,
+                                 background_line_type = 1,
                                  shrink = TRUE, 
                                  shrink_length = 20, 
                                  draw_grid = F,
                                  numeric_cols = F, 
                                  no_legend = F, ...) {
+  
+  if(is.null(no_txt)){
+    # auto detect based on size
+    sz <- diff(range(d$row))*diff(range(d$col))
+    if(sz>100){
+      no_txt <- T
+    }else{
+      no_txt <- F
+    }
+  }
+  
+  # process backgroud
+  bg_proto <- NULL
+  bg_proto_is_list <- F
+  if(!is.null(background)){
+    if(hasName(background,"row") & hasName(background,"col")){
+      bg_proto <- ggplot2::geom_tile(data = background, mapping = ggplot2::aes(col, -row),
+                                     color = "#00000036", na.rm = TRUE, width = 1, height = 1, inherit.aes = F, 
+                                     fill = background_color, alpha = background_alpha, lty = background_line_type)
+    }else{
+      if(inherits(background, "ggproto") & inherits(background, "Layer")){
+        bg_proto <- background
+      }else{
+        if(is.list(background)){
+          
+          if(!inherits(background[[1]], "ggproto")) abort("background (list) must be a list of layers")
+          
+          bg_proto_is_list <- T
+          bg_proto <- background
+          
+        }else{
+          abort("background must be a cell_df (or at least rc_df) or Layer(of ggplot2) or a list of the same")
+        }
+      }
+    }
+  }
+  
+  if(background_only & !is.null(background)){
+    return(bg_proto)
+  }
+  
   
   if (missing(fill)) {
     if(hasName(d, "type")){
@@ -71,14 +117,13 @@ plot_cell_df_ggplot2 <- function(d,
       
     }
     
-    if(!is.null(background)){
-      if(is_cell_df(background)){
-        g <- g +
-          ggplot2::geom_tile(data = background, mapping = ggplot2::aes(col, -row),
-                             color = "#00000036", na.rm = TRUE, width = 1, height = 1, inherit.aes = F, 
-                             fill = "black", alpha = 0.1)
+    if(!is.null(bg_proto)){
+      if(bg_proto_is_list){
+        for(pp in bg_proto){
+          g <- g + pp
+        }
       }else{
-        abort("background must be a cell_df")
+        g <- g + bg_proto
       }
     }
     

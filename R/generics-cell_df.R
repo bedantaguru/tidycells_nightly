@@ -133,7 +133,7 @@ plot.cell_df <- function(x, ...,
                          fill,
                          # ggplot2 specific
                          no_fill = FALSE,
-                         adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = FALSE, 
+                         adaptive_txt_size = TRUE, txt_size = 3, txt_alpha = 1, no_txt = NULL, 
                          fill_alpha = 1,
                          background = NULL,
                          # common
@@ -315,8 +315,8 @@ calc_meta_intra_block_dist_for_tf <- function(x, fresh = FALSE){
     return(lm)
   }
   
-  # nearby_threshold sqrt(2) gives corner cases and 1.9 is upper value than that
-  intra_block_dist(x, nearby_threshold = 1.9)
+  # nearby_threshold sqrt(2) gives corner cases and 1.5 is upper value than that
+  intra_block_dist(x, method = "hybrid", nearby_threshold = 1.5)
   
 }
 
@@ -422,8 +422,8 @@ mutate.cell_df <- function(.data, ..., direct = FALSE, join = 0, join_table_bloc
       new_gid_map <- xmeta_this %>% select(gid = gid1, new_gid = mgid) %>% 
         bind_rows(xmeta_this %>% select(gid = gid2, new_gid = mgid)) %>% unique() 
       
-      dthis <- get_group_id_join_gids(old_group_id_info = list(group_id_map = dthis), 
-                                      gid_map = new_gid_map, no_group_boundary = TRUE)$group_id_map
+      dthis <- get_group_id_join_gids(old_group_id_info = dthis, 
+                                      gid_map = new_gid_map)
       
       dout <- new_cell_df(dthis, minimal = TRUE)
     }

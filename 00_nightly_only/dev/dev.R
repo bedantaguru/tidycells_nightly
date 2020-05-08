@@ -2,7 +2,15 @@
 ##################################################################
 ##################################################################
 
+
+
+
+
+
+##################################################################
+##################################################################
 rm(list = setdiff(ls(), "tf0"))
+
 
 tictoc::tic()
 #analyze_cells(tf0)
@@ -16,10 +24,67 @@ analyze_cells(tf0)->ca
 
 
 
+d_gid_att_map_min_d_t2 <- d_gid_att_map %>%
+  group_by(data_gid, direction, direction_group) %>%
+  filter(dist == min(dist)) %>%
+  ungroup() 
+
+# for the data_gid having two sides (like N and S) in non-corner case
+# if there is any other data_gid having less dist in same direction
+# the connection is deleted
+
+data_gid_duals <- d_gid_att_map_min_d_t2 %>% 
+  filter(direction_group=="NS"|direction_group=="WE") %>% 
+  group_by(data_gid, direction_group) %>% 
+  mutate(ndir = n_distinct(direction)) %>% 
+  ungroup() %>% 
+  filter(ndir>1)
+
+attr_mdist_for_duals <- d_gid_att_map_min_d_t2 %>% 
+  filter(attr_gid %in% data_gid_duals$attr_gid) %>% 
+  group_by(attr_gid, direction_group) %>% 
+  summarise(a_m_dist = min(dist)) %>% 
+  ungroup()
 
 
+data_gid_duals <- data_gid_duals %>% 
+  inner_join(attr_mdist_for_duals,
+             by = c("attr_gid", "direction_group"))
+
+# it will discard many
+data_gid_duals_invalids <- data_gid_duals %>% filter(dist>a_m_dist)
+
+# so here is adjustment
+# 1st those who are loosing all in each direction grp
+data_gid_duals_invalids_duals <- data_gid_duals_invalids %>% 
+  group_by(data_gid, direction_group) %>% 
+  mutate(ndir = n_distinct(direction)) %>% 
+  ungroup() %>% 
+  filter(ndir>1)
+
+# each data_gid would try to connect near attr for each dir grp
+data_gid_duals_valids <-data_gid_duals %>% 
+  filter(data_gid %in% data_gid_duals_invalids_duals$data_gid) %>% 
+  group_by(data_gid, direction_group) %>% 
+  filter(dist == min(dist)) %>% 
+  ungroup()
 
 
+data_gid_duals_invalids <- data_gid_duals_invalids %>% 
+  group_by(data_gid, direction_group) %>% 
+  filter(dist == max(dist)) %>% 
+  ungroup()
+
+# logic 
+# dir_var is variance in directino group hist for a attribute
+# most_dir_grp  is most frequent dir group
+# if a attr is ever NS or WE then that will never become corner
+attr_cls <- d_gid_att_map_min_d_t2 %>% 
+  count(attr_gid, direction_group)
+attr_cls <- attr_cls %>% 
+  group_by(attr_gid) %>% 
+  summarise(dir_var = var(n), most_dir_grp = direction_group[which.max(n)]) %>% 
+  mutate(dir_var = ifelse(is.na(dir_var), 0, dir_var))
 
 
 ####
@@ -166,48 +231,48 @@ microbenchmark::microbenchmark("e"=admap %>%
 
 
 # type = 2 is fast
-expand_df <- function(d1, d2, type = 1){
-  out <- NULL
-  
-  if(type == 1){
-    d1 <- d1 %>% mutate(dummy = 1)
-    d2 <- d2 %>% mutate(dummy = 1)
-    out <- inner_join(d1, d2, by = "dummy") %>% select(-dummy)
-  }
-  
-  if(type > 1){
-    
-    n1 <- nrow(d1)
-    n2 <- nrow(d2)
-    if(type==3){
-      expnd <- list(r1 = rep(seq(n1), times = n2), r2 = rep(seq(n2), each = n1))
-    }else{
-      expnd <- expand.grid(r1 = seq(n1), r2 = seq(n2), KEEP.OUT.ATTRS = F, stringsAsFactors = F)
-    }
-    dexp1 <- d1[expnd$r1,]
-    dexp2 <- d2[expnd$r2,]
-    # cbind is faster than dplyr:bind_cols
-    out <- cbind(dexp1, dexp2)
-  }
-  
-  
-  class(out) <- c("tbl_df", "tbl", "data.frame")
-  out
-}
-
-expand_df2 <- function(d1, d2){
-  
-  n1 <- nrow(d1)
-  n2 <- nrow(d2)
-  expnd <- expand.grid(r1 = seq(n1), r2 = seq(n2), KEEP.OUT.ATTRS = F, stringsAsFactors = F)
-  dexp1 <- d1[expnd$r1,]
-  dexp2 <- d2[expnd$r2,]
-  # cbind is faster than dplyr:bind_cols
-  out <- cbind(dexp1, dexp2)
-  
-  class(out) <- c("tbl_df", "tbl", "data.frame")
-  out
-}
+# expand_df <- function(d1, d2, type = 1){
+#   out <- NULL
+#   
+#   if(type == 1){
+#     d1 <- d1 %>% mutate(dummy = 1)
+#     d2 <- d2 %>% mutate(dummy = 1)
+#     out <- inner_join(d1, d2, by = "dummy") %>% select(-dummy)
+#   }
+#   
+#   if(type > 1){
+#     
+#     n1 <- nrow(d1)
+#     n2 <- nrow(d2)
+#     if(type==3){
+#       expnd <- list(r1 = rep(seq(n1), times = n2), r2 = rep(seq(n2), each = n1))
+#     }else{
+#       expnd <- expand.grid(r1 = seq(n1), r2 = seq(n2), KEEP.OUT.ATTRS = F, stringsAsFactors = F)
+#     }
+#     dexp1 <- d1[expnd$r1,]
+#     dexp2 <- d2[expnd$r2,]
+#     # cbind is faster than dplyr:bind_cols
+#     out <- cbind(dexp1, dexp2)
+#   }
+#   
+#   
+#   class(out) <- c("tbl_df", "tbl", "data.frame")
+#   out
+# }
+# 
+# expand_df2 <- function(d1, d2){
+#   
+#   n1 <- nrow(d1)
+#   n2 <- nrow(d2)
+#   expnd <- expand.grid(r1 = seq(n1), r2 = seq(n2), KEEP.OUT.ATTRS = F, stringsAsFactors = F)
+#   dexp1 <- d1[expnd$r1,]
+#   dexp2 <- d2[expnd$r2,]
+#   # cbind is faster than dplyr:bind_cols
+#   out <- cbind(dexp1, dexp2)
+#   
+#   class(out) <- c("tbl_df", "tbl", "data.frame")
+#   out
+# }
 
 
 inner_join(a, d, by = "dummy") %>% select(-dummy)

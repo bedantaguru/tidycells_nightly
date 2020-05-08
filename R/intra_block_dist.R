@@ -2,8 +2,8 @@
 
 intra_block_dist <- function(
   cd, 
-  method = c("hybrid", "real", "approx", "joinable_only"), 
-  nearby_threshold = 5
+  method = c("hybrid", "real", "approx"), 
+  nearby_threshold = 1.9
 ){
   method <- match.arg(method)
   
@@ -26,74 +26,27 @@ intra_block_dist <- function(
 
 # helpers and raw functions
 
-# helper function to approx_intra_block_dist_part1_get_upper_dist
-# a generic concept similar to this
-# https://stackoverflow.com/a/26178015/2694407
-# this can be slower as it is not vectorised
-rect_dist <- function(r1m, c1m, r1M, c1M, r2m, c2m, r2M, c2M){
-  
-  left <- c2M < c1m
-  right <- c1M < c2m   
-  top <- r2M < r1m
-  bottom <- r1M < r2m
-  
-  if(top & left){
-    return(sqrt((r2M-r1m)^2+(c2M-c1m)^2))
-  }
-  
-  if(top & right){
-    return(sqrt((r2M-r1m)^2+(c1M-c2m)^2))
-  }
-  
-  if(bottom & left){
-    return(sqrt((r1M-r2m)^2+(c2M-c1m)^2))
-  }
-  
-  if(bottom & right){
-    return(sqrt((r1M-r2m)^2+(c1M-c2m)^2))
-  }
-  
-  if(left){
-    return(c1m-c2M)
-  }
-  
-  if(right){
-    return(c2m-c1M)
-  }
-  
-  if(top){
-    return(r1m-r2M)
-  }
-  
-  if(bottom){
-    return(r2m-r1M)
-  }
-  
-  return(0)
-  
-}
-
-# helper for approx_intra_block_dist
-approx_intra_block_dist_part1_get_upper_dist <- function(gid_this, bdrs){
-  guppers <- bdrs %>% filter(gid > gid_this)
-  ## Note
-  # this check is not required if following is ensured
-  # gids <- sort(bdrs$gid)
-  # gids[-length(gids)]
-  ## -->if(nrow(guppers)==0) return(tibble())
-  gthis <- bdrs %>% filter(gid == gid_this)
-  guppers %>% dplyr::rowwise() %>% mutate(d = rect_dist(gthis$rm, gthis$cm, gthis$rM, gthis$cM, rm, cm, rM, cM)) %>% 
-    ungroup() %>% mutate(gid1 = gid_this) %>% select(gid1, gid2 = gid, d)
-}
-
 ### dist based on gid boundary
 # fastest of three lacks accuracy
 approx_intra_block_dist <- function(cd){
-  bdrs <- cd %>% group_by(gid) %>% summarise(rm = min(row), cm = min(col), rM = max(row), cM =max(col))
-  gids <- sort(bdrs$gid)
-  gids[-length(gids)] %>% map_df(approx_intra_block_dist_part1_get_upper_dist, bdrs)
+  cd <- cd %>% as_tibble()
+  dr <- get_raw_map_for_ai_get_data_attr_map(
+    get_group_id_boundary(cd),
+    cd
+  )
+  drm <- dr %>% 
+    group_by(g1 = attr_gid, g2 = data_gid) %>% 
+    summarise(d = min(dist)) %>% 
+    ungroup()
+  
+  drm <- drm %>% 
+    mutate(gid1 = pmin(g1, g2), gid2 = pmax(g1, g2)) %>% 
+    group_by(gid1, gid2) %>% 
+    summarise(d = min(d)) %>% 
+    ungroup()
+  
+  drm
 }
-
 
 ### this is a real dist as per def of it for any cell df with gid
 # can be used in another module too
@@ -138,27 +91,5 @@ hybrid_intra_block_dist <- function(cd, nearby_threshold = 5){
   dr <- dr %>% dplyr::rowwise() %>% mutate(d = get_intra_block_dist(gid1, gid2, cd)) %>% ungroup()
   da_rest <- da %>% filter(d>nearby_threshold)
   bind_rows(da_rest,dr)
-}
-
-
-### this approach does not look for all possible
-joinable_only_intra_block_dist <- function(cd){
-  cd <- cd %>% as_tibble()
-  dr <- get_raw_map_for_ai_get_data_attr_map(
-    get_group_id_boundary(cd),
-    cd
-  )
-  drm <- dr %>% 
-    group_by(g1 = attr_gid, g2 = data_gid) %>% 
-    summarise(d = min(dist)) %>% 
-    ungroup()
-  
-  drm <- drm %>% 
-    mutate(gid1 = pmin(g1, g2), gid2 = pmax(g1, g2)) %>% 
-    group_by(gid1, gid2) %>% 
-    summarise(d = min(d)) %>% 
-    ungroup()
-  
-  drm
 }
 
