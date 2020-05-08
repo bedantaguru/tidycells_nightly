@@ -2,6 +2,17 @@
 ##################################################################
 ##################################################################
 
+# new_gid_map
+
+# link tune
+
+
+
+
+
+
+analyze_cells
+
 
 
 
@@ -9,6 +20,15 @@
 
 ##################################################################
 ##################################################################
+
+new_gid_map %>% 
+  distinct(data_gid = gid, attr_gid = new_gid)  %>% 
+  shiny_admap_display(
+    d_dat = tf0 %>% as_tibble() %>% distinct(gid, row, col), 
+    d_att = tf0 %>% as_tibble() %>% distinct(gid, row, col)
+  )
+
+
 rm(list = setdiff(ls(), "tf0"))
 
 

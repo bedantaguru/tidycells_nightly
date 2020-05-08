@@ -42,8 +42,26 @@ ai_main_part_phase_0_pre_process <- function(d){
     abort("No `attribute` cells found")
   }
   
+  # Check for angular_sides_stats
+  
+  ass <- angular_sides_stats(d)
+  if(!ass$well_sided){
+    if(!("with_table_blocks" %in% state(d))){
+      message(paste("Looks like there are multiple tables / attributes in varied directions",
+                    "Check if everything looks ok. You may use detect_table_block", sep = "\n"))
+      # @Dev make this adjustment optional by options
+      d <- d %>% detect_table_block() %>%  mutate(join = 5)
+    }
+  }
+  
+  if(!hasName(d,"gid")){
+    d$gid <- "dummy"
+  }
+  
   # clean common knowledge
   common_knowledge(clean = T)
+  common_knowledge(this_cell_df = d)
+  
   
   d_dat <- get_group_id(data_cells, gid_tag = "d")
   d_att <- get_group_id(attr_cells, gid_tag = "a")

@@ -134,7 +134,79 @@ boundary_cells_part <- function(dg){
 
 # gid map need to tune for multiple maps
 # thi enables it in a one go (gid merges)
-gid_map_link_tune <- function(gid_map){
+gid_map_link_tune <- function(gid_map, algo = c("vect","exact")){
+  algo <- match.arg(algo)
+  
+  if(algo=="exact"){
+    
+    repeat({
+      
+      gid_map_new<- gid_map_link_tune_single_iter(gid_map)
+      if(identical(gid_map$new_gid, gid_map_new$new_gid)){
+        break()
+      }
+      gid_map <- gid_map_new
+    })
+    
+    return(gid_map)
+    
+  }else{
+    
+    ngm <- gid_map %>% 
+      mutate(g = pmax(gid, new_gid), ng = pmin(gid, new_gid)) %>% 
+      distinct(gid = g, new_gid = ng) %>% 
+      filter(gid>new_gid) 
+    
+    ngm <- gid_map_link_tune_re_norm(ngm)
+    
+    repeat({
+      ngml <- gid_map_link_tune_level_down(ngm)
+      if(ngml$further){
+        ngm <- ngml$ngm_now
+      }else{
+        break()
+      }
+    })
+    
+    return(ngm)
+    
+  }
+  
+}
+
+gid_map_link_tune_re_norm <- function(ngm){
+  ngm %>% 
+    split(.$gid) %>% 
+    map_df(~tibble(gid = c(.x$gid[1], .x$new_gid)) %>% 
+             mutate(new_gid= min(gid))) %>% 
+    distinct()
+}
+
+gid_map_link_tune_level_down <- function(ngm){
+  
+  ngm2 <- ngm %>% 
+    left_join(ngm, by = c("new_gid"="gid"), suffix = c("", "2")) %>% 
+    mutate(new_gid2 = ifelse(is.na(new_gid2), new_gid, new_gid2)) %>% 
+    filter(new_gid2<=new_gid) 
+  
+  ngm2 <- ngm2 %>% distinct(gid, new_gid = new_gid2)
+  
+  ngm2 <- gid_map_link_tune_re_norm(ngm2)
+  
+  c1 <- ngm$new_gid %>% unique() %>% sort()
+  c2 <- ngm2$new_gid %>% unique() %>% sort()
+  
+  if(identical(c1,c2)){
+    outt <- F
+  }else{
+    outt <- T
+  }
+  
+  list(further = outt, ngm_now = ngm2)
+}
+
+
+gid_map_link_tune_single_iter <- function(gid_map){
   grps <- list()
   
   if(nrow(gid_map) > 0){

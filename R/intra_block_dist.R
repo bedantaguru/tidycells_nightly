@@ -7,7 +7,7 @@ intra_block_dist <- function(
 ){
   method <- match.arg(method)
   
-  if("with_table_blocks" %in% state(cd)){
+  if(!("with_table_blocks" %in% state(cd))){
     cd <- detect_table_block(cd)
   }
   

@@ -18,12 +18,17 @@ plot_cell_df_ggplot2 <- function(d,
                                  numeric_cols = F, 
                                  no_legend = F, ...) {
   
-  if(is.null(no_txt)){
-    # auto detect based on size
-    sz <- diff(range(d$row))*diff(range(d$col))
-    if(sz>100){
-      no_txt <- T
+  if(is.null(no_txt) ){
+    if(!missing(d)){
+      # auto detect based on size
+      sz <- diff(range(d$row))*diff(range(d$col))
+      if(sz>100){
+        no_txt <- T
+      }else{
+        no_txt <- F
+      }
     }else{
+      # just set 
       no_txt <- F
     }
   }

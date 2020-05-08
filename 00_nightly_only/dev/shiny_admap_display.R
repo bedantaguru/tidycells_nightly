@@ -414,7 +414,6 @@ shiny_admap_display <- function(admap, cd, d_dat, d_att){
     })
     
     output$plot_admap <- renderPlot({
-      
       cd0 <- cdf()
       if(is.null(cd0$gid)){
         cd0$gid <- "1"
